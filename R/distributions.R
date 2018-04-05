@@ -14,7 +14,7 @@
 #' @param ylabel string type
 #' @param perc boolean type. True if data's axis is a percentage
 #' proportion (instead of 0-1) only used if length(sampleNames) == 1
-#' @param subtitle string type
+#' @param subs string type
 #' @param sorted boolean type. True if histogram should be sorted in descending
 #' order
 #' @param cutoff int type. Number of maximum ticks to show (x on vert plots,
@@ -24,7 +24,7 @@
 #'
 #' @examples
 .plotDist <- function(dataframes, sampleNames, plotTitle, vert = T,
-                      xlabel = "", ylabel = "", perc = T, subtitle = "",
+                      xlabel = "", ylabel = "", perc = T, subs = "",
                       sorted = T, cutoff = 15) {
     frames <- length(dataframes)
     # sanity check
@@ -180,7 +180,7 @@
     }
     g <- g + theme(text = element_text(size = 10)) +
         labs(title = plotTitle,
-             subtitle = subtitle,
+             subtitle = subs,
              x = xlabel,
              y = ylabel,
              caption = caps)
