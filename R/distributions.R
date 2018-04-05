@@ -1,4 +1,3 @@
-
 .plotDist <- function(dataframes, sampleNames, plotTitle, vert = T,
                       xlabel = "", ylabel = "", perc = T, subtitle = "",
                       sorted = T, cutoff = 15) {
