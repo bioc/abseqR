@@ -137,8 +137,7 @@
             df.union$y <- factor(df.union$y, levels = unique(df.union$y))
             g <- ggplot(df.union,
                         aes(x = y, y = x,
-                            label = sprintf(placeholder, x)))
-            + coord_flip()
+                            label = sprintf(placeholder, x))) + coord_flip()
         }
 
         if (frames == 1) {
@@ -265,3 +264,44 @@
     return(g)
 }
 
+
+#' Title Creates a box plot
+#'
+#' @import ggplot2
+#'
+#' @param dataframes list type. List of sample dataframes
+#' @param sampleNames vector type. 1-1 with dataframes
+#' @param plotTitle string type
+#' @param xlabel string type
+#' @param ylabel string type
+#' @param subs string type
+#'
+#' @return ggplot2 object
+.boxPlot <- function(dataframes, sampleNames, plotTitle,
+                     xlabel = "", ylabel = "", subs = "") {
+    frames <- length(dataframes)
+
+    if (length(sampleNames) != frames) {
+        stop(paste("Expected equal number of sample names and dataframes, got",
+                   length(sampleNames), "samples and", frames, "dataframes."))
+    }
+
+    # add samplename into new "sample" column
+    dataframes <- Map(cbind, dataframes, sample = sampleNames)
+
+    # merge
+    df.union <- do.call("rbind", dataframes)
+
+    if (frames == 1) {
+        g <- ggplot(df.union,
+                    aes(x = x, y = y)) +
+            geom_boxplot(varwidth = T, fill = BLUEHEX)
+    } else {
+        g <- ggplot(df.union, aes(x = sample, y = y)) +
+            geom_boxplot(varwidth = T, fill = BLUEHEX) +
+            facet_grid(~x) +
+            theme(axis.text.x = element_text(angle = 75, hjust = 1))
+    }
+    g <- g + labs(title = plotTitle, sutitle = subs, x = xlabel, y = ylabel)
+    return(g)
+}

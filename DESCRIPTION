@@ -19,3 +19,4 @@ Collate:
     'distributions.R'
     'abundanceAnalysis.R'
     'annotationAnalysis.R'
+    'diversityAnalysis.R'
