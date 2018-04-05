@@ -4,6 +4,8 @@
 #' y-values (or x if horizontal plot) labels on them.
 #' Use 'perc' to control if the values are percentages.
 #'
+#' @import ggplot2
+#'
 #' @param dataframes  list type. List of dataframes
 #' @param sampleNames vector type. 1-1 correspondence to dataframes.
 #' @param plotTitle string type.
@@ -19,25 +21,11 @@
 #' y on hori plots).
 #'
 #' @return ggplot2 object
-#' @export
 #'
 #' @examples
 .plotDist <- function(dataframes, sampleNames, plotTitle, vert = T,
                       xlabel = "", ylabel = "", perc = T, subtitle = "",
                       sorted = T, cutoff = 15) {
-    # Args:
-    #   dataframes:
-    #   sampleNames: A
-    #   plotTitle: A
-    #   vert: A
-    #   xlabel: A
-    #   ylabel: A string type.
-    #   perc:
-    #   subs: subtitle. defaults to empty
-    #   sortDist: sorts plot by descending distribution order, True by default
-    # Returns:
-    #   ggplot().
-    require(ggplot2)
     frames <- length(dataframes)
     # sanity check
     if (length(sampleNames) != frames) {
@@ -202,6 +190,9 @@
 
 #' Title Spectratype plotter
 #' @description Plots length distribution
+#'
+#' @import ggplot2
+#'
 #' @param dataframes list type. List of dataframes.
 #' @param sampleNames vector type. 1-1 correspondance with dataframes
 #' @param region string type. Region that will be displayed in the plot title.
@@ -213,7 +204,6 @@
 #' @param ylabel string type
 #'
 #' @return ggplot2 object
-#' @export
 #'
 #' @examples
 .plotSpectratype <- function(dataframes, sampleNames, region,
@@ -244,7 +234,7 @@
     # Can be reused for other length distributions E.G.: whole seq length
     subtitle <- paste(subtitle, paste(unlist(lapply(dataframes, function(x) {
         sum(x$count)
-        })), collapse = ", "), "sequences with")
+    })), collapse = ", "), "sequences with")
     if (!missing(region)) {
         plotTitle <- paste(region, "amino acid spectratype")
         plotSubTitle <- paste(subtitle ,"distribution of", region,
