@@ -1,4 +1,4 @@
-#' Title Abundance distribution
+#' Abundance distribution
 #'
 #' @import ggplot2
 #' @include util.R
@@ -48,7 +48,7 @@
     }
 }
 
-#' Title V-J association plot
+#' V-J association plot
 #'
 #' @import circlize
 #' @import RColorBrewer
@@ -103,7 +103,7 @@
 }
 
 
-#' Title
+#' Conducts abundance analysis
 #'
 #' @import ggplot2
 #' @include util.R

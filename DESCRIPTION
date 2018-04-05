@@ -20,3 +20,4 @@ Collate:
     'abundanceAnalysis.R'
     'annotationAnalysis.R'
     'diversityAnalysis.R'
+    'primerAnalysis.R'

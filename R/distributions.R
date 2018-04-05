@@ -186,7 +186,7 @@
 }
 
 
-#' Title Spectratype plotter
+#' Spectratype plotter
 #' @description Plots length distribution
 #'
 #' @import ggplot2
@@ -265,7 +265,7 @@
 }
 
 
-#' Title Creates a box plot
+#' Creates a box plot
 #'
 #' @import ggplot2
 #'

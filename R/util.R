@@ -66,7 +66,7 @@ V_HEIGHT_L <- 7.5
     return(paste0(toupper(firstLetter), rest))
 }
 
-#' Title Summary of dataframe
+#' Summary of dataframe
 #'
 #' @description Gives count, mean, standard deviation,
 #' standard error of the mean, and confidence interval (default 95%).

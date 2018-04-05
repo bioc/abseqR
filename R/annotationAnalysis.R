@@ -1,4 +1,4 @@
-#' Title Annotation analysis
+#' Annotation analysis
 #'
 #' @import ggplot2
 #' @include util.R
