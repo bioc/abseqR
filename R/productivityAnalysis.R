@@ -47,6 +47,7 @@
 #' Plots a distribution plot for different productivity analysis files
 #'
 #' @include util.R
+#' @include distributions.R
 #' @import ggplot2
 #'
 #' @param productivityDirectories vector type.
@@ -94,6 +95,7 @@
 #' Conducts productivty analysis
 #'
 #' @include util.R
+#' @include distributions.R
 #' @import ggplot2
 #'
 #' @param productivityDirectories list type. List of directories

@@ -41,6 +41,7 @@
 #' Conducts primer specificity analysis
 #'
 #' @include util.R
+#' @include distributions.R
 #' @import ggplot2
 #'
 #' @param primer5File string type. 5' end primer file

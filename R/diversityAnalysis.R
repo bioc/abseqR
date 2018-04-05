@@ -649,6 +649,7 @@
 #'
 #' @import ggplot2
 #' @include util.R
+#' @include distributions.R
 #'
 #' @param diversityDirectories list type. List of directories to diversity dir
 #' @param diversityOut string type. Output directory
