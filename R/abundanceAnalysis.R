@@ -2,14 +2,13 @@
 #'
 #' @import ggplot2
 #' @include util.R
+#' @include distributions.R
 #'
 #' @param files list type. list of files in abundance directory
 #' @param sampleNames vector type. 1-1 correspondance to files
 #' @param outputDir string type
 #'
 #' @return None
-#'
-#' @examples
 .abundancePlot <- function(files, sampleNames, outputDir) {
     for (expression in c("family", "gene")) {
         for (gene in c("v", "d", "j")) {
@@ -49,17 +48,15 @@
     }
 }
 
-#' Title
+#' Title V-J association plot
 #'
 #' @import circlize
 #' @import RColorBrewer
 #'
-#' @param sampleName
-#' @param path
+#' @param sampleName string type
+#' @param path string type
 #'
-#' @return
-#'
-#' @examples
+#' @return None
 .plotCirclize <- function(sampleName, path) {
     filename <- paste0(path, sampleName, "_vjassoc.csv")
 
@@ -110,16 +107,15 @@
 #'
 #' @import ggplot2
 #' @include util.R
+#' @include distributions.R
 #'
-#' @param abundanceDirectories
-#' @param abunOut
-#' @param sampleNames
-#' @param combinedNames
-#' @param mashedNames
+#' @param abundanceDirectories list type. List of sample directories
+#' @param abunOut string type. Output directory
+#' @param sampleNames vector type. 1-1 correspondence with abundanceDirectories
+#' @param combinedNames string type. Title "combined" sample names
+#' @param mashedNames string type. File "mashed" names - avoid special chars
 #'
-#' @return
-#'
-#' @examples
+#' @return None
 .abundanceAnalysis <- function(abundanceDirectories, abunOut,
                                sampleNames, combinedNames, mashedNames) {
     # where to find the files

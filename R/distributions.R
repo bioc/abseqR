@@ -4,6 +4,7 @@
 #' y-values (or x if horizontal plot) labels on them.
 #' Use 'perc' to control if the values are percentages.
 #'
+#' @include util.R
 #' @import ggplot2
 #'
 #' @param dataframes  list type. List of dataframes
@@ -21,8 +22,6 @@
 #' y on hori plots).
 #'
 #' @return ggplot2 object
-#'
-#' @examples
 .plotDist <- function(dataframes, sampleNames, plotTitle, vert = T,
                       xlabel = "", ylabel = "", perc = T, subs = "",
                       sorted = T, cutoff = 15) {
@@ -204,14 +203,11 @@
 #' @param ylabel string type
 #'
 #' @return ggplot2 object
-#'
-#' @examples
 .plotSpectratype <- function(dataframes, sampleNames, region,
                              title = "Spectratype", subtitle = "",
                              xlabel = "Length(AA)",
                              ylabel = "Distribution") {
     nsample <- length(dataframes)
-    stopifnot(nsample == length(sampleNames))
     if (nsample != length(sampleNames)) {
         stop(paste("Expected equal number of sample names and dataframes, got",
                    length(sampleNames), "samples and", nsample, "dataframes."))

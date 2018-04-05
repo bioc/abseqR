@@ -16,5 +16,6 @@ VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 
     'util.R'
-    'abundanceAnalysis.R'
     'distributions.R'
+    'abundanceAnalysis.R'
+    'annotationAnalysis.R'
