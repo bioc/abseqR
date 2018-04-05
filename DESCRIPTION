@@ -21,3 +21,4 @@ Collate:
     'annotationAnalysis.R'
     'diversityAnalysis.R'
     'primerAnalysis.R'
+    'productivityAnalysis.R'

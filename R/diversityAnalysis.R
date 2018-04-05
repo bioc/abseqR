@@ -647,6 +647,9 @@
 
 #' Title Diversity analysis
 #'
+#' @import ggplot2
+#' @include util.R
+#'
 #' @param diversityDirectories list type. List of directories to diversity dir
 #' @param diversityOut string type. Output directory
 #' @param sampleNames vector type. 1-1 with diversityDirectories
