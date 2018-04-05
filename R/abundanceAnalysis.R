@@ -63,6 +63,8 @@
 .plotCirclize <- function(sampleName, path) {
     filename <- paste0(path, sampleName, "_vjassoc.csv")
 
+    message(paste("Plotting V-J association for", sampleName))
+
     if (file.exists(filename)) {
         df <- read.csv(filename)
 
@@ -97,6 +99,9 @@
         )
         circos.clear()
         dev.off()
+    } else {
+        warning(paste("Could not find file", filename,
+                      "skipping V-J association plot"))
     }
 }
 
@@ -124,6 +129,8 @@
                           pattern = ".*ig[vdj]_dist_[family|gene|variant].*\\.csv(\\.gz)?$",
                           expectedRet = c(8, 5))
     if (length(searchFiles) > 0) {
+        message(paste("Plotting V(D)J abundance distribution for",
+                      combinedNames))
         .abundancePlot(
             searchFiles,
             # what are the sample names (in-order)
@@ -131,6 +138,9 @@
             # output directory
             abunOut
         )
+    } else {
+        warning(paste("Could not find V(D)J abundance CSV files in",
+                      paste(abundanceDirectories, collapse = ",")))
     }
 
     # plot igv mismatches distribution
@@ -139,6 +149,7 @@
                           pattern = ".*_igv_mismatches_dist\\.csv(\\.gz)?$")
 
     if (length(abunIgvMismatchFiles) > 0) {
+        message("Plotting IGV mismatches distribution for", combinedNames)
         subtitle <- paste("Total is",
                           paste(lapply(abunIgvMismatchFiles, function(x) {
                               as.integer(.getTotal(x))
@@ -153,6 +164,9 @@
         )
         ggsave(paste0(abunOut, mashedNames, "_igv_mismatches_dist.png"),
                plot = abunIgvMismatches, width = V_WIDTH, height = V_HEIGHT)
+    } else {
+        warning("Could not find IGV mismatches distribution CSV files in",
+                paste(abundanceDirectories, collapse = ","))
     }
 
     # plot igv gaps distribution
@@ -160,6 +174,7 @@
         .listFilesInOrder(path = abundanceDirectories,
                           pattern = ".*_igv_gaps_dist\\.csv(\\.gz)?$")
     if (length(abunIgvGapsFiles) > 0) {
+        message("Plotting IGV indels distribution for", combinedNames)
         subtitle <- paste("Total is",
                           paste(lapply(abunIgvGapsFiles, function(x) {
                               as.integer(.getTotal(x))
@@ -173,6 +188,9 @@
         )
         ggsave(paste0(abunOut, mashedNames, "_igv_gaps_dist.png"),
                plot = abunIgvGaps, width = V_WIDTH, height = V_HEIGHT)
+    } else {
+        warning("Could not find IGV indels distribution CSV files in",
+                paste(abundanceDirectories, collapse = ","))
     }
 
     if (length(sampleNames) == 1) {
