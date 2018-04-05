@@ -136,9 +136,6 @@
                                                            upstreamLengthRange,
                                                            "_dist", len, ".png")),
                    plot = g, width = V_WIDTH, height = V_HEIGHT)
-        } else {
-            warning(paste("Could not find upstream files in",
-                          paste(upstreamDirectories, collapse = ", ")))
         }
 
         # class level
@@ -174,9 +171,6 @@
                                      "_dist", len, "_class", ".png")),
                        plot = g, width = H_WIDTH, height = H_HEIGHT)
             }
-        } else {
-            warning(paste("Could not find upstream files in",
-                          paste(upstreamDirectories, collapse = ", ")))
         }
 
         # box plot for class level
@@ -192,9 +186,6 @@
                           paste0("_", fname, "_", upstreamLengthRange, "_dist",
                                  len, "_class", "_box.png")),
                    plot = g, width = V_WIDTH, height = V_HEIGHT)
-        } else {
-            warning(paste("Could not find upstream files in",
-                          paste(upstreamDirectories, collapse = ", ")))
         }
     }
 }
