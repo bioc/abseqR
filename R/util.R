@@ -12,21 +12,21 @@ V_WIDTH_L <- 12
 V_HEIGHT_L <- 7.5
 
 
-checkVert <- function(filename) {
+.checkVert <- function(filename) {
     f <- file(filename, "r")
     res <- grepl("vert", readLines(f, n = 1), fixed = TRUE)
     close(f)
     return(res)
 }
 
-getTotal <- function(filename) {
+.getTotal <- function(filename) {
     f <- file(filename, "r")
     res <- unlist(strsplit(readLines(f, n = 1), "="))[2]
     close(f)
     return(res)
 }
 
-listFilesInOrder <- function(path, pattern, expectedRet = c(1)) {
+.listFilesInOrder <- function(path, pattern, expectedRet = c(1)) {
     # Returns files in order of path.
     # i.e overrides list.files' behaviour of sorted files
     # This is crucial because we are assuming sampleNames is
@@ -56,11 +56,11 @@ listFilesInOrder <- function(path, pattern, expectedRet = c(1)) {
     return(orderedFiles)
 }
 
-inferAnalyzed <- function(sampleDirectory) {
+.inferAnalyzed <- function(sampleDirectory) {
     return(list.files(sampleDirectory))
 }
 
-capitalize <- function(str) {
+.capitalize <- function(str) {
     firstLetter <- substr(str, 1, 1)
     rest <- substr(str, 2, nchar(str))
     return(paste0(toupper(firstLetter), rest))
