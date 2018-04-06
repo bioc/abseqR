@@ -131,13 +131,14 @@
         if (sorted) {
             g <- ggplot(df.union,
                         aes(x = reorder(y, x), y = x,
-                            label = sprintf(placeholder, x)))
-            + coord_flip()
+                            label = sprintf(placeholder, x))) +
+                coord_flip()
         } else {
             df.union$y <- factor(df.union$y, levels = unique(df.union$y))
             g <- ggplot(df.union,
                         aes(x = y, y = x,
-                            label = sprintf(placeholder, x))) + coord_flip()
+                            label = sprintf(placeholder, x))) +
+                coord_flip()
         }
 
         if (frames == 1) {

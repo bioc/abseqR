@@ -114,7 +114,7 @@
     if (length(prodFiles) > 0) {
         g <- .productivityPlot(lapply(prodFiles, read.csv,
                                       stringsAsFactors = FALSE), sampleNames)
-        ggsave(paste0(prodOut, mashedNames, "_productivity.png"),
+        ggsave(file.path(prodOut, paste0(mashedNames, "_productivity.png")),
                plot = g, width = V_WIDTH, height = V_HEIGHT)
     }
 
@@ -131,8 +131,8 @@
                   "Gaps in",
                   "_gaps_dist\\.csv(\\.gz)?$",
                   unlist(lapply(regions, function(region) {
-                      paste0(prodOut, mashedNames, "_",
-                             region, "_gaps_dist.png")
+                      file.path(prodOut, paste0(mashedNames, "_",
+                             region, "_gaps_dist.png"))
                   })),
                   regions)
     # gaps_out_of_frame plots only (no igv, igd, ihj plots for this)
@@ -143,9 +143,9 @@
                   "Gaps in",
                   "_gaps_dist_out_of_frame\\.csv(\\.gz)?$",
                   unlist(lapply(subregions, function(region) {
-                      paste0(prodOut, mashedNames, "_",
+                      file.path(prodOut, paste0(mashedNames, "_",
                              region,
-                             "_gaps_dist_out_of_frame.png")
+                             "_gaps_dist_out_of_frame.png"))
                   })),
                   subregions)
     # mismatch dist only
@@ -155,9 +155,9 @@
                   "Mismatches in",
                   "_mismatches_dist\\.csv(\\.gz)?$",
                   unlist(lapply(regions, function(region) {
-                      paste0(prodOut, mashedNames,
+                      file.path(prodOut, paste0(mashedNames,
                              "_", region,
-                             "_mismatches_dist.png")
+                             "_mismatches_dist.png"))
                       })),
                   regions)
 
@@ -167,8 +167,8 @@
    .prodDistPlot(productivityDirectories, sampleNames,
                  "Stop codon in In-frame Clones",
                  "_stopcodon_dist_in_frame\\.csv(\\.gz)?$",
-                 c(paste0(prodOut, mashedNames,
-                          "_stopcodon_dist_in_frame.png")),
+                 c(file.path(prodOut, paste0(mashedNames,
+                          "_stopcodon_dist_in_frame.png"))),
                  c("")) # no regions
 
     # vjframe plot
@@ -176,8 +176,8 @@
     .prodDistPlot(productivityDirectories, sampleNames,
                   "V-D-J Rearrangement",
                   "_vjframe_dist\\.csv(\\.gz)?$",
-                  c(paste0(prodOut, mashedNames,
-                           "_vjframe_dist.png")),
+                  c(file.path(prodOut, paste0(mashedNames,
+                           "_vjframe_dist.png"))),
                   c("")) # no regions
 
     # 3 special cases for IGV region
@@ -187,8 +187,8 @@
     .prodDistPlot(productivityDirectories, sampleNames,
                   "Abundance of In-frame Unproductive Clones in",
                   "_dist_inframe_unproductive\\.csv(\\.gz)?$",
-                  c(paste0(prodOut, mashedNames,
-                           "_igv_dist_inframe_unproductive.png")),
+                  c(file.path(prodOut, paste0(mashedNames,
+                           "_igv_dist_inframe_unproductive.png"))),
                   c("igv"))
 
     message(paste("Plotting out of frame clones distributions for",
@@ -196,8 +196,8 @@
     .prodDistPlot(productivityDirectories, sampleNames,
                   "Abundance of Out-Of-Frame Clones in",
                   "_dist_out_of_frame\\.csv(\\.gz)?$",
-                  c(paste0(prodOut, mashedNames,
-                           "_igv_dist_out_of_frame.png")),
+                  c(file.path(prodOut, paste0(mashedNames,
+                           "_igv_dist_out_of_frame.png"))),
                   c("igv"))
 
     message(paste("Plotting out IGV productive distributions for",
@@ -205,8 +205,8 @@
     .prodDistPlot(productivityDirectories, sampleNames,
                   "Abundance of Productive Clones in",
                   "_dist_productive\\.csv(\\.gz)?$",
-                  c(paste0(prodOut, mashedNames,
-                           "_igv_dist_productive.png")),
+                  c(file.path(prodOut, paste0(mashedNames,
+                           "_igv_dist_productive.png"))),
                   c("igv"))
 
     # stop codon in FR/CDR region proportion plot
@@ -240,18 +240,15 @@
                 sorted = FALSE
             )
             if (vert) {
-                ggsave(paste0(prodOut, mashedNames,
-                              "_stopcodon_region_", framestat, ".png"),
+                ggsave(file.path(prodOut, paste0(mashedNames,
+                              "_stopcodon_region_", framestat, ".png")),
                        plot = stopcodonRegion,
                        width = V_WIDTH, height = V_HEIGHT)
             } else {
-                ggsave(paste0(prodOut, mashedNames, "_stopcodon_region_",
-                              framestat, ".png"), plot = stopcodonRegion,
+                ggsave(file.path(prodOut, paste0(mashedNames,  "_stopcodon_region_",
+                              framestat, ".png")), plot = stopcodonRegion,
                        width = H_WIDTH, height = H_HEIGHT)
             }
-        } else {
-            warning(paste("Could not find stop codon region file in",
-                          paste(productivityDirectories, collapse = ", ")))
         }
     }
 }

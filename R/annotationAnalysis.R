@@ -27,8 +27,8 @@
             xlabel = "Sequence Length (bp)",
             ylabel = "Proportion"
         )
-        ggsave(paste0(annotOut, mashedNames,
-                      "_all_clones_len_dist.png"), plot = g,
+        ggsave(file.path(annotOut, paste0(mashedNames,
+                      "_all_clones_len_dist.png")), plot = g,
                width = V_WIDTH, height = V_HEIGHT)
     }
 
@@ -46,8 +46,8 @@
             xlabel = "Sequence Length (bp)",
             ylabel = "Proportion"
         )
-        ggsave(paste0(annotOut, mashedNames,
-                      "_all_clones_len_dist_no_outliers.png"),
+        ggsave(file.path(annotOut, paste0(mashedNames,
+                      "_all_clones_len_dist_no_outliers.png")),
                plot = g, width = V_WIDTH, height = V_HEIGHT)
     }
 }

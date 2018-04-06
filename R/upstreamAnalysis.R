@@ -66,11 +66,10 @@
                         width <- H_WIDTH;
                         height <- H_WIDTH;
                     }
-                    ggsave(paste0(upstreamOut,
-                                  mashedNames,
-                                  paste0("_", fname, "_",
-                                         upstreamLengthRange, "_",
-                                         status, "_", lvl, ".png")),
+                    ggsave(file.path(upstreamOut,
+                                     paste0(mashedNames, "_", fname, "_",
+                                            upstreamLengthRange, "_", status,
+                                            "_", lvl, ".png")),
                            plot = g,
                            width = width,
                            height = height)
@@ -131,10 +130,9 @@
                                  title = "Sequence lengths",
                                  xlabel = "Sequence Length(bp)",
                                  ylabel = "Distribution")
-            ggsave(paste0(upstreamOut, mashedNames, paste0("_",
-                                                           fname, "_",
-                                                           upstreamLengthRange,
-                                                           "_dist", len, ".png")),
+            ggsave(file.path(upstreamOut,
+                             paste0(mashedNames,  "_", fname, "_",
+                                    upstreamLengthRange, "_dist",  len, ".png")),
                    plot = g, width = V_WIDTH, height = V_HEIGHT)
         }
 
@@ -160,13 +158,12 @@
                           subs = subtitle)
 
             if (plotVert) {
-                ggsave(paste0(upstreamOut, mashedNames,
-                              paste0("_", fname, "_", upstreamLengthRange,
-                                     "_dist", len, "_class",".png")), plot = g,
+                ggsave(file.path(upstreamOut, paste0(mashedNames , "_", fname, "_", upstreamLengthRange, "_dist", len, "_class",".png")),
+                       plot = g,
                        width = V_WIDTH, height = V_HEIGHT)
             } else {
-                ggsave(paste0(upstreamOut, mashedNames,
-                              paste0("_", fname, "_",
+                ggsave(file.path(upstreamOut,
+                              paste0(mashedNames,"_", fname, "_",
                                      upstreamLengthRange,
                                      "_dist", len, "_class", ".png")),
                        plot = g, width = H_WIDTH, height = H_HEIGHT)
@@ -182,8 +179,9 @@
         if (length(seqClassLengthBoxFiles) > 0) {
             g <- .boxPlot(lapply(seqClassLengthBoxFiles, read.csv),
                           sampleNames, paste("Sequence Lengths in", combinedNames))
-            ggsave(paste0(upstreamOut, mashedNames,
-                          paste0("_", fname, "_", upstreamLengthRange, "_dist",
+            ggsave(file.path(upstreamOut,
+                          paste0(mashedNames,"_", fname, "_",
+                                 upstreamLengthRange, "_dist",
                                  len, "_class", "_box.png")),
                    plot = g, width = V_WIDTH, height = V_HEIGHT)
         }

@@ -70,8 +70,8 @@
                           dataframes[[i + 1]][colnames],
                           sampleNames[i],
                           sampleNames[i + 1], cloneClass)
-        ggsave(paste0(outputPath, sampleNames[i], "_vs_",
-                      sampleNames[i + 1], "_clone_scatter.png"),
+        ggsave(file.path(outputPath, paste0(sampleNames[i], "_vs_",
+                      sampleNames[i + 1], "_clone_scatter.png")),
                plot = p, width = V_WIDTH, height = V_HEIGHT)
     }
 }
@@ -88,7 +88,7 @@
 #' @param top int type. Top N cutoff, defaults to ALL clones if not specified
 #'
 #' @return Nothing
-.vennIntersection <- function(dataframes, sampleNames, outFile, top) {
+.vennIntersection <- function(dataframes, sampleNames, outFile, top = Inf) {
 
     nsample <- length(dataframes)
 
@@ -107,12 +107,7 @@
         # specified below
         colNames <- c("Clonotype", "Count")
         dataframes <- lapply(dataframes, function(df) {
-            if (!missing(top)) {
-                df <- head(df[colNames], top)
-            } else {
-                df <- df[colNames]
-            }
-            return(df)
+            head(df[colNames], top)
         })
 
         # merge all dataframes
@@ -290,11 +285,13 @@
         g <- g + geom_line(aes(linetype = region, color = sample),
                            color = BLUEHEX, size = 0.75) +
             guides(color = FALSE) +
-            geom_point(aes(shape = region))
+            scale_size_manual(values = head(seq(1, length(regions), by = .5),
+                                            n = length(regions)))
     } else {
         g <- g + geom_line(aes(linetype = region, color = sample),
                            size = 0.75) +
-            geom_point(aes(shape = region, color = sample))
+            scale_size_manual(values = head(seq(1, length(regions), by = .5),
+                                            n = length(regions)))
     }
 
     g <- g + scale_x_continuous(breaks = xticks, labels = xlabels) +
@@ -332,8 +329,8 @@
                    length(sampleNames), "samples and", nsamples, "dataframes."))
     }
 
-    message(paste("Creating rarefaction plot for samples"),
-            paste(sampleNames, collapse = ", "))
+    message(paste("Creating rarefaction plot for samples",
+            paste(sampleNames, collapse = ", ")))
 
     # find the minimum xtick value from all the samples to plot as the
     # max xtick value on the actual graph (i.e. the graph is truncated to the
@@ -383,11 +380,13 @@
         g <- g + geom_line(aes(linetype = region, color = sample),
                            color = BLUEHEX, size = 0.75) +
             guides(color = FALSE) +
-            geom_point(aes(shape = region, color = sample))
+            scale_size_manual(values = head(seq(1, length(regions), by = .5),
+                                            n = length(regions)))
     } else {
         g <- g +
             geom_line(aes(linetype = region, color = sample), size = 0.75) +
-            geom_point(aes(shape = region, color = sample))
+            scale_size_manual(values = head(seq(1, length(regions), by = .5),
+                                            n = length(regions)))
     }
 
     g <- g + scale_x_continuous(breaks = xticks,
@@ -428,8 +427,8 @@
                    length(sampleNames), "samples and", nsamples, "dataframes."))
     }
 
-    message(paste("Creating recapture plot for samples"),
-            paste(sampleNames, collapse = ", "))
+    message(paste("Creating recapture plot for samples",
+            paste(sampleNames, collapse = ", ")))
 
     # find the minimum xtick value from all the samples to plot as the
     # max xtick value on the actual graph (i.e. the graph is truncated to the
@@ -482,11 +481,13 @@
         p <- p + geom_line(aes(linetype = region, color = sample),
                            color = BLUEHEX, size = 0.75) +
             guides(color = FALSE) +
-            geom_point(aes(shape = region, color = sample))
+            scale_size_manual(values = head(seq(1, length(regions), by = .5),
+                                            n = length(regions)))
     } else {
         p <- p +
             geom_line(aes(linetype = region, color = sample), size = 0.75) +
-            geom_point(aes(shape = region, color = sample))
+            scale_size_manual(values = head(seq(1, length(regions), by = .5),
+                                            n = length(regions)))
     }
 
     p <- p + scale_x_continuous(breaks = xticks) +
@@ -660,8 +661,8 @@
 #' @return None
 .diversityAnalysis <- function(diversityDirectories, diversityOut,
                               sampleNames, mashedNames) {
-    message("Starting diversity analysis on samples",
-            paste(sampleNames, collapse = ", "))
+    message(paste("Starting diversity analysis on samples",
+            paste(sampleNames, collapse = ", ")))
     # clonotype plots
     cdr3ClonesFile <-
         .listFilesInOrder(path = diversityDirectories,
@@ -678,7 +679,8 @@
         .vennIntersection(
             lapply(cdr3ClonesFile, read.csv, stringsAsFactors = FALSE),
             sampleNames,
-            paste0(diversityOut, mashedNames, "_cdr3_clonotypeIntersection.png")
+            file.path(diversityOut, paste0(mashedNames,
+                                           "_cdr3_clonotypeIntersection.png"))
             )
 
         # plot top N distribution (clonotypes)
@@ -686,7 +688,8 @@
             lapply(cdr3ClonesFile, read.csv, stringsAsFactors = FALSE),
             sampleNames
             )
-        ggsave(paste0(diversityOut, mashedNames, "_top10Clonotypes.png"),
+        ggsave(file.path(diversityOut, paste0(mashedNames,
+                                              "_top10Clonotypes.png")),
                plot = g, width = V_WIDTH_L, height = V_HEIGHT_L)
     }
 
@@ -709,9 +712,8 @@
             g <- .plotDuplication(searchFiles,
                                  sampleNames,
                                  includedRegions)
-            ggsave(paste0(diversityOut,
-                          mashedNames, "_", reg,
-                          "_duplication.png"),
+            ggsave(file.path(diversityOut,
+                             paste0(mashedNames, "_", reg, "_duplication.png")),
                    plot = g, width = V_WIDTH, height = V_HEIGHT)
         } else {
             warning(paste("Could not find duplication files in",
@@ -727,8 +729,8 @@
             g <- .plotRarefaction(searchFiles,
                                  sampleNames,
                                  includedRegions)
-            ggsave(paste0(diversityOut, mashedNames, "_", reg,
-                          "_rarefaction.png"),
+            ggsave(file.path(diversityOut,
+                             paste0(mashedNames, "_", reg, "_rarefaction.png")),
                    plot = g, width = V_WIDTH, height = V_HEIGHT)
         } else {
             warning(paste("Could not find rarefaction files in",
@@ -743,8 +745,9 @@
             g <- .plotRecapture(searchFiles,
                                sampleNames,
                                includedRegions)
-            ggsave(paste0(diversityOut, mashedNames, "_",
-                          reg, "_recapture.png"), plot = g,
+            ggsave(file.path(diversityOut,
+                             paste0(mashedNames, "_", reg, "_recapture.png")),
+                   plot = g,
                    width = V_WIDTH, height = V_HEIGHT)
         } else {
             warning(paste("Could not find recapture files in",
@@ -754,12 +757,12 @@
 
     # MINISECTION:
     # ## SPECTRATYPES ###
-    specOut <- paste0(diversityOut, "spectratypes/")
+    specOut <- file.path(diversityOut, "spectratypes")
     if (!file.exists(specOut)) {
         dir.create(specOut)
     }
-    message("Plotting spectratypes on samples",
-            paste(sampleNames, collapse = ", "))
+    message(paste("Plotting spectratypes on samples",
+            paste(sampleNames, collapse = ", ")))
     # CDR 1 - 3
     for (i in 1:3) {
         specFiles <-
@@ -771,8 +774,8 @@
                                          stringsAsFactors = FALSE),
                                   sampleNames,
                                   paste0("CDR", i))
-            ggsave(paste0(specOut, mashedNames, "_cdr", i,
-                          "_spectratype.png"),
+            ggsave(file.path(specOut, paste0(mashedNames, "_cdr", i,
+                          "_spectratype.png")),
                    plot = g, width = V_WIDTH, height = V_HEIGHT)
         } else {
             warning(paste0("Could not find CDR", i, " spectratype files in ",
@@ -789,7 +792,8 @@
         g <- .plotSpectratype(lapply(specFiles, read.csv, stringsAsFactors = FALSE),
                              sampleNames,
                              "CDR3")
-        ggsave(paste0(specOut, mashedNames, "_cdr3_spectratype_no_outliers.png"),
+        ggsave(file.path(specOut,
+                         paste0(mashedNames, "_cdr3_spectratype_no_outliers.png")),
                plot = g, width = V_WIDTH, height = V_HEIGHT)
     } else {
             warning(paste("Could not find CDR3 spectratype (no outlier) files in",
@@ -806,7 +810,8 @@
             g <- .plotSpectratype(lapply(specFiles, read.csv, stringsAsFactors = FALSE),
                                  sampleNames,
                                  paste0("FR", i))
-            ggsave(paste0(specOut, mashedNames, "_fr", i, "_spectratype.png"),
+            ggsave(file.path(specOut, paste0(mashedNames, "_fr",
+                                             i, "_spectratype.png")),
                    plot = g, width = V_WIDTH, height = V_HEIGHT)
         } else {
             warning(paste0("Could not find FR", i, " spectratype files in ",
@@ -822,7 +827,7 @@
         g <- .plotSpectratype(lapply(specFiles, read.csv, stringsAsFactors = FALSE),
                              sampleNames,
                              "V domain")
-        ggsave(paste0(specOut, mashedNames, "_v_spectratype.png"),
+        ggsave(file.path(specOut, paste0(mashedNames, "_v_spectratype.png")),
                plot = g, width = V_WIDTH, height = V_HEIGHT)
     }
 

@@ -108,17 +108,17 @@
                             subs = subtitle
                         )
                         if (vertical) {
-                            ggsave(paste0(primerOut, mashedNames,
-                                          paste0("_", ctg, "_", pend, "end_",
-                                                 primerNames[j],
-                                                 "_igv_dist.png")),
+                            ggsave(file.path(primerOut,
+                                             paste0(mashedNames,"_", ctg,
+                                                    "_", pend, "end_",
+                                                    primerNames[j], "_igv_dist.png")),
                                    plot = primPlot, width = V_WIDTH,
                                    height = V_HEIGHT)
                         } else {
-                            ggsave(paste0(primerOut, mashedNames,
-                                          paste0("_", ctg, "_", pend, "end_",
-                                                 primerNames[j],
-                                                 "_igv_dist.png")),
+                            ggsave(file.path(primerOut,
+                                             paste0(mashedNames,"_", ctg, "_",
+                                                    pend, "end_",
+                                                    primerNames[j], "_igv_dist.png")),
                                    plot = primPlot,
                                    width = H_WIDTH, height = H_HEIGHT)
                         }
@@ -158,15 +158,17 @@
                             subs = subtitle
                         )
                         if (vertical) {
-                            ggsave(paste0(primerOut, mashedNames,
-                                          paste0("_", ctg, "_", pend, "end_",
-                                                 analysisType[j], "_dist.png")),
+                            ggsave(file.path(primerOut,
+                                             paste0(mashedNames,"_", ctg,
+                                                    "_", pend, "end_",
+                                                    analysisType[j], "_dist.png")),
                                    plot = primPlot, width = V_WIDTH,
                                    height = V_HEIGHT)
                         } else {
-                            ggsave(paste0(primerOut, mashedNames,
-                                          paste0("_", ctg, "_", pend, "end_",
-                                                 analysisType[j], "_dist.png")),
+                            ggsave(file.path(primerOut,
+                                             paste0(mashedNames,"_", ctg, "_",
+                                                    pend, "end_", analysisType[j],
+                                                    "_dist.png")),
                                    plot = primPlot,
                                    width = H_WIDTH, height = H_HEIGHT)
                         }
