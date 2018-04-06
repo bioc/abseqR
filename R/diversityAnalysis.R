@@ -233,6 +233,7 @@
 #' Title
 #'
 #' @import ggplot2
+#' @include util.R
 #'
 #' @param files list type. List of strings to _cdr_v_duplication.csv pathname
 #' @param sampleNames vector type. Vector of strings each representing
@@ -283,15 +284,17 @@
 
     if (nsamples == 1) {
         g <- g + geom_line(aes(linetype = region, color = sample),
-                           color = BLUEHEX, size = 0.75) +
+                           color = BLUEHEX, size = 0.65) +
             guides(color = FALSE) +
-            scale_size_manual(values = head(seq(1, length(regions), by = .5),
-                                            n = length(regions)))
+            #scale_size_manual(values = head(seq(1, length(regions), by = .5),
+            #                                n = length(regions))) +
+            scale_linetype_manual(values = .getLineTypes(regions))
     } else {
         g <- g + geom_line(aes(linetype = region, color = sample),
-                           size = 0.75) +
-            scale_size_manual(values = head(seq(1, length(regions), by = .5),
-                                            n = length(regions)))
+                           size = 0.65) +
+            #scale_size_manual(values = head(seq(1, length(regions), by = .5),
+            #                                n = length(regions))) +
+            scale_linetype_manual(values = .getLineTypes(regions))
     }
 
     g <- g + scale_x_continuous(breaks = xticks, labels = xlabels) +
@@ -378,15 +381,17 @@
 
     if (nsamples == 1) {
         g <- g + geom_line(aes(linetype = region, color = sample),
-                           color = BLUEHEX, size = 0.75) +
+                           color = BLUEHEX, size = 0.65) +
             guides(color = FALSE) +
-            scale_size_manual(values = head(seq(1, length(regions), by = .5),
-                                            n = length(regions)))
+            #scale_size_manual(values = head(seq(1, length(regions), by = .5),
+            #                                n = length(regions))) +
+            scale_linetype_manual(values = .getLineTypes(regions))
     } else {
         g <- g +
-            geom_line(aes(linetype = region, color = sample), size = 0.75) +
-            scale_size_manual(values = head(seq(1, length(regions), by = .5),
-                                            n = length(regions)))
+            geom_line(aes(linetype = region, color = sample), size = 0.65) +
+            #scale_size_manual(values = head(seq(1, length(regions), by = .5),
+            #                                n = length(regions))) +
+            scale_linetype_manual(values = .getLineTypes(regions))
     }
 
     g <- g + scale_x_continuous(breaks = xticks,
@@ -479,15 +484,17 @@
 
     if (nsamples == 1) {
         p <- p + geom_line(aes(linetype = region, color = sample),
-                           color = BLUEHEX, size = 0.75) +
+                           color = BLUEHEX, size = 0.65) +
             guides(color = FALSE) +
-            scale_size_manual(values = head(seq(1, length(regions), by = .5),
-                                            n = length(regions)))
+            #scale_size_manual(values = head(seq(1, length(regions), by = .5),
+            #                                n = length(regions))) +
+            scale_linetype_manual(values = .getLineTypes(regions))
     } else {
         p <- p +
-            geom_line(aes(linetype = region, color = sample), size = 0.75) +
-            scale_size_manual(values = head(seq(1, length(regions), by = .5),
-                                            n = length(regions)))
+            geom_line(aes(linetype = region, color = sample), size = 0.65) +
+            #scale_size_manual(values = head(seq(1, length(regions), by = .5),
+            #                                n = length(regions))) +
+            scale_linetype_manual(values = .getLineTypes(regions))
     }
 
     p <- p + scale_x_continuous(breaks = xticks) +

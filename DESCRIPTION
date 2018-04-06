@@ -15,13 +15,12 @@ Imports: ggplot2, RColorBrewer, circlize, reshape2, VennDiagram, plyr
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 
-    'abseq.R'
     'util.R'
     'distributions.R'
-    'abundanceAnalysis.R'
-    'annotationAnalysis.R'
-    'diversityAnalysis.R'
     'upstreamAnalysis.R'
     'productivityAnalysis.R'
     'primerAnalysis.R'
-    'methods-abseq.R'
+    'diversityAnalysis.R'
+    'annotationAnalysis.R'
+    'abundanceAnalysis.R'
+    'abseq.R'

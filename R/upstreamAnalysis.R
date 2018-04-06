@@ -73,9 +73,6 @@
                            plot = g,
                            width = width,
                            height = height)
-                } else {
-                    warning(paste("Could not find upstream files in",
-                                  paste(upstreamDirectories, collapse = ", ")))
                 }
             }
         }

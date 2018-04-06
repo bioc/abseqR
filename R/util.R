@@ -116,3 +116,17 @@ V_HEIGHT_L <- 7.5
 
     return(datac)
 }
+
+.getLineTypes <- function(regions) {
+    if (length(regions) > 6) {
+        stop("No line types for regions with length > 6 ")
+    }
+    regions <- unlist(lapply(regions, toupper))
+    # order of importance: min -> max
+    lvls <- c("FR4", "FR1", "FR2", "FR3", "CDR1", "CDR2", "CDR3", "V")
+    # order of importance: max -> min
+    lines <- c("solid", "twodash", "dotted", "dotdash", "longdash", "dashed")
+
+    factorRegions <- factor(regions, levels = lvls)
+    return(lines[order(factorRegions, decreasing = T)])
+}
