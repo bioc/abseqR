@@ -4,6 +4,7 @@
 #' y-values (or x if horizontal plot) labels on them.
 #' Use 'perc' to control if the values are percentages.
 #'
+#' @include util.R
 #' @import ggplot2
 #'
 #' @param dataframes  list type. List of dataframes
@@ -14,17 +15,15 @@
 #' @param ylabel string type
 #' @param perc boolean type. True if data's axis is a percentage
 #' proportion (instead of 0-1) only used if length(sampleNames) == 1
-#' @param subtitle string type
+#' @param subs string type
 #' @param sorted boolean type. True if histogram should be sorted in descending
 #' order
 #' @param cutoff int type. Number of maximum ticks to show (x on vert plots,
 #' y on hori plots).
 #'
 #' @return ggplot2 object
-#'
-#' @examples
 .plotDist <- function(dataframes, sampleNames, plotTitle, vert = T,
-                      xlabel = "", ylabel = "", perc = T, subtitle = "",
+                      xlabel = "", ylabel = "", perc = T, subs = "",
                       sorted = T, cutoff = 15) {
     frames <- length(dataframes)
     # sanity check
@@ -132,14 +131,14 @@
         if (sorted) {
             g <- ggplot(df.union,
                         aes(x = reorder(y, x), y = x,
-                            label = sprintf(placeholder, x)))
-            + coord_flip()
+                            label = sprintf(placeholder, x))) +
+                coord_flip()
         } else {
             df.union$y <- factor(df.union$y, levels = unique(df.union$y))
             g <- ggplot(df.union,
                         aes(x = y, y = x,
-                            label = sprintf(placeholder, x)))
-            + coord_flip()
+                            label = sprintf(placeholder, x))) +
+                coord_flip()
         }
 
         if (frames == 1) {
@@ -180,7 +179,7 @@
     }
     g <- g + theme(text = element_text(size = 10)) +
         labs(title = plotTitle,
-             subtitle = subtitle,
+             subtitle = subs,
              x = xlabel,
              y = ylabel,
              caption = caps)
@@ -188,7 +187,7 @@
 }
 
 
-#' Title Spectratype plotter
+#' Spectratype plotter
 #' @description Plots length distribution
 #'
 #' @import ggplot2
@@ -204,14 +203,11 @@
 #' @param ylabel string type
 #'
 #' @return ggplot2 object
-#'
-#' @examples
 .plotSpectratype <- function(dataframes, sampleNames, region,
                              title = "Spectratype", subtitle = "",
                              xlabel = "Length(AA)",
                              ylabel = "Distribution") {
     nsample <- length(dataframes)
-    stopifnot(nsample == length(sampleNames))
     if (nsample != length(sampleNames)) {
         stop(paste("Expected equal number of sample names and dataframes, got",
                    length(sampleNames), "samples and", nsample, "dataframes."))
@@ -269,3 +265,44 @@
     return(g)
 }
 
+
+#' Creates a box plot
+#'
+#' @import ggplot2
+#'
+#' @param dataframes list type. List of sample dataframes
+#' @param sampleNames vector type. 1-1 with dataframes
+#' @param plotTitle string type
+#' @param xlabel string type
+#' @param ylabel string type
+#' @param subs string type
+#'
+#' @return ggplot2 object
+.boxPlot <- function(dataframes, sampleNames, plotTitle,
+                     xlabel = "", ylabel = "", subs = "") {
+    frames <- length(dataframes)
+
+    if (length(sampleNames) != frames) {
+        stop(paste("Expected equal number of sample names and dataframes, got",
+                   length(sampleNames), "samples and", frames, "dataframes."))
+    }
+
+    # add samplename into new "sample" column
+    dataframes <- Map(cbind, dataframes, sample = sampleNames)
+
+    # merge
+    df.union <- do.call("rbind", dataframes)
+
+    if (frames == 1) {
+        g <- ggplot(df.union,
+                    aes(x = x, y = y)) +
+            geom_boxplot(varwidth = T, fill = BLUEHEX)
+    } else {
+        g <- ggplot(df.union, aes(x = sample, y = y)) +
+            geom_boxplot(varwidth = T, fill = BLUEHEX) +
+            facet_grid(~x) +
+            theme(axis.text.x = element_text(angle = 75, hjust = 1))
+    }
+    g <- g + labs(title = plotTitle, sutitle = subs, x = xlabel, y = ylabel)
+    return(g)
+}
