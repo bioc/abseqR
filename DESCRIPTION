@@ -23,4 +23,5 @@ Collate:
     'diversityAnalysis.R'
     'annotationAnalysis.R'
     'abundanceAnalysis.R'
+    'plotter.R'
     'abseq.R'

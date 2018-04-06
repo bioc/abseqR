@@ -9,9 +9,6 @@ abSeqPlot(object)
 \arguments{
 \item{object}{AbSeq object}
 }
-\value{
-None
-}
 \description{
 Todo
 }
