@@ -28,7 +28,7 @@ setGeneric(name = "abSeqPlot",
            })
 
 setMethod(f = "abSeqPlot",
-          signature(object = "AbSeqLoad"),
+          signature = "AbSeqLoad",
           definition = function(object) {
               individualSamples <- list()
 
@@ -81,7 +81,7 @@ setMethod(f = "abSeqPlot",
                       samples <- .loadRepertoireFromParams(file.path(directories[[1]], ANALYSIS_PARAMS))
                       individualSamples <- c(individualSamples, samples)
                   }
-                  plotRepertoires(samples, outputDir)
+                  AbSeq::plotRepertoires(samples, outputDir)
               }
               return(individualSamples)
           })
