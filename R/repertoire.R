@@ -138,3 +138,75 @@ setMethod("+", signature(e1 = "CompositeRepertoire", e2 = "Repertoire"), functio
 setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), function(e1, e2) {
     new("CompositeRepertoire", repertoires = unique(c(e1, e2@repertoires)))
 })
+
+#' Title
+#'
+#' @include util.R
+#' @include plotter.R
+#' @include compositeRepertoire.R
+#'
+#' @param object
+#' @param outputDir
+#'
+#' @return
+#' @export
+#'
+#' @examples
+setGeneric(name = "plotRepertoires",
+           def = function(object, outputDir) {
+               standardGeneric("plotRepertoires")
+           })
+
+
+
+setMethod(f = "plotRepertoires",
+          signature = "Repertoire",
+          definition = function(object, outputDir) {
+              analysisDirectories = unlist(file.path(object@outdir, RESULT_DIR, object@name))
+              analyses <- unlist(.inferAnalyzed(analysisDirectories[[1]]))
+              sampleNames <- c(object@name)
+
+              # TODO:
+              primer5File <- primer3File <- upstreamStart <- upstreamEnd <- "None"
+
+              .plotSamples(sampleNames,
+                           analysisDirectories,
+                           analyses,
+                           outputDir,
+                           primer5File,
+                           primer3File,
+                           upstreamStart,
+                           upstreamEnd)
+
+          })
+
+setMethod(f = "plotRepertoires",
+          signature = "CompositeRepertoire",
+          definition = function(object, outputDir) {
+              analysisDirectories = unlist(lapply(object@repertoires, function(x) {
+                  # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
+                  file.path(x@outdir, RESULT_DIR, x@name)
+              }))
+              # get all analyses conducted by each repertoire
+              analysesConducted <- lapply(analysisDirectories, .inferAnalyzed)
+
+              # find the intersection of all analysis, because it makes no
+              # sense to compare samples if they don't have the same analysis
+              similarAnalyses <- unlist(Reduce(intersect, analysesConducted))
+
+              sampleNames <- unlist(lapply(object@repertoires, function(x) {
+                  x@name
+              }))
+
+              # TODO:
+              primer5File <- primer3File <- upstreamStart <- upstreamEnd <- "None"
+
+              .plotSamples(sampleNames,
+                           analysisDirectories,
+                           similarAnalyses,
+                           outputDir,
+                           primer5File,
+                           primer3File,
+                           upstreamStart,
+                           upstreamEnd)
+          })

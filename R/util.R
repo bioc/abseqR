@@ -11,6 +11,10 @@ VENN_HEIGHT <- 8
 V_WIDTH_L <- 12
 V_HEIGHT_L <- 7.5
 
+RESULT_DIR <- "report"
+AUX_DIR <- "auxiliary"
+ANALYSIS_PARAMS <- "analysis.params"
+
 
 .checkVert <- function(filename) {
     f <- file(filename, "r")
@@ -57,7 +61,11 @@ V_HEIGHT_L <- 7.5
 }
 
 .inferAnalyzed <- function(sampleDirectory) {
-    return(list.files(sampleDirectory))
+    everything <- list.files(sampleDirectory)
+    fullPath <- lapply(everything, function(x) {
+        file.path(sampleDirectory, x)
+    })
+    return(everything[unlist(lapply(fullPath, dir.exists))])
 }
 
 .capitalize <- function(str) {

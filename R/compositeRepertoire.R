@@ -6,9 +6,8 @@
 #' @export
 #'
 #' @examples
-CompositeRepertoire <- setClass("CompositeRepertoire", slots = c(
-    repertoires = "list"
-))
+CompositeRepertoire <-
+    setClass("CompositeRepertoire", slots = c(repertoires = "list"))
 
 
 #' Title
@@ -20,6 +19,11 @@ CompositeRepertoire <- setClass("CompositeRepertoire", slots = c(
 #' @export
 #'
 #' @examples
-setMethod("+", signature(e1 = "CompositeRepertoire", e2 = "CompositeRepertoire"), function(e1, e2) {
-    new("CompositeRepertoire", repertoires = unique(c(e1@repertoires, e2@repertoires)))
-})
+setMethod("+",
+          signature(e1 = "CompositeRepertoire",
+                    e2 = "CompositeRepertoire"),
+          function(e1, e2) {
+              new("CompositeRepertoire",
+                  repertoires = unique(c(e1@repertoires, e2@repertoires)))
+
+          })

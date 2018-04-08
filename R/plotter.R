@@ -12,10 +12,14 @@
 #' @import ggplot2
 #'
 #'
-#' @param sampleNames
-#' @param directories
-#' @param analysis
-#' @param outputDir
+#' @param sampleNames vector type. Vector of sample names in strings
+#' @param directories vector type. Vector of directories in strings, must be
+#' 1-1 with sampleNames
+#' @param analysis vector / list type. What analysis to plot for. If sampleNames
+#' or directories is > 1 (i.e. compositeRepertoire), then make sure that it's
+#' an intersection of all analysis conducted by the repertoires, otherwise, it
+#' wouldn't make sense
+#' @param outputDir string type. Where to dump the output
 #' @param primer5File
 #' @param primer3File
 #' @param upstreamStart
@@ -31,9 +35,12 @@
              primer3File,
              upstreamStart,
              upstreamEnd) {
+        if (!dir.exists(outputDir)) {
+            dir.create(outputDir)
+        }
         mashedNames <- paste(sampleNames, collapse = "_")
         combinedNames <- paste(sampleNames, collapse = ", ")
-        if ('annot' %in% analysis) {
+        if ("annot" %in% analysis) {
             annotOut <- file.path(outputDir, "annot")
             if (!file.exists(annotOut)) {
                 dir.create(annotOut)
@@ -48,7 +55,7 @@
         #               ABUNDANCE PLOTS                  #
         #                                                #
         ##################################################
-        if ('abundance' %in% analysis) {
+        if ("abundance" %in% analysis) {
             abunOut <- file.path(outputDir, "abundance")
             if (!file.exists(abunOut)) {
                 dir.create(abunOut)
@@ -68,7 +75,7 @@
         #              PRODUCTIVITY PLOTS                #
         #                                                #
         ##################################################
-        if ('productivity' %in% analysis) {
+        if ("productivity" %in% analysis) {
             prodOut <- file.path(outputDir, "productivity")
             if (!file.exists(prodOut)) {
                 dir.create(prodOut)
@@ -87,7 +94,7 @@
         #               DIVERSITY PLOTS                  #
         #                                                #
         ##################################################
-        if ('diversity' %in% analysis) {
+        if ("diversity" %in% analysis) {
             diversityOut <- file.path(outputDir, "diversity")
             if (!file.exists(diversityOut)) {
                 dir.create(diversityOut)
@@ -106,7 +113,7 @@
         #               PRIMER.S  PLOTS                  #
         #                                                #
         ##################################################
-        if ('primer_specificity' %in% analysis) {
+        if ("primer_specificity" %in% analysis) {
             primerOut <- file.path(outputDir, "primer_specificity")
             if (!file.exists(primerOut)) {
                 dir.create(primerOut)
@@ -133,7 +140,7 @@
         #               UPSTREAM 5UTR PLOTS              #
         #                                                #
         ##################################################
-        if ('utr5' %in% analysis) {
+        if ("utr5" %in% analysis) {
             utr5Out <- file.path(outputDir, "utr5")
             if (!file.exists(utr5Out)) {
                 dir.create(utr5Out)

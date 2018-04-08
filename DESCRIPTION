@@ -24,6 +24,6 @@ Collate:
     'annotationAnalysis.R'
     'abundanceAnalysis.R'
     'plotter.R'
-    'abseq.R'
     'compositeRepertoire.R'
     'repertoire.R'
+    'abseqLoad.R'
