@@ -2,6 +2,9 @@
 
 export(AbSeq)
 export(abSeqPlot)
+exportClasses(CompositeRepertoire)
+exportClasses(Repertoire)
+exportMethods("+")
 import(RColorBrewer)
 import(VennDiagram)
 import(circlize)
