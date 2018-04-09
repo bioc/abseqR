@@ -4,10 +4,10 @@
 \alias{abSeqPlot}
 \title{Title}
 \usage{
-abSeqPlot(object)
+abSeqPlot(object, BPPARAM = BiocParallel::bpparam())
 }
 \arguments{
-\item{object}{}
+\item{BPPARAM}{}
 }
 \description{
 Title

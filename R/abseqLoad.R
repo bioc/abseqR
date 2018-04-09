@@ -19,19 +19,20 @@ AbSeqLoad <- setClass("AbSeqLoad", slots = c(outputDirectory = "character"))
 #' @include util.R
 #'
 #' @param object
+#' @param BPPARAM
 #'
 #' @return
 #' @export
 #'
 #' @examples
 setGeneric(name = "abSeqPlot",
-           def = function(object) {
+           def = function(object, BPPARAM = BiocParallel::bpparam()) {
                standardGeneric("abSeqPlot")
            })
 
 setMethod(f = "abSeqPlot",
           signature = "AbSeqLoad",
-          definition = function(object) {
+          definition = function(object, BPPARAM = BiocParallel::bpparam()) {
 
               root <- object@outputDirectory
 
@@ -42,8 +43,8 @@ setMethod(f = "abSeqPlot",
               pairings <- rev(tail(readLines(con), n = -1))
               close(con)
 
-              lapply(pairings, function(pair) {
-              #BiocParallel::bplapply(pairings, function(pair) {
+              # lapply(pairings, function(pair) {
+              BiocParallel::bplapply(pairings, function(pair) {
                   sampleNames <- unlist(strsplit(pair, ","))
 
                   if (length(sampleNames) > 1) {
@@ -62,7 +63,7 @@ setMethod(f = "abSeqPlot",
                       samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
                   }
                   AbSeq::plotRepertoires(samples, outputDir)
-              })
+              }, BPPARAM = BPPARAM)
 
               individualSamples <- list()
               # populate individualSample list with samples for user to browse
