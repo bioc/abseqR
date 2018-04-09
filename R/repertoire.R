@@ -168,7 +168,6 @@ setMethod(f = "plotRepertoires",
 
               # TODO:
               primer5File <- primer3File <- upstreamStart <- upstreamEnd <- "None"
-
               .plotSamples(sampleNames,
                            analysisDirectories,
                            analyses,

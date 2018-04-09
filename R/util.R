@@ -14,6 +14,7 @@ V_HEIGHT_L <- 7.5
 RESULT_DIR <- "report"
 AUX_DIR <- "auxiliary"
 ANALYSIS_PARAMS <- "analysis.params"
+ABSEQ_CFG <- "abseq.cfg"
 
 
 .checkVert <- function(filename) {
