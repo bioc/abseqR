@@ -7,7 +7,7 @@
 #' @param upstreamDirectories list type. List of sample directories
 #' @param upstreamOut string type. Output directory
 #' @param expectedLength int type. Expected length of upstream sequences.
-#' NA means inf in this context
+#' Can be infinite
 #' @param upstreamLengthRange string type. start_end format
 #' @param sampleNames vector type. 1-1 with upstream directories
 #' @param combinedNames string type. Title friendly "combined" sample names
@@ -24,7 +24,7 @@
 
     message(paste("Starting upstream analysis on", combinedNames))
 
-    if (!is.na(expectedLength)) {
+    if (!is.infinite(expectedLength)) {
         level <- c("gene", "family")
         for (lvl in level) {
             statuses <- c("valid", "faulty", "no_atg")
@@ -90,7 +90,7 @@
 #' @param upstreamDirectories list type. List of sample directories
 #' @param upstreamOut string type. Output directory
 #' @param expectedLength int type. Expected length of upstream sequences.
-#' NA means inf in this context
+#' Can be infinite
 #' @param upstreamLengthRange string type. start_end format
 #' @param sampleNames vector type. 1-1 with upstream directories
 #' @param combinedNames string type. Title friendly "combined" sample names
@@ -108,10 +108,10 @@
     fname <-  if (secsig) "secsig" else "5utr"
     # full lengthed upstream sequences and upstream seqs
     # that are shorter than the expected length
-    if (!is.na(expectedLength)) {
+    if (!is.infinite(expectedLength)) {
         lengths <- c("", "_short")
     } else {
-        # if expected length is NA => Expected length is Inf
+        # Expected length is Inf
         lengths <- c("")
     }
 
@@ -182,5 +182,144 @@
                                  len, "_class", "_box.png")),
                    plot = g, width = V_WIDTH, height = V_HEIGHT)
         }
+    }
+}
+
+
+
+#' Title
+#'
+#' @param utr5Directories list type. 5UTR directories where files are located
+#' @param utr5Out string type. Where to dump output
+#' @param sampleNames vector type. 1-1 with utr5Directories
+#' @param combinedNames string type. Title friendly string
+#' @param mashedNames string type. File name friendly string
+#' @param upstreamRanges list type. Upstream ranges for each sample.
+#' If length(utr5Directories) > 1, the plots will only be generated for
+#' upstream ranges that are present in ALL samples. (i.e the intersection)
+#'
+#' @return none
+.UTR5Analysis <- function(utr5Directories, utr5Out, sampleNames,
+                          combinedNames, mashedNames, upstreamRanges) {
+    message(paste("Starting 5'UTR analysis on samples", combinedNames))
+    upstreamRange <- unique(upstreamRanges)
+    if (length(upstreamRange) == 1 && is.numeric(upstreamRange[[1]])) {
+        upRange <- upstreamRange[[1]]
+        START <- 1
+        END <- 2
+        if (length(upRange) != 2) {
+            stop(paste("Expected range to only have start and stop values, but got",
+                       upRange, "instead"))
+        }
+        expectedLength <- as.numeric(upRange[END]) - as.numeric(upRange[START]) + 1
+        if (is.infinite(expectedLength)) {
+            upRangeString <- paste0(upRange[START], "_", "inf")
+        } else {
+            upRangeString <- paste0(expectedLength, "_", expectedLength)
+        }
+        .upstreamDist(
+            utr5Directories,
+            utr5Out,
+            expectedLength,
+            paste0(upRange[START], "_", upRange[END]),
+            sampleNames,
+            combinedNames,
+            mashedNames,
+            FALSE
+        )
+
+        .upstreamAnalysis(
+            utr5Directories,
+            utr5Out,
+            expectedLength,
+            upRangeString,
+            sampleNames,
+            combinedNames,
+            mashedNames,
+            FALSE
+        )
+    } else if (length(upstreamRange) > 1) {
+        warning(paste("Found multiple different upstream ranges for samples",
+                      combinedNames, ":", upstreamRange,
+                      "Will not plot comparisons."))
+    } else {
+        warning(paste("UpstreamRange is not numeric for sample", combinedNames))
+    }
+}
+
+
+
+#' Title
+#'
+#' @param secDirectories list type. Secretion signal directories where files
+#' are located
+#' @param secOut string type. Where to dump output
+#' @param sampleNames vector type. 1-1 with secDirectories
+#' @param combinedNames string type. Title friendly string
+#' @param mashedNames string type. File name friendly string
+#' @param upstreamRanges list type. Upstream ranges for each sample.
+#' If length(secDirectories) > 1, the plots will only be generated for
+#' upstream ranges that are present in ALL samples. (i.e. the intersection)
+#'
+#' @return none
+.secretionSignalAnalysis <- function(secDirectories, secOut, sampleNames,
+                                     combinedNames, mashedNames,
+                                     upstreamRanges) {
+    message(paste("Starting secretion signal analysis on samples",
+                  combinedNames))
+    upstreamRange <- unique(upstreamRanges)
+    if (length(upstreamRange) == 1 && is.numeric(upstreamRange[[1]])) {
+        upRange <- upstreamRange[[1]]
+        START <- 1
+        END <- 2
+        if (length(upRange) != 2) {
+            stop(paste("Expected range to only have start and stop values, but got",
+                       upRange, "instead"))
+        }
+        expectedLength <- as.numeric(upRange[END]) - as.numeric(upRange[START]) + 1
+        if (is.infinite(expectedLength)) {
+            upRangeString <- paste0(upRange[START], "_", "inf")
+        } else {
+            upRangeString <- paste0(expectedLength, "_", expectedLength)
+            upRangeTrimmedString <- paste0("1_", expectedLength - 1)
+        }
+        .upstreamDist(
+            secDirectories,
+            secOut,
+            expectedLength,
+            paste0(upRange[START], "_", upRange[END]),
+            sampleNames,
+            combinedNames,
+            mashedNames,
+            TRUE
+        )
+        .upstreamAnalysis(
+            secDirectories,
+            secOut,
+            expectedLength,
+            upRangeString,
+            sampleNames,
+            combinedNames,
+            mashedNames,
+            TRUE
+        )
+        if (!is.infinite(expectedLength)) {
+            .upstreamAnalysis(
+                secDirectories,
+                secOut,
+                expectedLength,
+                upRangeTrimmedString,
+                sampleNames,
+                combinedNames,
+                mashedNames,
+                TRUE
+            )
+        }
+    } else if (length(upstreamRange) > 1) {
+        warning(paste("Found multiple different upstream ranges for samples",
+                      combinedNames, ":", upstreamRange,
+                      "Will not plot comparisons."))
+    } else {
+        warning(paste("UpstreamRange is not numeric for sample", combinedNames))
     }
 }

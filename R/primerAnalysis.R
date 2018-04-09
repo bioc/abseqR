@@ -38,46 +38,63 @@
     }
 }
 
+#' Collect the intersection of all primer names within a collection
+#' of primer files
+#'
+#' @param primerFiles list / vector type. Collection of primer files
+#'
+#' @return vector type. Vector of primerNames that are present in ALL
+#' primerFiles. NULL if there's no intersection at all
+.commonPrimerNames <- function(primerFiles) {
+    unionPrimers <- lapply(primerFiles, function(f) {
+        if (file.exists(f)) {
+            return(.allPrimerNames(f))
+        } else {
+            return(c())
+        }
+    })
+    return(Reduce(intersect, unionPrimers))
+}
+
+
 #' Conducts primer specificity analysis
 #'
 #' @include util.R
 #' @include distributions.R
 #' @import ggplot2
 #'
-#' @param primer5File string type. 5' end primer file
-#' @param primer3File string type. 3' end primer file
 #' @param primerDirectories string type. Path to primer analysis directory
+#' @param primer5Files vector / list type. 5' end primer files
+#' @param primer3Files vector / list type. 3' end primer files
 #' @param primerOut string type. output directory
 #' @param sampleNames vector type. 1-1 with primerDirectories
 #' @param combinedNames string type. Title friendly "combined" sample names
 #' @param mashedNames string type. File friendly "mashed-up" sample names
 #'
 #' @return None
-.primerAnalysis <- function(primer5File, primer3File, primerDirectories,
+.primerAnalysis <- function(primerDirectories, primer5Files, primer3Files,
                            primerOut, sampleNames, combinedNames, mashedNames) {
     message(paste("Starting primer analysis for", combinedNames))
-    if (primer5File == "None") {
-        primer5 <- c()
-    } else {
-        primer5 <- .allPrimerNames(primer5File)
-    }
-    if (primer3File == "None") {
-        primer3 <- c()
-    } else {
-        primer3 <- .allPrimerNames(primer3File)
-    }
+
+    primer5 <- .commonPrimerNames(primer5Files)
+    primer3 <- .commonPrimerNames(primer3Files)
 
     allPrimers <- list(primer5, primer3)
     category <- c("all", "productive", "outframe")
     analysisType <- c("stopcodon", "integrity", "indelled", "indel_pos")
+
 
     for (ctg in category) {
 
         for (i in seq_along(allPrimers)) {
             # what end this is, 3? 5?
             primerNames <- allPrimers[[i]]
-            if (length(primerNames)) {
+            if (!is.null(primerNames)) {
                 pend <- if (i == 1) '5' else '3'
+
+                message(paste("Primers found across all samples", combinedNames
+                              ,"for", paste0(pend,"'"), "end are: ",
+                              paste(primerNames, collapse = ", ")))
 
                 # individual primer IGV abundance
                 for (j in seq_along(primerNames)) {
@@ -174,7 +191,7 @@
                         }
                     }  # endof if length(files)
                 } # endof "type" analysis
-            } # endof if length(primerNames)
+            } # endof if !is.null(primerNames)
         } # end of for (i in allPrimers)
     } # end of category
 }

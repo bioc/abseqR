@@ -11,7 +11,7 @@ License: MIT
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.4)
-Imports: ggplot2, RColorBrewer, circlize, reshape2, VennDiagram, plyr
+Imports: ggplot2, RColorBrewer, circlize, reshape2, VennDiagram, plyr, BiocParallel
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 
@@ -23,4 +23,7 @@ Collate:
     'diversityAnalysis.R'
     'annotationAnalysis.R'
     'abundanceAnalysis.R'
-    'abseq.R'
+    'plotter.R'
+    'compositeRepertoire.R'
+    'repertoire.R'
+    'abseqLoad.R'

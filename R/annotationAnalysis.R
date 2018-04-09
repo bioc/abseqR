@@ -18,6 +18,7 @@
         .listFilesInOrder(path = annotDirectories,
                           pattern = ".*_all_clones_len_dist\\.csv(\\.gz)?$")
 
+    message("Starting annotation plot")
     # plotSpectratype names the sample(s) for us in the title
     if (length(searchFiles) > 0) {
         g <- .plotSpectratype(
@@ -30,6 +31,9 @@
         ggsave(file.path(annotOut, paste0(mashedNames,
                       "_all_clones_len_dist.png")), plot = g,
                width = V_WIDTH, height = V_HEIGHT)
+    } else {
+        warning(paste("Cannot find clone length distribution file from samples",
+                      paste(sampleNames, collapse = ", ")))
     }
 
     # without outliers
@@ -49,5 +53,11 @@
         ggsave(file.path(annotOut, paste0(mashedNames,
                       "_all_clones_len_dist_no_outliers.png")),
                plot = g, width = V_WIDTH, height = V_HEIGHT)
+    } else {
+        warning(paste(
+            "Cannot find clone length (no outliers)",
+            "distribution file from samples",
+            paste(sampleNames, collapse = ", ")
+        ))
     }
 }
