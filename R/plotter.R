@@ -20,18 +20,36 @@
 #' an intersection of all analysis conducted by the repertoires, otherwise, it
 #' wouldn't make sense
 #' @param outputDir string type. Where to dump the output
+#' @param primer5Files vector / list type. Collection of strings that the sample
+#' used for primer5 analysis. If sample N doesn't have a primer 5 file,
+#' leave it as anthing but a valid file path.
+#' @param primer3Files vector / list type. Collection of strings that the sample
+#' used for primer 3 analysis. If sample N doesn't have a primer 3 file,
+#' leave it as anthing but a valid file path.
+#' @param upstreamRanges list type. Collection of "None"s or vector
+#' denoting upstreamStart and upstreamEnd for each sample.
 #'
 #' @return None
 .plotSamples <-
     function(sampleNames,
              directories,
              analysis,
-             outputDir) {
+             outputDir,
+             primer5Files,
+             primer3Files,
+             upstreamRanges) {
+
         if (!dir.exists(outputDir)) {
             dir.create(outputDir)
         }
         mashedNames <- paste(sampleNames, collapse = "_")
         combinedNames <- paste(sampleNames, collapse = ", ")
+
+        ##################################################
+        #                                                #
+        #               ANNOTATION PLOTS                 #
+        #                                                #
+        ##################################################
         if ("annot" %in% analysis) {
             annotOut <- file.path(outputDir, "annot")
             if (!file.exists(annotOut)) {
@@ -114,17 +132,15 @@
                                         file.path,
                                         "primer_specificity",
                                         USE.NAMES = F)
-            if (primer5File != "None" || primer3File != "None") {
-                .primerAnalysis(
-                    primer5File,
-                    primer3File,
-                    primerDirectories,
-                    primerOut,
-                    sampleNames,
-                    combinedNames,
-                    mashedNames
-                )
-            }
+            .primerAnalysis(
+                primerDirectories,
+                primer5Files,
+                primer3Files,
+                primerOut,
+                sampleNames,
+                combinedNames,
+                mashedNames
+            )
         }
 
         ##################################################
@@ -139,37 +155,8 @@
             }
             utr5Directories <- sapply(directories, file.path, "utr5",
                                       USE.NAMES = F)
-
-            if (upstreamStart != "None" && upstreamEnd != "None") {
-                expectedLength <-
-                    as.integer(upstreamEnd) - as.integer(upstreamStart) + 1
-                # NA => upstreamEnd is Inf
-                if (is.na(expectedLength)) {
-                    upstreamRange <- paste0(upstreamStart, "_", 'inf')
-                } else {
-                    upstreamRange <- paste0(expectedLength, "_", expectedLength)
-                }
-                .upstreamDist(
-                    utr5Directories,
-                    utr5Out,
-                    expectedLength,
-                    paste0(upstreamStart, "_", upstreamEnd),
-                    sampleNames,
-                    combinedNames,
-                    mashedNames,
-                    FALSE
-                )
-                .upstreamAnalysis(
-                    utr5Directories,
-                    utr5Out,
-                    expectedLength,
-                    upstreamRange,
-                    sampleNames,
-                    combinedNames,
-                    mashedNames,
-                    FALSE
-                )
-            }
+            .UTR5Analysis(utr5Directories, utr5Out, sampleNames, combinedNames,
+                          mashedNames, upstreamRanges)
         }
 
         ##################################################
@@ -185,49 +172,7 @@
             secDirectories <-
                 sapply(directories, file.path, "secretion",
                        USE.NAMES = F)
-            if (upstreamStart != "None" && upstreamEnd != "None") {
-                expectedLength <-
-                    as.integer(upstreamEnd) - as.integer(upstreamStart) + 1
-                # NA => upstream is Inf
-                if (is.na(expectedLength)) {
-                    upstreamRange <- paste0(upstreamStart, "_", 'inf')
-                } else {
-                    upstreamRange <- paste0(expectedLength, "_", expectedLength)
-                    upstreamRangeTrimmed <-
-                        paste0("1_", expectedLength - 1)
-                }
-                .upstreamDist(
-                    secDirectories,
-                    secOut,
-                    expectedLength,
-                    paste0(upstreamStart, "_", upstreamEnd),
-                    sampleNames,
-                    combinedNames,
-                    mashedNames,
-                    TRUE
-                )
-                .upstreamAnalysis(
-                    secDirectories,
-                    secOut,
-                    expectedLength,
-                    upstreamRange,
-                    sampleNames,
-                    combinedNames,
-                    mashedNames,
-                    TRUE
-                )
-                if (!is.na(expectedLength)) {
-                    .upstreamAnalysis(
-                        secDirectories,
-                        secOut,
-                        expectedLength,
-                        upstreamRangeTrimmed,
-                        sampleNames,
-                        combinedNames,
-                        mashedNames,
-                        TRUE
-                    )
-                }
-            }
+            .secretionSignalAnalysis(secDirectories, secOut, sampleNames,
+                                     combinedNames, mashedNames, upstreamRanges)
         }
     }
