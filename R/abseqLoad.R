@@ -48,14 +48,10 @@ setMethod(f = "abSeqPlot",
                       outputDir <- file.path(root, RESULT_DIR,
                                              paste(sampleNames,
                                                    collapse = "_vs_"))
-                      sampleDirectories <- lapply(sampleNames, function(sampleName) {
-                          file.path(root, RESULT_DIR, sampleName)
-                      })
                       samples <- Reduce("+",
-                                        lapply(sampleDirectories, function(directory) {
+                                        lapply(sampleNames, function(sampleName) {
                                             .loadRepertoireFromParams(
-                                                file.path(directory,
-                                                          ANALYSIS_PARAMS))
+                                                file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
                                         }))
                   } else {
                       outputDir <- file.path(root,
