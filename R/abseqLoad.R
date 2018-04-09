@@ -11,6 +11,8 @@ AbSeqLoad <- setClass("AbSeqLoad", slots = c(outputDirectory = "character"))
 
 #' Title
 #'
+#' @import BiocParallel
+#'
 #' @include repertoire.R
 #' @include compositeRepertoire.R
 #' @include plotter.R
@@ -30,7 +32,6 @@ setGeneric(name = "abSeqPlot",
 setMethod(f = "abSeqPlot",
           signature = "AbSeqLoad",
           definition = function(object) {
-              individualSamples <- list()
 
               root <- object@outputDirectory
 
@@ -41,7 +42,8 @@ setMethod(f = "abSeqPlot",
               pairings <- rev(tail(readLines(con), n = -1))
               close(con)
 
-              for (pair in pairings) {
+              lapply(pairings, function(pair) {
+              #BiocParallel::bplapply(pairings, function(pair) {
                   sampleNames <- unlist(strsplit(pair, ","))
 
                   if (length(sampleNames) > 1) {
@@ -58,9 +60,21 @@ setMethod(f = "abSeqPlot",
                                              RESULT_DIR,
                                              sampleNames[1])
                       samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
-                      individualSamples <- c(individualSamples, samples)
                   }
                   AbSeq::plotRepertoires(samples, outputDir)
+              })
+
+              individualSamples <- list()
+              # populate individualSample list with samples for user to browse
+              for (pair in pairings) {
+                  sampleNames <- unlist(strsplit(pair, ","))
+                  if (length(sampleNames) == 1) {
+                      outputDir <- file.path(root,
+                                             RESULT_DIR,
+                                             sampleNames[1])
+                      samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
+                      individualSamples <- c(individualSamples)
+                  }
               }
               return(individualSamples)
           })
