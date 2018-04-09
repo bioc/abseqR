@@ -73,7 +73,7 @@ setMethod(f = "abSeqPlot",
                                              RESULT_DIR,
                                              sampleNames[1])
                       samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
-                      individualSamples <- c(individualSamples)
+                      individualSamples <- c(individualSamples, samples)
                   }
               }
               return(individualSamples)

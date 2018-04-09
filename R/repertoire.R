@@ -166,17 +166,10 @@ setMethod(f = "plotRepertoires",
               analyses <- unlist(.inferAnalyzed(analysisDirectories[[1]]))
               sampleNames <- c(object@name)
 
-              # TODO:
-              primer5File <- primer3File <- upstreamStart <- upstreamEnd <- "None"
               .plotSamples(sampleNames,
                            analysisDirectories,
                            analyses,
-                           outputDir,
-                           primer5File,
-                           primer3File,
-                           upstreamStart,
-                           upstreamEnd)
-
+                           outputDir)
           })
 
 setMethod(f = "plotRepertoires",
@@ -197,15 +190,8 @@ setMethod(f = "plotRepertoires",
                   x@name
               }))
 
-              # TODO:
-              primer5File <- primer3File <- upstreamStart <- upstreamEnd <- "None"
-
               .plotSamples(sampleNames,
                            analysisDirectories,
                            similarAnalyses,
-                           outputDir,
-                           primer5File,
-                           primer3File,
-                           upstreamStart,
-                           upstreamEnd)
+                           outputDir)
           })

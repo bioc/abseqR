@@ -20,21 +20,13 @@
 #' an intersection of all analysis conducted by the repertoires, otherwise, it
 #' wouldn't make sense
 #' @param outputDir string type. Where to dump the output
-#' @param primer5File
-#' @param primer3File
-#' @param upstreamStart
-#' @param upstreamEnd
 #'
 #' @return None
 .plotSamples <-
     function(sampleNames,
              directories,
              analysis,
-             outputDir,
-             primer5File,
-             primer3File,
-             upstreamStart,
-             upstreamEnd) {
+             outputDir) {
         if (!dir.exists(outputDir)) {
             dir.create(outputDir)
         }
