@@ -17,9 +17,8 @@ params:
     name: "PLACEHOLDER SAMPLE NAME"
     # single sample?
     single: FALSE
-    # directory names
-    annotOut: "/newhome/jiahong/sandbox/immulator_out/output_results/report/PCR1_ACGT_L001_crossed_vs_PCR2_ACGT_L001_crossed_vs_PCR3_ACGT_L001_crossed_vs_PCR4_ACGT_L001_crossed_vs_PCR5_ACGT_L001_crossed/annot"
-    abunOut: "/newhome/jiahong/sandbox/immulator_out/output_results/report/PCR1_ACGT_L001_crossed_vs_PCR2_ACGT_L001_crossed_vs_PCR3_ACGT_L001_crossed_vs_PCR4_ACGT_L001_crossed_vs_PCR5_ACGT_L001_crossed/abundance"
+    # root output directory
+    rootDir: ""
     hasAnnot: TRUE
     hasAbun: TRUE
 ---
@@ -56,7 +55,7 @@ Row
 ### Sequence lengths without outlier removal
 
 ```{r, eval=params$hasAnnot, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = params$annotOut,
+fname <- .getFile(path = file.path(params$rootDir, "annot"),
                   pattern = ".*_all_clones_len_dist\\.Rdata")
 load(fname)
 if (params$interactive) {
@@ -72,7 +71,7 @@ Row
 ### Sequence lengths __with__ outlier removal
 
 ```{r, eval=params$hasAnnot, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = params$annotOut,
+fname <- .getFile(path = file.path(params$rootDir, "annot"),
                   pattern = ".*_all_clones_len_dist_no_outliers\\.Rdata")
 load(fname)
 if (params$interactive) {
@@ -97,9 +96,10 @@ Abundance {data-orientation=columns}
 Column {.tabset .tabset-fade}
 -----------------------------------------------------------------------
 
-### V family germline abundance
+### V family
+
 ```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = params$abunOut,
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igv_dist_family_level\\.Rdata")
 load(fname)
 if (params$interactive) {
@@ -109,10 +109,10 @@ if (params$interactive) {
 }
 ```
 
-### V gene germline abundance
+### V gene
 
 ```{r, eval=params$hasAbun, fig.width=params$height, fig.height=params$width}
-fname <- .getFile(path = params$abunOut,
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igv_dist_gene_level\\.Rdata")
 load(fname)
 # TODO: ggplotly is buggy with horizontal plot in tabsets
@@ -124,15 +124,17 @@ if (params$interactive) {
 }
 ```
 
+> Only the top 15 from each sample are shown
+
 `r if(!params$inclD || !params$hasAbun) {"\\begin{comment}"}`
 
 Column {.tabset .tabset-fade}
 -----------------------------------------------------------------------
 
-### D family germline abundance
+### D family
 
 ```{r, eval=(params$inclD && params$hasAbun), fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = params$abunOut,
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igd_dist_family_level\\.Rdata")
 load(fname)
 if (params$interactive) {
@@ -142,10 +144,10 @@ if (params$interactive) {
 }
 ```
 
-### D gene germline abundance
+### D gene
 
 ```{r, eval=(params$inclD && params$hasAbun), fig.width=params$height, fig.height=params$width}
-fname <- .getFile(path = params$abunOut,
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igd_dist_gene_level\\.Rdata")
 load(fname)
 # TODO: ggplotly is buggy with horizontal plot in tabsets
@@ -156,16 +158,19 @@ if (params$interactive) {
     plot
 }
 ```
+
+> Only the top 15 from each sample are shown
+
 `r if(!params$inclD || !params$hasAbun) {"\\end{comment}"}`
 
 
 Column {.tabset .tabset-fade}
 -----------------------------------------------------------------------
 
-### J family germline abundance
+### J family
 
 ```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = params$abunOut,
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igj_dist_family_level\\.Rdata")
 load(fname)
 if (params$interactive) {
@@ -175,9 +180,10 @@ if (params$interactive) {
 }
 ```
 
-### J variant germline abundance
+### J variant
+
 ```{r, eval=params$hasAbun, fig.width=params$height, fig.height=params$width}
-fname <- .getFile(path = params$abunOut,
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igj_dist_variant_level\\.Rdata")
 load(fname)
 # TODO: ggplotly is buggy with horizontal plot in tabsets
@@ -189,10 +195,13 @@ if (params$interactive) {
 }
 ```
 
+> Only the top 15 from each sample are shown
+
 `r if(!params$single || !params$hasAbun) {"\\begin{comment}"}`
 ### V-J association
+
 ```{r, eval=(params$single && params$hasAbun), fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = params$abunOut, pattern = ".*_vjassoc\\.png")
+fname <- .getFile(path = file.path(params$rootDir, "abundance"), pattern = ".*_vjassoc\\.png")
 img <- readPNG(fname)
 grid.raster(img)
 ```

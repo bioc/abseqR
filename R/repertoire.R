@@ -141,6 +141,8 @@ setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), functio
 
 #' Title
 #'
+#' @import rmarkdown
+#'
 #' @include util.R
 #' @include plotter.R
 #' @include compositeRepertoire.R
@@ -175,6 +177,19 @@ setMethod(f = "plotRepertoires",
                            primer5Files,
                            primer3Files,
                            upstreamRanges)
+
+              # TODO: params$has<analysis_name> should be supplied using
+              # analyses variable.
+
+              rmarkdown::render(
+                  system.file("extdata", "template.Rmd", package = "AbSeq"),
+                  output_dir = outputDir,
+                  output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
+                  params = list(
+                      rootDir = outputDir,
+                      single = TRUE
+                  )
+              )
           })
 
 setMethod(f = "plotRepertoires",
@@ -215,4 +230,17 @@ setMethod(f = "plotRepertoires",
                            primer5Files,
                            primer3Files,
                            upstreamRanges)
+
+              # TODO: params$has<analysis_name> should be supplied using
+              # similarAnalyses variable.
+
+              rmarkdown::render(
+                  system.file("extdata", "template.Rmd", package = "AbSeq"),
+                  output_dir = outputDir,
+                  output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
+                  params = list(
+                      rootDir = outputDir,
+                      single = FALSE
+                  )
+              )
           })

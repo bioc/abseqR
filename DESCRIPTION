@@ -21,7 +21,8 @@ Imports:
     flexdashboard,
     BiocParallel (>= 1.1.25),
     png,
-    grid
+    grid,
+    rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 
