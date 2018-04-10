@@ -20,11 +20,12 @@
 #' order
 #' @param cutoff int type. Number of maximum ticks to show (x on vert plots,
 #' y on hori plots).
+#' @param legendPos string type. Where to position legend (see ggplot's theme())
 #'
 #' @return ggplot2 object
 .plotDist <- function(dataframes, sampleNames, plotTitle, vert = T,
                       xlabel = "", ylabel = "", perc = T, subs = "",
-                      sorted = T, cutoff = 15) {
+                      sorted = T, cutoff = 15, legendPos = "bottom") {
     frames <- length(dataframes)
     # sanity check
     if (length(sampleNames) != frames) {
@@ -177,7 +178,8 @@
                               aes(fill = sample), position = 'dodge')
         }
     }
-    g <- g + theme(text = element_text(size = 10)) +
+    g <- g + theme(text = element_text(size = 10),
+                   legend.position = legend.position) +
         labs(title = plotTitle,
              subtitle = subs,
              x = xlabel,
