@@ -18,7 +18,10 @@ Imports:
     reshape2,
     VennDiagram,
     plyr,
-    BiocParallel (>= 1.1.25)
+    flexdashboard,
+    BiocParallel (>= 1.1.25),
+    png,
+    grid
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 

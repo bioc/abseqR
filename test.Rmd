@@ -1,0 +1,207 @@
+---
+title: "AbSeq"
+header-evals:
+  - \usepackage{comment}
+output: 
+  flexdashboard::flex_dashboard:
+    vertical_layout: scroll
+params:
+    # img dimensions
+    width: 8
+    height: 5
+    # ggplotly?
+    interactive: TRUE
+    # eval D-gene abundance related plots? - light chain might not want this
+    inclD: TRUE
+    # sample name
+    name: "PLACEHOLDER SAMPLE NAME"
+    # single sample?
+    single: FALSE
+    # directory names
+    annotOut: "/newhome/jiahong/sandbox/immulator_out/output_results/report/PCR1_ACGT_L001_crossed_vs_PCR2_ACGT_L001_crossed_vs_PCR3_ACGT_L001_crossed_vs_PCR4_ACGT_L001_crossed_vs_PCR5_ACGT_L001_crossed/annot"
+    abunOut: "/newhome/jiahong/sandbox/immulator_out/output_results/report/PCR1_ACGT_L001_crossed_vs_PCR2_ACGT_L001_crossed_vs_PCR3_ACGT_L001_crossed_vs_PCR4_ACGT_L001_crossed_vs_PCR5_ACGT_L001_crossed/abundance"
+    hasAnnot: TRUE
+    hasAbun: TRUE
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(plotly)
+library(png)
+library(grid)
+
+.getFile <- function(path, pattern) {
+    flist <- list.files(path = path, pattern = pattern, full.names = T)
+    n <- length(flist)
+    if (n != 1) {
+        stop(paste("Expected to find one file, but found", n, "from",
+                   paste(flist, collapse = ", "), "instead"))
+    }
+    return(flist[[1]])
+}
+```
+
+\begin{comment}
+Page 1 is a overview of the sample analysis
+\end{comment}
+
+`r if(!params$hasAnnot) {"\\begin{comment}"}`
+
+Summary {data-orientation=rows}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Sequence lengths without outlier removal
+
+```{r, eval=params$hasAnnot, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = params$annotOut,
+                  pattern = ".*_all_clones_len_dist\\.Rdata")
+load(fname)
+if (params$interactive) {
+    ggplotly(plot)
+} else {
+    plot
+}
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Sequence lengths __with__ outlier removal
+
+```{r, eval=params$hasAnnot, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = params$annotOut,
+                  pattern = ".*_all_clones_len_dist_no_outliers\\.Rdata")
+load(fname)
+if (params$interactive) {
+    ggplotly(plot)
+} else {
+    plot
+}
+```
+
+`r if(!params$hasAnnot) {"\\end{comment}"}`
+
+\begin{comment}
+Page 2 is abundance analysis
+\end{comment}
+
+`r if(!params$hasAbun) {"\\begin{comment}"}`
+
+Abundance {data-orientation=columns}
+=======================================================================
+
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### V family germline abundance
+```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = params$abunOut,
+                  pattern = ".*igv_dist_family_level\\.Rdata")
+load(fname)
+if (params$interactive) {
+    ggplotly(plot)
+} else {
+    plot
+}
+```
+
+### V gene germline abundance
+
+```{r, eval=params$hasAbun, fig.width=params$height, fig.height=params$width}
+fname <- .getFile(path = params$abunOut,
+                  pattern = ".*igv_dist_gene_level\\.Rdata")
+load(fname)
+# TODO: ggplotly is buggy with horizontal plot in tabsets
+if (params$interactive) {
+    plot
+    #ggplotly(plot)
+} else {
+    plot
+}
+```
+
+`r if(!params$inclD || !params$hasAbun) {"\\begin{comment}"}`
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### D family germline abundance
+
+```{r, eval=(params$inclD && params$hasAbun), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = params$abunOut,
+                  pattern = ".*igd_dist_family_level\\.Rdata")
+load(fname)
+if (params$interactive) {
+    ggplotly(plot)
+} else {
+    plot
+}
+```
+
+### D gene germline abundance
+
+```{r, eval=(params$inclD && params$hasAbun), fig.width=params$height, fig.height=params$width}
+fname <- .getFile(path = params$abunOut,
+                  pattern = ".*igd_dist_gene_level\\.Rdata")
+load(fname)
+# TODO: ggplotly is buggy with horizontal plot in tabsets
+if (params$interactive) {
+    plot
+    # ggplotly(plot)
+} else {
+    plot
+}
+```
+`r if(!params$inclD || !params$hasAbun) {"\\end{comment}"}`
+
+
+Column {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### J family germline abundance
+
+```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = params$abunOut,
+                  pattern = ".*igj_dist_family_level\\.Rdata")
+load(fname)
+if (params$interactive) {
+    ggplotly(plot)
+} else {
+    plot
+}
+```
+
+### J variant germline abundance
+```{r, eval=params$hasAbun, fig.width=params$height, fig.height=params$width}
+fname <- .getFile(path = params$abunOut,
+                  pattern = ".*igj_dist_variant_level\\.Rdata")
+load(fname)
+# TODO: ggplotly is buggy with horizontal plot in tabsets
+if (params$interactive) {
+    plot
+    # ggplotly(plot)
+} else {
+    plot
+}
+```
+
+`r if(!params$single || !params$hasAbun) {"\\begin{comment}"}`
+### V-J association
+```{r, eval=(params$single && params$hasAbun), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = params$abunOut, pattern = ".*_vjassoc\\.png")
+img <- readPNG(fname)
+grid.raster(img)
+```
+`r if(!params$single || !params$hasAbun) {"\\end{comment}"}`
+
+`r if(!params$hasAbun) {"\\end{comment}"}`
+
+
+\begin{comment}
+=======================================================================
+-----------------------------------------------------------------------
+\end{comment}

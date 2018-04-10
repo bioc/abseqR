@@ -7,9 +7,10 @@
 #' @param files list type. list of files in abundance directory
 #' @param sampleNames vector type. 1-1 correspondance to files
 #' @param outputDir string type
+#' @param .save logical type. Save Rdata ggplot item
 #'
 #' @return None
-.abundancePlot <- function(files, sampleNames, outputDir) {
+.abundancePlot <- function(files, sampleNames, outputDir, .save = TRUE) {
     for (expression in c("family", "gene")) {
         for (gene in c("v", "d", "j")) {
             # correction, J has no "gene" but rather variant
@@ -39,10 +40,9 @@
                                paste0("IG", toupper(gene),
                                       " abundance in ", mashedName),
                                vert, subs = subtitle)
-                ggsave(file.path(outputDir,
-                              paste0(paste(sampleNames, collapse = "_"), "_ig",
-                              gene, "_dist_", expression, "_level.png")),
-                       plot = p, width = width, height = height)
+                filename <- file.path(outputDir, paste0(paste(sampleNames, collapse = "_"), "_ig", gene, "_dist_", expression, "_level.png"))
+                ggsave(filename, plot = p, width = width, height = height)
+                .saveAs(.save, filename, plot = p)
             }
         }
     }
@@ -114,10 +114,12 @@
 #' @param sampleNames vector type. 1-1 correspondence with abundanceDirectories
 #' @param combinedNames string type. Title "combined" sample names
 #' @param mashedNames string type. File "mashed" names - avoid special chars
+#' @param .save logical type. Save ggplot as Rdata
 #'
 #' @return None
 .abundanceAnalysis <- function(abundanceDirectories, abunOut,
-                               sampleNames, combinedNames, mashedNames) {
+                               sampleNames, combinedNames, mashedNames,
+                               .save = TRUE) {
     # where to find the files
     # 3 each from V and D, then 2 from J (no gene) or 5 (exclude the 3 from D)
     searchFiles <-
@@ -158,9 +160,9 @@
             .checkVert(abunIgvMismatchFiles[[1]]),
             subs = subtitle
         )
-        ggsave(file.path(abunOut, paste0(mashedNames,
-                                         "_igv_mismatches_dist.png")),
-               plot = abunIgvMismatches, width = V_WIDTH, height = V_HEIGHT)
+        saveName <- file.path(abunOut, paste0(mashedNames, "_igv_mismatches_dist.png"))
+        ggsave(saveName, plot = abunIgvMismatches, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, saveName, plot = abunIgvMismatches)
     } else {
         warning("Could not find IGV mismatches distribution CSV files in",
                 paste(abundanceDirectories, collapse = ","))
@@ -183,8 +185,9 @@
             .checkVert(abunIgvGapsFiles[[1]]),
             subs = subtitle
         )
-        ggsave(file.path(abunOut, paste0(mashedNames, "_igv_gaps_dist.png")),
-               plot = abunIgvGaps, width = V_WIDTH, height = V_HEIGHT)
+        saveName <- file.path(abunOut, paste0(mashedNames, "_igv_gaps_dist.png"))
+        ggsave(saveName, plot = abunIgvGaps, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, saveName, plot = abunIgvGaps)
     } else {
         warning("Could not find IGV indels distribution CSV files in",
                 paste(abundanceDirectories, collapse = ","))

@@ -139,3 +139,20 @@ ABSEQ_CFG <- "abseq.cfg"
     factorRegions <- factor(regions, levels = lvls)
     return(lines[order(factorRegions, decreasing = T)])
 }
+
+
+#' Title
+#'
+#' @import tools
+#'
+#' @param .save
+#' @param filename
+#' @param plot
+#'
+#' @return
+.saveAs <- function(.save, filename, plot) {
+    if (.save) {
+        fname <- sub(tools::file_ext(filename), "Rdata", filename)
+        save(file = fname, list = c("plot"))
+    }
+}

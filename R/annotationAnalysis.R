@@ -8,16 +8,16 @@
 #' @param annotOut string type. Output directory
 #' @param sampleNames vector type. 1-1 with annotDirectories
 #' @param mashedNames string type. File output "mashed" sample names
+#' @param .save logical type. Saves ggplot object
 #'
-#' @return None
+#' @return none
 .annotAnalysis <- function(annotDirectories, annotOut,
-                          sampleNames, mashedNames) {
+                          sampleNames, mashedNames, .save = TRUE) {
 
     # with outliers
     searchFiles <-
         .listFilesInOrder(path = annotDirectories,
                           pattern = ".*_all_clones_len_dist\\.csv(\\.gz)?$")
-
     message("Starting annotation plot")
     # plotSpectratype names the sample(s) for us in the title
     if (length(searchFiles) > 0) {
@@ -28,9 +28,10 @@
             xlabel = "Sequence Length (bp)",
             ylabel = "Proportion"
         )
-        ggsave(file.path(annotOut, paste0(mashedNames,
-                      "_all_clones_len_dist.png")), plot = g,
-               width = V_WIDTH, height = V_HEIGHT)
+        fname <- file.path(annotOut,
+                           paste0(mashedNames, "_all_clones_len_dist.png"))
+        ggsave(fname, plot = g, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, fname, g)
     } else {
         warning(paste("Cannot find clone length distribution file from samples",
                       paste(sampleNames, collapse = ", ")))
@@ -50,9 +51,11 @@
             xlabel = "Sequence Length (bp)",
             ylabel = "Proportion"
         )
-        ggsave(file.path(annotOut, paste0(mashedNames,
-                      "_all_clones_len_dist_no_outliers.png")),
-               plot = g, width = V_WIDTH, height = V_HEIGHT)
+        fname <- file.path(annotOut,
+                           paste0(mashedNames,
+                                  "_all_clones_len_dist_no_outliers.png"))
+        ggsave(fname, plot = g, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, fname, g)
     } else {
         warning(paste(
             "Cannot find clone length (no outliers)",

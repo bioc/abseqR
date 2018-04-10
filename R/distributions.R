@@ -25,7 +25,7 @@
 #' @return ggplot2 object
 .plotDist <- function(dataframes, sampleNames, plotTitle, vert = T,
                       xlabel = "", ylabel = "", perc = T, subs = "",
-                      sorted = T, cutoff = 15, legendPos = "bottom") {
+                      sorted = T, cutoff = 15, legendPos = "right") {
     frames <- length(dataframes)
     # sanity check
     if (length(sampleNames) != frames) {
@@ -179,7 +179,7 @@
         }
     }
     g <- g + theme(text = element_text(size = 10),
-                   legend.position = legend.position) +
+                   legend.position = legendPos) +
         labs(title = plotTitle,
              subtitle = subs,
              x = xlabel,
