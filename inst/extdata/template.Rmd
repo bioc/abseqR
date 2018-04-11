@@ -16,9 +16,9 @@ params:
     # sample name
     name: "PLACEHOLDER SAMPLE NAME"
     # single sample?
-    single: FALSE
+    single: TRUE
     # root output directory
-    rootDir: ""
+    rootDir: "/newhome/jiahong/sandbox/immulator_out/output_results/report/PCR1_ACGT_L001_crossed"
     hasAnnot: TRUE
     hasAbun: TRUE
 ---
@@ -89,14 +89,14 @@ Page 2 is abundance analysis
 
 `r if(!params$hasAbun) {"\\begin{comment}"}`
 
-Abundance {data-orientation=columns}
+Abundance {data-orientation=rows}
 =======================================================================
 
 
-Column {.tabset .tabset-fade}
+Row
 -----------------------------------------------------------------------
 
-### V family
+### V family 
 
 ```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "abundance"),
@@ -128,7 +128,7 @@ if (params$interactive) {
 
 `r if(!params$inclD || !params$hasAbun) {"\\begin{comment}"}`
 
-Column {.tabset .tabset-fade}
+Row
 -----------------------------------------------------------------------
 
 ### D family
@@ -153,7 +153,7 @@ load(fname)
 # TODO: ggplotly is buggy with horizontal plot in tabsets
 if (params$interactive) {
     plot
-    # ggplotly(plot)
+    #ggplotly(plot)
 } else {
     plot
 }
@@ -164,7 +164,7 @@ if (params$interactive) {
 `r if(!params$inclD || !params$hasAbun) {"\\end{comment}"}`
 
 
-Column {.tabset .tabset-fade}
+Row
 -----------------------------------------------------------------------
 
 ### J family
@@ -189,7 +189,7 @@ load(fname)
 # TODO: ggplotly is buggy with horizontal plot in tabsets
 if (params$interactive) {
     plot
-    # ggplotly(plot)
+    #ggplotly(plot)
 } else {
     plot
 }
@@ -198,6 +198,10 @@ if (params$interactive) {
 > Only the top 15 from each sample are shown
 
 `r if(!params$single || !params$hasAbun) {"\\begin{comment}"}`
+
+Row
+-----------------------------------------------------------------------
+
 ### V-J association
 
 ```{r, eval=(params$single && params$hasAbun), fig.width=params$width, fig.height=params$height}
@@ -207,8 +211,84 @@ grid.raster(img)
 ```
 `r if(!params$single || !params$hasAbun) {"\\end{comment}"}`
 
+> Plot associations between V genes and J genes on the family level
+
 `r if(!params$hasAbun) {"\\end{comment}"}`
 
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Bitscore vs Alignment Length
+```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
+                  pattern = ".*_igv_align_quality_bitscore_hm\\.png")
+img <- readPNG(fname)
+grid.raster(img)
+```
+
+### Gaps vs Alignment Length
+```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
+                  pattern = ".*_igv_align_quality_gaps_hm\\.png")
+img <- readPNG(fname)
+grid.raster(img)
+```
+
+### Identity vs Alignment Length
+```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
+                  pattern = ".*_igv_align_quality_identity_hm\\.png")
+img <- readPNG(fname)
+grid.raster(img)
+```
+
+### Mismatches vs Alignment Length
+```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
+                  pattern = ".*_igv_align_quality_mismatches_hm\\.png")
+img <- readPNG(fname)
+grid.raster(img)
+```
+
+### Subject Start vs Query Start
+```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
+                  pattern = ".*_igv_align_quality_start_hm\\.png")
+img <- readPNG(fname)
+grid.raster(img)
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Indels (Gaps)
+```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
+                  pattern = ".*_igv_gaps_dist\\.Rdata")
+load(fname)
+if (params$interactive) {
+    ggplotly(plot)
+} else {
+    plot
+}
+```
+
+> Plot of insertions and deletions found within the __V gene__
+
+### Mismatches
+```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
+                  pattern = ".*_igv_mismatches_dist\\.Rdata")
+load(fname)
+if (params$interactive) {
+    ggplotly(plot)
+} else {
+    plot
+}
+```
+
+> Plot of nucleotide base mismatches found within the __V gene__
 
 \begin{comment}
 =======================================================================
