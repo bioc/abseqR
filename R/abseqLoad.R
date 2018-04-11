@@ -43,8 +43,8 @@ setMethod(f = "abSeqPlot",
               pairings <- rev(tail(readLines(con), n = -1))
               close(con)
 
-              lapply(pairings, function(pair) {
-              #BiocParallel::bplapply(pairings, function(pair) {
+              #lapply(pairings, function(pair) {
+              BiocParallel::bplapply(pairings, function(pair) {
                   sampleNames <- unlist(strsplit(pair, ","))
 
                   if (length(sampleNames) > 1) {
@@ -63,8 +63,8 @@ setMethod(f = "abSeqPlot",
                       samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
                   }
                   AbSeq::plotRepertoires(samples, outputDir)
-              })
-              #}, BPPARAM = BPPARAM)
+              #})
+              }, BPPARAM = BPPARAM)
 
               individualSamples <- list()
               # populate individualSample list with samples for user to browse

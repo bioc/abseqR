@@ -651,8 +651,6 @@
     return(g)
 }
 
-
-
 #' Title Diversity analysis
 #'
 #' @import ggplot2
@@ -823,7 +821,6 @@
         } else {
             warning(paste0("Could not find FR", i, " spectratype files in ",
                           paste(diversityDirectories, collapse = ", ")))
-
         }
     }
 
@@ -838,6 +835,18 @@
                plot = g, width = V_WIDTH, height = V_HEIGHT)
     }
 
+    # MINISECTION:
+    # ## COMPOSITION LOGOS ###
+    if (length(sampleNames) == 1) {
+        compOut <- file.path(diversityOut, "composition_logos")
+        if (!file.exists(compOut)) {
+            dir.create(compOut)
+        }
+        message(paste("Plotting composition logos on samples",
+                paste(sampleNames, collapse = ", ")))
+        .aminoAcidPlot(compOut, sampleNames[1])
+    }
+
     # we can plot region analysis if there's only one sample
     #if (length(sampleNames) == 1) {
     #  # default = top 15
@@ -845,4 +854,126 @@
     #  ggsave(paste0(diversityOut, mashedNames, "_region_analysis.png"),
     #         plot = g, width = V_WIDTH, height = V_HEIGHT)
     #}
+}
+
+
+.aminoAcidPlot <- function(compositionDirectory, sampleName,
+                           regions = c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3", "FR4")) {
+    for (region in regions) {
+        dirName <- file.path(compositionDirectory, region)
+        summaryPlot <- file.path(dirName, paste0(sampleName, "_cumulative_logo.csv"))
+        df <- read.csv(summaryPlot)
+        g1 <- .aminoAcidBar(df, scale = F, region)
+        g2 <- .aminoAcidBar(df, scale = T, region)
+        fname1 <- file.path(dirName, paste0(sampleName, "_cumulative_logo.png"))
+        fname2 <- file.path(dirName, paste0(sampleName, "_cumulative_logo_scaled.png"))
+        ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
+        ggsave(fname2, plot = g2, width = V_WIDTH, height = V_HEIGHT)
+
+        germlineSpecific <- list.files(path = dirName, pattern = paste0(sampleName, "_.+_cumulative_logo\\.csv(\\.gz)?$"), full.names = T)
+        lapply(germlineSpecific, function(gLogoFile) {
+            germName <-
+                sub(paste0(dirName, .Platform$file.sep),
+                    "",
+                    gsub(
+                        paste0(sampleName, "_(.*)_cumulative_logo\\.csv$"),
+                        "\\1",
+                        gLogoFile
+                    ))
+            df <- read.csv(gLogoFile)
+            g1 <- .aminoAcidBar(df, scale = F, region, germ = germName)
+            g2 <- .aminoAcidBar(df, scale = T, region, germ = germName)
+            fname1 <- file.path(dirName, paste0(sampleName, "_", germName, "_cumulative_logo.png"))
+            fname2 <- file.path(dirName, paste0(sampleName, "_", germName, "_cumulative_logo_scaled.png"))
+            ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
+            ggsave(fname2, plot = g2, width = V_WIDTH, height = V_HEIGHT)
+        })
+    }
+}
+
+.aminoAcidBar <- function(df, scale, region, germ = "") {
+    group.colors <-
+        c(
+            # oranges
+            G = "#ff9900",
+            A = "#ffc266",
+            S = "#ffe0b3",
+            T = "#fff5e6",
+            # greens
+            C = "#145214",
+            V = "#248f24",
+            I = "#2eb82e",
+            L = "#47d147",
+            P = "#70db70",
+            F = "#99e699",
+            Y = "#c2f0c2",
+            M = "#d6f5d6",
+            W = "#ebfaeb",
+            # purples
+            N = "#cc00cc",
+            Q = "#ff99ff",
+            H = "#ffe6ff",
+            # reds
+            D = "#ff1a1a",
+            E = "#ffb3b3",
+            # blues
+            K = "#6699ff",
+            R = "#e6eeff"
+        )
+    df.agg <- aggregate(count ~ position, df, sum)
+
+    # get the max counts for each position - then xlabel will contain
+    # the amino acid character for that position - break ties on first occurance
+    df.max <- merge(aggregate(count ~ position, df, max), df)
+    df.max <- df.max[!duplicated(df.max[c(1,2)]), ]
+    xlabels <- df.max[with(df.max, order(position)), ]$aa
+
+    total <- max(df.agg$count)
+    if (scale) {
+        df$proportion <- df$count / total
+        subs <- "Scaled to proportion"
+    } else {
+        df.tmp <- merge(df, df.agg, by = "position")
+        df.tmp <- df.tmp[with(df.tmp, order(position)), ]
+        # if not scaled, divide within its own position rather than
+        # overall (i.e. the max)
+        df$proportion <- df.tmp$count.x / df.tmp$count.y
+        subs <- ""
+    }
+
+    df$aa <-
+        factor(
+            df$aa,
+            levels = c(
+                "G",
+                "A",
+                "S",
+                "T",
+                "C",
+                "V",
+                "I",
+                "L",
+                "P",
+                "F",
+                "Y",
+                "M",
+                "W",
+                "N",
+                "Q",
+                "H",
+                "D",
+                "E",
+                "K",
+                "R"
+            )
+        )
+    g <- ggplot(df, aes(x = position, y = proportion)) +
+        geom_bar(stat = "identity", aes(fill = aa)) +
+        labs(title = paste0(germ, " ", region, " (", total, ")"),
+             subtitle = subs, x = "amino acid", y = "proportion") +
+        scale_x_continuous(breaks = df.agg$position, labels = xlabels) +
+        scale_fill_manual(values = group.colors, drop = F) +
+        theme(legend.title = element_blank(),
+              legend.text = element_text(size = 5))
+    return(g)
 }
