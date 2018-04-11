@@ -23,6 +23,11 @@ params:
     hasAbun: TRUE
 ---
 
+<style type="text/css">
+.chart-title {  /* increase chart title font size */
+   font-size: 24px;
+</style>
+
 ```{r setup, include=FALSE}
 library(flexdashboard)
 library(plotly)
