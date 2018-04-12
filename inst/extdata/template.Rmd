@@ -19,9 +19,9 @@ params:
     single: TRUE
     # root output directory
     rootDir: "/newhome/jiahong/sandbox/immulator_out/output_results/report/PCR1_ACGT_L001_crossed"
-    hasAnnot: FALSE
-    hasAbun: FALSE
-    hasProd: FALSE
+    hasAnnot: TRUE
+    hasAbun: TRUE
+    hasProd: TRUE
     hasDiv: TRUE
 ---
 
@@ -38,7 +38,7 @@ library(png)
 library(grid)
 library(gridExtra)
 
-.getFile <- function(path, pattern, .stop = T) {
+.getFile <- function(path, pattern, .stop = F) {
     flist <- list.files(path = path, pattern = pattern, full.names = T)
     n <- length(flist)
     if (n != 1) {
@@ -53,9 +53,9 @@ library(gridExtra)
 }
 ```
 
-\begin{comment}
+<!-- 
 Page 1 is a overview of the sample analysis
-\end{comment}
+-->
 
 `r if(!params$hasAnnot) {"\\begin{comment}"}`
 
@@ -70,11 +70,15 @@ Row
 ```{r, eval=params$hasAnnot, fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "annot"),
                   pattern = ".*_all_clones_len_dist\\.Rdata")
-load(fname)
-if (params$interactive) {
-    ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
@@ -86,19 +90,21 @@ Row
 ```{r, eval=params$hasAnnot, fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "annot"),
                   pattern = ".*_all_clones_len_dist_no_outliers\\.Rdata")
-load(fname)
-if (params$interactive) {
-    ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
 `r if(!params$hasAnnot) {"\\end{comment}"}`
 
-\begin{comment}
-Page 2 is abundance analysis
-\end{comment}
+<!-- Page 2 is abundance analysis -->
 
 `r if(!params$hasAbun) {"\\begin{comment}"}`
 
@@ -114,11 +120,15 @@ Row
 ```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igv_dist_family_level\\.Rdata")
-load(fname)
-if (params$interactive) {
-    ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
@@ -127,13 +137,17 @@ if (params$interactive) {
 ```{r, eval=params$hasAbun, fig.width=params$height, fig.height=params$width}
 fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igv_dist_gene_level\\.Rdata")
-load(fname)
-# TODO: ggplotly is buggy with horizontal plot in tabsets
-if (params$interactive) {
-    plot
-    #ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    # TODO: ggplotly is buggy with horizontal plot in tabsets
+    if (params$interactive) {
+        plot
+        #ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
@@ -149,11 +163,15 @@ Row
 ```{r, eval=(params$inclD && params$hasAbun), fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igd_dist_family_level\\.Rdata")
-load(fname)
-if (params$interactive) {
-    ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
@@ -162,14 +180,19 @@ if (params$interactive) {
 ```{r, eval=(params$inclD && params$hasAbun), fig.width=params$height, fig.height=params$width}
 fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igd_dist_gene_level\\.Rdata")
-load(fname)
-# TODO: ggplotly is buggy with horizontal plot in tabsets
-if (params$interactive) {
-    plot
-    #ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    # TODO: ggplotly is buggy with horizontal plot in tabsets
+    if (params$interactive) {
+        plot
+        #ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
+    
 ```
 
 > Only the top 15 from each sample are shown
@@ -185,11 +208,15 @@ Row
 ```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igj_dist_family_level\\.Rdata")
-load(fname)
-if (params$interactive) {
-    ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
@@ -198,13 +225,17 @@ if (params$interactive) {
 ```{r, eval=params$hasAbun, fig.width=params$height, fig.height=params$width}
 fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igj_dist_variant_level\\.Rdata")
-load(fname)
-# TODO: ggplotly is buggy with horizontal plot in tabsets
-if (params$interactive) {
-    plot
-    #ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    # TODO: ggplotly is buggy with horizontal plot in tabsets
+    if (params$interactive) {
+        plot
+        #ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
@@ -219,9 +250,14 @@ Row
 
 ```{r, eval=(params$single && params$hasAbun), fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "abundance"), pattern = ".*_vjassoc\\.png")
-img <- readPNG(fname)
-grid.raster(img)
+if (!is.na(fname)) {
+    img <- readPNG(fname)
+    grid.raster(img)
+} else {
+    cat("404!")
+}
 ```
+
 > Plot associations between V genes and J genes on the family level
 
 `r if(!params$single) {"\\end{comment}"}`
@@ -230,46 +266,23 @@ grid.raster(img)
 
 Row {.tabset .tabset-fade}
 -----------------------------------------------------------------------
-
-### Bitscore vs Alignment Length
-```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "abundance"),
-                  pattern = ".*_igv_align_quality_bitscore_hm\\.png")
-img <- readPNG(fname)
-grid.raster(img)
+```{r, echo = FALSE, eval = TRUE}
+alignQual <- list("Bitscore vs Alignment Length" = "bitscore",
+               "Gaps vs Alignment Length" = "gaps",
+               "Identity vs Alignment Length" = "identity",
+               "Mismatches vs Alignment Length" = "mismatches",
+               "Subject Start vs Query Start" = "start")
+alignmentQuality <- lapply(seq_along(alignQual), function(i) {
+    line1 <- knitr::knit_expand(text = sprintf("### %s\n", names(alignQual)[i]))
+    line2 <- knitr::knit_expand(text = sprintf("\n```{r align_qual_chunk_%d, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}", i))
+    line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(path = file.path(params$rootDir, "abundance"), pattern = ".*_igv_align_quality_%s_hm\\\\.png")', alignQual[[i]]))
+    line4 <- knitr::knit_expand(text = '\nif(!is.na(fname)) { img <- readPNG(fname); grid.raster(img) } else { cat("404!") }')
+    line5 <- knitr::knit_expand(text = "\n```\n")
+    paste(line1, line2, line3, line4, line5, collapse = "\n")
+})
 ```
 
-### Gaps vs Alignment Length
-```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "abundance"),
-                  pattern = ".*_igv_align_quality_gaps_hm\\.png")
-img <- readPNG(fname)
-grid.raster(img)
-```
-
-### Identity vs Alignment Length
-```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "abundance"),
-                  pattern = ".*_igv_align_quality_identity_hm\\.png")
-img <- readPNG(fname)
-grid.raster(img)
-```
-
-### Mismatches vs Alignment Length
-```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "abundance"),
-                  pattern = ".*_igv_align_quality_mismatches_hm\\.png")
-img <- readPNG(fname)
-grid.raster(img)
-```
-
-### Subject Start vs Query Start
-```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "abundance"),
-                  pattern = ".*_igv_align_quality_start_hm\\.png")
-img <- readPNG(fname)
-grid.raster(img)
-```
+`r paste(knitr::knit(text = paste(alignmentQuality, collapse = "\n")))`
 
 Row
 -----------------------------------------------------------------------
@@ -278,11 +291,15 @@ Row
 ```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*_igv_gaps_dist\\.Rdata")
-load(fname)
-if (params$interactive) {
-    ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
@@ -292,11 +309,15 @@ if (params$interactive) {
 ```{r, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*_igv_mismatches_dist\\.Rdata")
-load(fname)
-if (params$interactive) {
-    ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
@@ -318,13 +339,17 @@ Row
 ```{r, eval=params$hasProd, fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_productivity\\.Rdata")
-load(fname)
-if (params$interactive) {
-    # TODO: buggy facet plot
-    plot
-    # ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        # TODO: buggy facet plot
+        plot
+        # ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
@@ -336,62 +361,65 @@ if (params$interactive) {
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_crossed_vjframe_dist\\.Rdata")
 
-load(fname)
-if (params$interactive) {
-    ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
 > Distribution of in-frame and out-of-frame sequences
 
-
-Row
------------------------------------------------------------------------
-
-### Mismatches, Gaps
-
-Diagrams below, from left to right:
-
-
-Distribution of __mismatches__, __gaps__ and __gaps__ of __out-of-frame__ sequences
-within FR/CDR region and V, (D), J germlines.
-
-
-> Gaps of __out-of-frame__ sequences are only shown for FR/CDR regions
-
 Row {.tabset .tabset-fade}
 -----------------------------------------------------------------------
-
+<!--  Example of how it should look like after knitting
 ### CDR1
-```{r, eval=params$hasProd, fig.width=params$width*3, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_cdr1_mismatches_dist\\.Rdata")
-# take the titles away if it's interactive because subplots will only use the first
-load(fname)
-if (params$interactive) {
-    mismatch <- ggplotly(plot + labs(title = ""))
+
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        mismatch <- ggplotly(plot + labs(title = "Mismatches, gaps and gaps in out-of-frame sequences in CDR1"))
+    } else {
+        mismatch <- plot
+    }
 } else {
-    mismatch <- plot
+    df <- data.frame()      # give user empty graph
+    mismatch  <- ggplot(df), + geom_point() + xlim(0, 10) + ylim(0, 100)
 }
 
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_cdr1_gaps_dist\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gaps <- ggplotly(plot + labs(title = ""))
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        gaps <- ggplotly(plot + labs(title = ""))
+    } else {
+        gaps <- plot
+    }
 } else {
-    gaps <- plot
+    df <- data.frame()      # give user empty graph
+    gaps <- ggplot(df), + geom_point() + xlim(0, 10) + ylim(0, 100)
 }
 
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_cdr1_gaps_dist_out_of_frame\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gapsOut <- ggplotly(plot + labs(title = ""))
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        gapsOut <- ggplotly(plot + labs(title = ""))
+    } else {
+        gapsOut <- plot
+    }
 } else {
-    gapsOut <- plot
+    df <- data.frame()      # give user empty graph
+    gapsOut  <- ggplot(df), + geom_point() + xlim(0, 10) + ylim(0, 100)
 }
 
 if (params$interactive) {
@@ -399,225 +427,59 @@ if (params$interactive) {
 } else {
     grid.arrange(mismatch, gaps, gapsOut, nrow = 1)
 }
+> Mismatches, gaps, gaps (in out-of-frame sequences) distribution in %s region\n
+-->
+
+```{r echo = FALSE, eval = TRUE}
+titles <- c("CDR1", "CDR2", "CDR3", "FR1", "FR2", "FR3")
+frcdrMisGaps <- lapply(seq_along(titles), function(i) {
+    line1 <- knitr::knit_expand(text = sprintf("### %s\n", titles[i]))
+    line2 <- knitr::knit_expand(text = sprintf("\n```{r frcdr_gap_mis_chunk_%d, eval=params$hasProd, fig.width=params$width*3, fig.height=params$height}", i))
+    line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(file.path(params$rootDir, "productivity"), pattern = ".*_%s_mismatches_dist\\\\.Rdata")', tolower(titles[i])))
+    line4 <- knitr::knit_expand(text = sprintf('\nif (!is.na(fname)) { load(fname); if (params$interactive) { mismatch <- ggplotly(plot + labs(title = "Mismatches, gaps and gaps in out-of-frame sequences in %s")) } else { mismatch <- plot } } else { df <- data.frame(); mismatch <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) }', titles[i]))
+    line5 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(file.path(params$rootDir, "productivity"), pattern = ".*_%s_gaps_dist\\\\.Rdata")', tolower(titles[i])))
+    line6 <- knitr::knit_expand(text = '\nif (!is.na(fname)) { load(fname); if (params$interactive) { gaps <- ggplotly(plot + labs(title = "")) } else { gaps <- plot } } else { df <- data.frame(); gaps <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) }')
+    line7 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(file.path(params$rootDir, "productivity"), pattern = ".*_%s_gaps_dist_out_of_frame\\\\.Rdata")', tolower(titles[i])))
+    line8 <- knitr::knit_expand(text = '\nif (!is.na(fname)) { load(fname); if (params$interactive) { gapsOut <- ggplotly(plot + labs(title = "")) } else { gapsOut <- plot } } else { df <- data.frame(); gapsOut <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) }')
+    line9 <- knitr::knit_expand(text = "\nif (params$interactive) { subplot(mismatch, gaps, gapsOut, titleX = T, titleY = T) } else { grid.arrange(mismatch, gaps, gapsOut, nrow = 1)}")
+    line10 <- knitr::knit_expand(text = "\n```\n")
+    line11 <- knitr::knit_expand(text = sprintf("\n> Mismatches, gaps and gaps (in out-of-frame sequences) distribution in %s region\n", titles[i]))
+    paste(line1, line2, line3, line4, line5, line6, line7, line8, line9, line10,
+          line11, collapse = "\n")
+})
 ```
 
-> Distribution of mismatches, gaps and gaps of __out-of-frame__ sequences in CDR1
+`r paste(knitr::knit(text = paste(frcdrMisGaps, collapse = "\n")))`
 
-### CDR2
-```{r, eval=params$hasProd, fig.width=params$width*3, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_cdr2_mismatches_dist\\.Rdata")
-# take the titles away if it's interactive because subplots will only use the first
-load(fname)
-if (params$interactive) {
-    mismatch <- ggplotly(plot + labs(title = ""))
-} else {
-    mismatch <- plot
-}
-
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_cdr2_gaps_dist\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gaps <- ggplotly(plot + labs(title = ""))
-} else {
-    gaps <- plot
-}
-
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_cdr2_gaps_dist_out_of_frame\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gapsOut <- ggplotly(plot + labs(title = ""))
-} else {
-    gapsOut <- plot
-}
-
-if (params$interactive) {
-    subplot(mismatch, gaps, gapsOut, titleX = TRUE, titleY = TRUE)
-} else {
-    grid.arrange(mismatch, gaps, gapsOut, nrow = 1)
-}
-```
-
-> Distribution of mismatches, gaps and gaps of __out-of-frame__ sequences in CDR2
-
-
-### CDR3
-```{r, eval=params$hasProd, fig.width=params$width*3, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_cdr3_mismatches_dist\\.Rdata")
-# take the titles away if it's interactive because subplots will only use the first
-load(fname)
-if (params$interactive) {
-    mismatch <- ggplotly(plot + labs(title = ""))
-} else {
-    mismatch <- plot
-}
-
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_cdr3_gaps_dist\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gaps <- ggplotly(plot + labs(title = ""))
-} else {
-    gaps <- plot
-}
-
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_cdr3_gaps_dist_out_of_frame\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gapsOut <- ggplotly(plot + labs(title = ""))
-} else {
-    gapsOut <- plot
-}
-
-if (params$interactive) {
-    subplot(mismatch, gaps, gapsOut, titleX = TRUE, titleY = TRUE)
-} else {
-    grid.arrange(mismatch, gaps, gapsOut, nrow = 1)
-}
-```
-
-> Distribution of mismatches, gaps and gaps of __out-of-frame__ sequences in CDR3
-
-### FR1
-```{r, eval=params$hasProd, fig.width=params$width*3, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_fr1_mismatches_dist\\.Rdata")
-# take the titles away if it's interactive because subplots will only use the first
-load(fname)
-if (params$interactive) {
-    mismatch <- ggplotly(plot + labs(title = ""))
-} else {
-    mismatch <- plot
-}
-
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_fr1_gaps_dist\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gaps <- ggplotly(plot + labs(title = ""))
-} else {
-    gaps <- plot
-}
-
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_fr1_gaps_dist_out_of_frame\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gapsOut <- ggplotly(plot + labs(title = ""))
-} else {
-    gapsOut <- plot
-}
-
-if (params$interactive) {
-    subplot(mismatch, gaps, gapsOut, titleX = TRUE, titleY = TRUE)
-} else {
-    grid.arrange(mismatch, gaps, gapsOut, nrow = 1)
-}
-```
-
-> Distribution of mismatches, gaps and gaps of __out-of-frame__ sequences in FR1
-
-### FR2
-```{r, eval=params$hasProd, fig.width=params$width*3, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_fr2_mismatches_dist\\.Rdata")
-# take the titles away if it's interactive because subplots will only use the first
-load(fname)
-if (params$interactive) {
-    mismatch <- ggplotly(plot + labs(title = ""))
-} else {
-    mismatch <- plot
-}
-
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_fr2_gaps_dist\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gaps <- ggplotly(plot + labs(title = ""))
-} else {
-    gaps <- plot
-}
-
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_fr2_gaps_dist_out_of_frame\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gapsOut <- ggplotly(plot + labs(title = ""))
-} else {
-    gapsOut <- plot
-}
-
-if (params$interactive) {
-    subplot(mismatch, gaps, gapsOut, titleX = TRUE, titleY = TRUE)
-} else {
-    grid.arrange(mismatch, gaps, gapsOut, nrow = 1)
-}
-```
-
-> Distribution of mismatches, gaps and gaps of __out-of-frame__ sequences in FR2
-
-### FR3
-```{r, eval=params$hasProd, fig.width=params$width*3, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_fr3_mismatches_dist\\.Rdata")
-# take the titles away if it's interactive because subplots will only use the first
-load(fname)
-if (params$interactive) {
-    mismatch <- ggplotly(plot + labs(title = ""))
-} else {
-    mismatch <- plot
-}
-
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_fr3_gaps_dist\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gaps <- ggplotly(plot + labs(title = ""))
-} else {
-    gaps <- plot
-}
-
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_fr3_gaps_dist_out_of_frame\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gapsOut <- ggplotly(plot + labs(title = ""))
-} else {
-    gapsOut <- plot
-}
-
-if (params$interactive) {
-    subplot(mismatch, gaps, gapsOut, titleX = TRUE, titleY = TRUE)
-} else {
-    grid.arrange(mismatch, gaps, gapsOut, nrow = 1)
-}
-```
-
-> Distribution of mismatches, gaps and gaps of __out-of-frame__ sequences in FR3
-
+<!-- Example of this knitr output:
 ### IGV
-```{r, eval=params$hasProd, fig.width=params$width*2, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_igv_mismatches_dist\\.Rdata")
 # take the titles away if it's interactive because subplots will only use the first
-load(fname)
-if (params$interactive) {
-    mismatch <- ggplotly(plot + labs(title = ""))
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        mismatch <- ggplotly(plot + labs(title = "Mismatches and gaps in IGV"))
+    } else {
+        mismatch <- plot
+    }
 } else {
-    mismatch <- plot
+    df <- data.frame()      # give user empty graph
+    mismatch <- ggplot(df), + geom_point() + xlim(0, 10) + ylim(0, 100)
 }
 
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_igv_gaps_dist\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gaps <- ggplotly(plot + labs(title = ""))
+if (is.na(fname)) {}
+    load(fname)
+    if (params$interactive) {
+        gaps <- ggplotly(plot + labs(title = ""))
+    } else {
+        gaps <- plot
+    }
 } else {
-    gaps <- plot
+    df <- data.frame()      # give user empty graph
+    gaps <- ggplot(df), + geom_point() + xlim(0, 10) + ylim(0, 100)
 }
 
 if (params$interactive) {
@@ -625,74 +487,30 @@ if (params$interactive) {
 } else {
     grid.arrange(mismatch, gaps, nrow = 1)
 }
-```
-
 > Mismatches and gaps distribution in V gene
+-->
 
-`r if(!params$inclD) {"\\start{comment}"}`
-### IGD
-```{r, eval=(params$hasProd && params$inclD), fig.width=params$width*2, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_igd_mismatches_dist\\.Rdata")
-# take the titles away if it's interactive because subplots will only use the first
-load(fname)
-if (params$interactive) {
-    mismatch <- ggplotly(plot + labs(title = ""))
+```{r echo = FALSE, eval = TRUE}
+if (params$inclD) {
+    titles <- c("IGV", "IGD", "IGJ")
 } else {
-    mismatch <- plot
+    titles <- c("IGV", "IGJ")
 }
-
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_igd_gaps_dist\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gaps <- ggplotly(plot + labs(title = ""))
-} else {
-    gaps <- plot
-}
-
-if (params$interactive) {
-    subplot(mismatch, gaps, titleX = TRUE, titleY = TRUE)
-} else {
-    grid.arrange(mismatch, gaps, nrow = 1)
-}
+vdjMisGaps <- lapply(seq_along(titles), function(i) {
+    line1 <- knitr::knit_expand(text = sprintf("### %s\n", titles[i]))
+    line2 <- knitr::knit_expand(text = sprintf("\n```{r vdj_gap_mis_chunk_%d, eval=params$hasProd, fig.width=params$width*3, fig.height=params$height}", i))
+    line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(file.path(params$rootDir, "productivity"), pattern = ".*_%s_mismatches_dist\\\\.Rdata")', tolower(titles[i])))
+    line4 <- knitr::knit_expand(text = sprintf('\nif (!is.na(fname)) { load(fname); if (params$interactive) { mismatch <- ggplotly(plot + labs(title = "Mismatches and gaps in %s")) } else { mismatch <- plot } } else { df <- data.frame(); mismatch <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) }', titles[i]))
+    line5 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(file.path(params$rootDir, "productivity"), pattern = ".*_%s_gaps_dist\\\\.Rdata")', tolower(titles[i])))
+    line6 <- knitr::knit_expand(text = '\nif (!is.na(fname)) { load(fname); if (params$interactive) { gaps <- ggplotly(plot + labs(title = "")) } else { gaps <- plot } } else { df <- data.frame(); gaps <- ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100) }')
+    line7 <- knitr::knit_expand(text = "\nif (params$interactive) { subplot(mismatch, gaps, titleX = T, titleY = T) } else { grid.arrange(mismatch, gaps, nrow = 1)}")
+    line8 <- knitr::knit_expand(text = "\n```\n")
+    line9 <- knitr::knit_expand(text = sprintf("\n> Mismatchesa and gaps distribution in %s\n", titles[i]))
+    paste(line1, line2, line3, line4, line5, line6, line7, line8, line9, collapse = "\n")
+})
 ```
 
-> Mismatches and gaps distribution in D gene
-
-`r if(!params$inclD) {"\\end{comment}"}`
-
-### IGJ
-```{r, eval=params$hasProd, fig.width=params$width*2, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_igj_mismatches_dist\\.Rdata")
-# take the titles away if it's interactive because subplots will only use the first
-load(fname)
-if (params$interactive) {
-    mismatch <- ggplotly(plot + labs(title = ""))
-} else {
-    mismatch <- plot
-}
-
-fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_igj_gaps_dist\\.Rdata")
-load(fname)
-if (params$interactive) {
-    gaps <- ggplotly(plot + labs(title = ""))
-} else {
-    gaps <- plot
-}
-
-if (params$interactive) {
-    subplot(mismatch, gaps, titleX = TRUE, titleY = TRUE)
-} else {
-    grid.arrange(mismatch, gaps, nrow = 1)
-}
-```
-
-`r if(!params$hasProd) {"\\end{comment}"}`
-
-> Mismatches and gaps distribution in J gene
+`r paste(knitr::knit(text = paste(vdjMisGaps, collapse = "\n")))`
 
 
 Row {.tabset .tabset-fade}
@@ -704,11 +522,15 @@ Row {.tabset .tabset-fade}
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_igv_dist_productive\\.Rdata")
 
-load(fname)
-if (params$interactive) {
-    ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
@@ -720,11 +542,15 @@ if (params$interactive) {
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_igv_dist_inframe_unproductive\\.Rdata")
 
-load(fname)
-if (params$interactive) {
-    ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
@@ -736,11 +562,15 @@ if (params$interactive) {
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_igv_dist_out_of_frame\\.Rdata")
 
-load(fname)
-if (params$interactive) {
-    ggplotly(plot)
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
 } else {
-    plot
+    cat("404!")
 }
 ```
 
@@ -791,7 +621,7 @@ if (is.na(fname)) {
 > Distribution of stop codons in CDR/FR regions from out-of-frame sequences
 
 
-\begin{comment}
+<!--
 =======================================================================
 -----------------------------------------------------------------------
-\end{comment}
+-->
