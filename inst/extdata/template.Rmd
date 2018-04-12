@@ -622,6 +622,20 @@ if (is.na(fname)) {
 > Distribution of stop codons in CDR/FR regions from out-of-frame sequences
 
 
+`r if(!params$hasProd) {"\\end{comment}"}`
+
+`r if(!params$hasDiv) {"\\start{comment}"}`
+
+Diversity {data-orientation=rows}
+=======================================================================
+
+
+
+
+`r if(!params$hasDiv) {"\\end{comment}"}`
+
+
+
 <!--
 =======================================================================
 -----------------------------------------------------------------------

@@ -48,9 +48,11 @@
 #' @param cloneClass string type.
 #' What region was used to classify clonotypes - appears in title. For example,
 #' CDR3 or V region
+#' @param .save logical type. Save ggplot object?
 #'
 #' @return None
-.scatterClones <- function(dataframes, sampleNames, outputPath, cloneClass) {
+.scatterClones <- function(dataframes, sampleNames, outputPath, cloneClass,
+                           .save = T) {
     nsamples <- length(dataframes)
     message(paste("Plotting pairwise scatter plot for",
                   paste(sampleNames, collapse = ", ")))
@@ -70,9 +72,10 @@
                           dataframes[[i + 1]][colnames],
                           sampleNames[i],
                           sampleNames[i + 1], cloneClass)
-        ggsave(file.path(outputPath, paste0(sampleNames[i], "_vs_",
-                      sampleNames[i + 1], "_clone_scatter.png")),
-               plot = p, width = V_WIDTH, height = V_HEIGHT)
+        saveName <- file.path(outputPath, paste0(sampleNames[i], "_vs_",
+                      sampleNames[i + 1], "_clone_scatter.png"))
+        ggsave(saveName, plot = p, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, saveName, p)
     }
 }
 
@@ -662,10 +665,11 @@
 #' @param sampleNames vector type. 1-1 with diversityDirectories
 #' @param mashedNames string type. Prefix for output files using "mashed-up"
 #' sample names
+#' @param .save logical type. Save ggplot object?
 #'
 #' @return None
 .diversityAnalysis <- function(diversityDirectories, diversityOut,
-                              sampleNames, mashedNames) {
+                              sampleNames, mashedNames, .save = T) {
     message(paste("Starting diversity analysis on samples",
             paste(sampleNames, collapse = ", ")))
     # clonotype plots
@@ -693,9 +697,10 @@
             lapply(cdr3ClonesFile, read.csv, stringsAsFactors = FALSE),
             sampleNames
             )
-        ggsave(file.path(diversityOut, paste0(mashedNames,
-                                              "_top10Clonotypes.png")),
-               plot = g, width = V_WIDTH_L, height = V_HEIGHT_L)
+        saveName <- file.path(diversityOut, paste0(mashedNames,
+                                              "_top10Clonotypes.png"))
+        ggsave(saveName, plot = g, width = V_WIDTH_L, height = V_HEIGHT_L)
+        .saveAs(.save, saveName, g)
     }
 
     # fr/cdr plots
@@ -717,9 +722,9 @@
             g <- .plotDuplication(searchFiles,
                                  sampleNames,
                                  includedRegions)
-            ggsave(file.path(diversityOut,
-                             paste0(mashedNames, "_", reg, "_duplication.png")),
-                   plot = g, width = V_WIDTH, height = V_HEIGHT)
+            saveName <- file.path(diversityOut, paste0(mashedNames, "_", reg, "_duplication.png"))
+            ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
+            .saveAs(.save, saveName, g)
         } else {
             warning(paste("Could not find duplication files in",
                           paste(diversityDirectories, collapse = ", ")))
@@ -734,9 +739,9 @@
             g <- .plotRarefaction(searchFiles,
                                  sampleNames,
                                  includedRegions)
-            ggsave(file.path(diversityOut,
-                             paste0(mashedNames, "_", reg, "_rarefaction.png")),
-                   plot = g, width = V_WIDTH, height = V_HEIGHT)
+            saveName <- file.path(diversityOut, paste0(mashedNames, "_", reg, "_rarefaction.png"))
+            ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
+            .saveAs(.save, saveName, g)
         } else {
             warning(paste("Could not find rarefaction files in",
                           paste(diversityDirectories, collapse = ", ")))
@@ -750,10 +755,11 @@
             g <- .plotRecapture(searchFiles,
                                sampleNames,
                                includedRegions)
-            ggsave(file.path(diversityOut,
-                             paste0(mashedNames, "_", reg, "_recapture.png")),
+            saveName <- file.path(diversityOut, paste0(mashedNames, "_", reg, "_recapture.png"))
+            ggsave(saveName,
                    plot = g,
                    width = V_WIDTH, height = V_HEIGHT)
+            .saveAs(.save, saveName, g)
         } else {
             warning(paste("Could not find recapture files in",
                           paste(diversityDirectories, collapse = ", ")))
@@ -779,9 +785,9 @@
                                          stringsAsFactors = FALSE),
                                   sampleNames,
                                   paste0("CDR", i))
-            ggsave(file.path(specOut, paste0(mashedNames, "_cdr", i,
-                          "_spectratype.png")),
-                   plot = g, width = V_WIDTH, height = V_HEIGHT)
+            saveName <- file.path(specOut, paste0(mashedNames, "_cdr", i, "_spectratype.png"))
+            ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
+            .saveAs(.save, saveName, g)
         } else {
             warning(paste0("Could not find CDR", i, " spectratype files in ",
                           paste(diversityDirectories, collapse = ", ")))
@@ -797,9 +803,9 @@
         g <- .plotSpectratype(lapply(specFiles, read.csv, stringsAsFactors = FALSE),
                              sampleNames,
                              "CDR3")
-        ggsave(file.path(specOut,
-                         paste0(mashedNames, "_cdr3_spectratype_no_outliers.png")),
-               plot = g, width = V_WIDTH, height = V_HEIGHT)
+        saveName <- file.path(specOut, paste0(mashedNames, "_cdr3_spectratype_no_outliers.png"))
+        ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, saveName, g)
     } else {
             warning(paste("Could not find CDR3 spectratype (no outlier) files in",
                           paste(diversityDirectories, collapse = ", ")))
@@ -815,9 +821,10 @@
             g <- .plotSpectratype(lapply(specFiles, read.csv, stringsAsFactors = FALSE),
                                  sampleNames,
                                  paste0("FR", i))
-            ggsave(file.path(specOut, paste0(mashedNames, "_fr",
-                                             i, "_spectratype.png")),
-                   plot = g, width = V_WIDTH, height = V_HEIGHT)
+            saveName <- file.path(specOut, paste0(mashedNames, "_fr",
+                                             i, "_spectratype.png"))
+            ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
+            .saveAs(.save, saveName, g)
         } else {
             warning(paste0("Could not find FR", i, " spectratype files in ",
                           paste(diversityDirectories, collapse = ", ")))
@@ -831,8 +838,9 @@
         g <- .plotSpectratype(lapply(specFiles, read.csv, stringsAsFactors = FALSE),
                              sampleNames,
                              "V domain")
-        ggsave(file.path(specOut, paste0(mashedNames, "_v_spectratype.png")),
-               plot = g, width = V_WIDTH, height = V_HEIGHT)
+        saveName <- file.path(specOut, paste0(mashedNames, "_v_spectratype.png"))
+        ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, saveName, g)
     }
 
     # MINISECTION:
@@ -857,8 +865,17 @@
 }
 
 
+#' Composition logo plot
+#'
+#' @param compositionDirectory string type.
+#' @param sampleName string type.
+#' @param regions logical type. vector of FR/CDR regions to plot
+#' @param .save logical type. save ggplot object
+#'
+#' @return none
 .aminoAcidPlot <- function(compositionDirectory, sampleName,
-                           regions = c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3", "FR4")) {
+                           regions = c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3", "FR4"),
+                           .save = T) {
     for (region in regions) {
         dirName <- file.path(compositionDirectory, region)
         summaryPlot <- file.path(dirName, paste0(sampleName, "_cumulative_logo.csv"))
@@ -869,6 +886,8 @@
         fname2 <- file.path(dirName, paste0(sampleName, "_cumulative_logo_scaled.png"))
         ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
         ggsave(fname2, plot = g2, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, fname1, g1)
+        .saveAs(.save, fname2, g2)
 
         germlineSpecific <- list.files(path = dirName, pattern = paste0(sampleName, "_.+_cumulative_logo\\.csv(\\.gz)?$"), full.names = T)
         lapply(germlineSpecific, function(gLogoFile) {
@@ -887,6 +906,8 @@
             fname2 <- file.path(dirName, paste0(sampleName, "_", germName, "_cumulative_logo_scaled.png"))
             ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
             ggsave(fname2, plot = g2, width = V_WIDTH, height = V_HEIGHT)
+            .saveAs(.save, fname1, g1)
+            .saveAs(.save, fname2, g2)
         })
     }
 }
