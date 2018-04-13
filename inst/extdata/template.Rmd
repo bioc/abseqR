@@ -844,13 +844,13 @@ if (!is.na(fname)) { load(fname); if (params$interactive) { ggplotly(plot); } el
 ```{r, echo=FALSE, eval=params$hasDiv}
 regions <-
     c(
+    "FR1" = "_fr1_spectratype",
     "CDR1" = "_cdr1_spectratype",
+    "FR2" = "_fr2_spectratype",
     "CDR2" = "_cdr2_spectratype",
+    "FR3" = "_fr3_spectratype",
     "CDR3" = "_cdr3_spectratype",
     "CDR3 without outliers" = "_cdr3_spectratype_no_outliers",
-    "FR1" = "_fr1_spectratype",
-    "FR2" = "_fr2_spectratype",
-    "FR3" = "_fr3_spectratype",
     "FR4" = "_fr4_spectratype",
     "V domain" = "_v_spectratype"
     )
@@ -991,7 +991,7 @@ if (params$interactive) {
 -->
 
 ```{r, echo = FALSE, eval = (params$single && params$hasDiv)}
-regions = c("CDR1", "CDR2", "CDR3", "FR1", "FR2", "FR3", "FR4")
+regions = c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3", "FR4")
 compOut <- lapply(seq_along(regions), function(i) {
     line1 <- knitr::knit_expand(text = sprintf("### %s\n", regions[i]))
     line2 <- knitr::knit_expand(text = sprintf("\n```{r comp_out_%d, eval=(params$hasDiv && params$single), fig.width=params$width*2, fig.height=params$height}\n", i))
@@ -1033,7 +1033,7 @@ grid.arrange(imgAl, img, nrow = 1)
 -->
 
 ```{r, echo = FALSE, eval = (params$hasDiv && params$single)}
-regions = c("CDR1", "CDR2", "CDR3", "FR1", "FR2", "FR3", "FR4")
+regions = c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3", "FR4")
 motifOut <- lapply(seq_along(regions), function(i) {
     line1 <- knitr::knit_expand(text = sprintf("### %s (aligned, unaligned)\n", regions[i]))
     line2 <- knitr::knit_expand(text = sprintf("\n```{r motif_out_%d, eval=(params$hasDiv && params$single), fig.width=params$width*2, fig.height=params$height}", i))
