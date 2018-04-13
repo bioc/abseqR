@@ -9,6 +9,9 @@ params:
     # img dimensions
     width: 8
     height: 5
+    # larger sizes (if needed)
+    widthL: 12
+    heightL: 7.5
     # ggplotly?
     interactive: TRUE
     # eval D-gene abundance related plots? - light chain might not want this
@@ -16,12 +19,12 @@ params:
     # sample name
     name: "PLACEHOLDER SAMPLE NAME"
     # single sample?
-    single: FALSE
+    single: TRUE
     # root output directory
-    rootDir: "/newhome/jiahong/sandbox/immulator_out/output_results/report/PCR1_ACGT_L001_crossed_vs_PCR2_ACGT_L001_crossed"
-    hasAnnot: TRUE
-    hasAbun: TRUE
-    hasProd: TRUE
+    rootDir: "/newhome/jiahong/sandbox/immulator_out/output_results/report/PCR1_ACGT_L001_crossed"
+    hasAnnot: FALSE
+    hasAbun: FALSE
+    hasProd: FALSE
     hasDiv: TRUE
 ---
 
@@ -38,18 +41,24 @@ library(png)
 library(grid)
 library(gridExtra)
 
-.getFile <- function(path, pattern, .stop = F) {
+.getFile <- function(path, pattern, .stop = F, .callback = NULL) {
     flist <- list.files(path = path, pattern = pattern, full.names = T)
     n <- length(flist)
-    if (n != 1) {
+    if (n != 1 && is.null(.callback)) {
         if (.stop) {
             stop(paste("Expected to find one file, but found", n, "from",
                        paste(flist, collapse = ", "), "instead"))
         } else {
             return(NA)
         }
+    } else if (!is.null(.callback)) {
+        flist <- flist[lapply(flist, .callback) == T]
     }
     return(flist[[1]])
+}
+
+.compositionNoGene <- function(x) {
+    return(length(grep("-", x, fixed = T)) == 0)
 }
 ```
 
@@ -57,7 +66,9 @@ library(gridExtra)
 Page 1 is a overview of the sample analysis
 -->
 
+
 `r if(!params$hasAnnot) {"\\begin{comment}"}`
+
 
 Summary {data-orientation=rows}
 =======================================================================
@@ -102,15 +113,18 @@ if (!is.na(fname)) {
 }
 ```
 
+
 `r if(!params$hasAnnot) {"\\end{comment}"}`
+
 
 <!-- Page 2 is abundance analysis -->
 
+
 `r if(!params$hasAbun) {"\\begin{comment}"}`
+
 
 Abundance {data-orientation=rows}
 =======================================================================
-
 
 Row
 -----------------------------------------------------------------------
@@ -153,7 +167,9 @@ if (!is.na(fname)) {
 
 > Only the top 15 from each sample are shown
 
+
 `r if(!params$inclD) {"\\begin{comment}"}`
+
 
 Row
 -----------------------------------------------------------------------
@@ -197,7 +213,9 @@ if (!is.na(fname)) {
 
 > Only the top 15 from each sample are shown
 
+
 `r if(!params$inclD) {"\\end{comment}"}`
+
 
 
 Row
@@ -241,7 +259,11 @@ if (!is.na(fname)) {
 
 > Only the top 15 from each sample are shown
 
+
+
 `r if(!params$single) {"\\begin{comment}"}`
+
+
 
 Row
 -----------------------------------------------------------------------
@@ -283,7 +305,9 @@ alignmentQuality <- lapply(seq_along(alignQual), function(i) {
 
 `r if (params$single) { paste(knitr::knit(text = paste(alignmentQuality, collapse = "\n"))) }`
 
+
 `r if(!params$single) {"\\end{comment}"}`
+
 
 Row
 -----------------------------------------------------------------------
@@ -324,10 +348,14 @@ if (!is.na(fname)) {
 
 > Plot of nucleotide base mismatches found within the __V gene__
 
+
 `r if(!params$hasAbun) {"\\end{comment}"}`
 
 
-`r if(!params$hasProd) {"\\start{comment}"}`
+
+
+`r if(!params$hasProd) {"\\begin{comment}"}`
+
 
 Productivity {data-orientation=rows}
 =======================================================================
@@ -431,6 +459,7 @@ if (params$interactive) {
 > Mismatches, gaps, gaps (in out-of-frame sequences) distribution in %s region\n
 -->
 
+<!-- TODO: fix legend && beware of missing samples when doing so -->
 ```{r echo = FALSE, eval = TRUE}
 titles <- c("CDR1", "CDR2", "CDR3", "FR1", "FR2", "FR3")
 frcdrMisGaps <- lapply(seq_along(titles), function(i) {
@@ -491,6 +520,7 @@ if (params$interactive) {
 > Mismatches and gaps distribution in V gene
 -->
 
+<!-- TODO: fix legend && beware of missing samples when doing so -->
 ```{r echo = FALSE, eval = TRUE}
 if (params$inclD) {
     titles <- c("IGV", "IGD", "IGJ")
@@ -622,21 +652,368 @@ if (is.na(fname)) {
 > Distribution of stop codons in CDR/FR regions from out-of-frame sequences
 
 
+
 `r if(!params$hasProd) {"\\end{comment}"}`
 
-`r if(!params$hasDiv) {"\\start{comment}"}`
+
+
+`r if(!params$hasDiv) {"\\begin{comment}"}`
+
+
+
+<!-- TODO: currently, assumes that all 3 rarefaction, duplication, and recapture
+are present because of the ggplotly legend hack -->
 
 Diversity {data-orientation=rows}
 =======================================================================
 
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### CDR-V
+
+```{r, eval=params$hasDiv, fig.width=params$width*3, fig.height=params$height}
+
+fname <- .getFile(path = file.path(params$rootDir, "diversity"),
+                  pattern = ".*_cdr_v_duplication\\.Rdata")
+
+if (!is.na(fname)) {
+    load(fname)
+    dup <- plot + labs(title = "Sequence duplication level, rarefaction, and recapture")
+} else {
+    dup <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+
+fname <- .getFile(path = file.path(params$rootDir, "diversity"),
+                  pattern = ".*_cdr_v_rarefaction\\.Rdata")
+
+if (!is.na(fname)) {
+    load(fname)
+    rare <- plot + labs(title = "")
+} else {
+    rare <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+
+fname <- .getFile(path = file.path(params$rootDir, "diversity"),
+                  pattern = ".*_cdr_v_recapture\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    recap <- plot + labs(title = "")
+} else {
+    recap <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+
+if (params$interactive) {
+    dup <- hide_legend(dup)
+    rare <- hide_legend(rare)
+    p <- subplot(hide_legend(dup), hide_legend(rare), recap, titleX = T, titleY = T)
+    .p <- plotly_build(p)
+    for (i in seq_along(.p$x$data)) {
+        if (length(grep(",\\d+(,NA)?\\)$", .p$x$data[[i]]$name))) {
+            .p$x$data[[i]]$showlegend <- FALSE
+        }
+    }
+    .p
+} else {
+    grid.arrange(dup, rare, recap, nrow = 1)
+}
+```
+
+> Duplication level, rarefaction and recapture plots for CDR (regions) and
+(V)ariable domain
+
+
+### CDR
+
+```{r, eval=params$hasDiv, fig.width=params$width*3, fig.height=params$height}
+
+fname <- .getFile(path = file.path(params$rootDir, "diversity"),
+                  pattern = ".*_cdr_duplication\\.Rdata")
+
+if (!is.na(fname)) {
+    load(fname)
+    dup <- plot + labs(title = "Sequence duplication level, rarefaction, and recapture")
+} else {
+    dup <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+
+fname <- .getFile(path = file.path(params$rootDir, "diversity"),
+                  pattern = ".*_cdr_rarefaction\\.Rdata")
+
+if (!is.na(fname)) {
+    load(fname)
+    rare <- plot + labs(title = "")
+} else {
+    rare <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+
+fname <- .getFile(path = file.path(params$rootDir, "diversity"),
+                  pattern = ".*_cdr_recapture\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    recap <- plot + labs(title = "")
+} else {
+    recap <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+
+if (params$interactive) {
+    dup <- hide_legend(dup)
+    rare <- hide_legend(rare)
+    p <- subplot(hide_legend(dup), hide_legend(rare), recap, titleX = T, titleY = T)
+    .p <- plotly_build(p)
+    for (i in seq_along(.p$x$data)) {
+        if (length(grep(",\\d+(,NA)?\\)$", .p$x$data[[i]]$name))) {
+            .p$x$data[[i]]$showlegend <- FALSE
+        }
+    }
+    .p
+} else {
+    grid.arrange(dup, rare, recap, nrow = 1)
+}
+```
+
+> Duplication level, rarefaction and recapture plots for CDR (regions)
+
+
+### FR
+
+```{r, eval=params$hasDiv, fig.width=params$width*3, fig.height=params$height}
+
+fname <- .getFile(path = file.path(params$rootDir, "diversity"),
+                  pattern = ".*_fr_duplication\\.Rdata")
+
+if (!is.na(fname)) {
+    load(fname)
+    dup <- plot + labs(title = "Sequence duplication level, rarefaction, and recapture")
+} else {
+    dup <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+
+fname <- .getFile(path = file.path(params$rootDir, "diversity"),
+                  pattern = ".*_fr_rarefaction\\.Rdata")
+
+if (!is.na(fname)) {
+    load(fname)
+    rare <- plot + labs(title = "")
+} else {
+    rare <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+
+fname <- .getFile(path = file.path(params$rootDir, "diversity"),
+                  pattern = ".*_fr_recapture\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    recap <- plot + labs(title = "")
+} else {
+    recap <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+
+if (params$interactive) {
+    dup <- hide_legend(dup)
+    rare <- hide_legend(rare)
+    p <- subplot(hide_legend(dup), hide_legend(rare), recap, titleX = T, titleY = T)
+    .p <- plotly_build(p)
+    for (i in seq_along(.p$x$data)) {
+        if (length(grep(",\\d+(,NA)?\\)$", .p$x$data[[i]]$name))) {
+            .p$x$data[[i]]$showlegend <- FALSE
+        }
+    }
+    .p
+} else {
+    grid.arrange(dup, rare, recap, nrow = 1)
+}
+```
+
+> Duplication level, rarefaction and recapture plots for FR (regions)
 
 
 
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+<!-- EXAMPLE:
+### CDR1
+```{r, eval=params$hasDiv, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "diversity/spectratypes"), pattern = ".*_cdr1_spectratype\\.Rdata")
+if (!is.na(fname)) { load(fname); if (params$interactive) { ggplotly(plot); } else { plot; } } else { cat("404!"); }
+```
+
+> Amino acid lengths distribution for CDR1 region
+-->
+
+```{r, echo=FALSE, eval=params$hasDiv}
+regions <-
+    c(
+    "CDR1" = "_cdr1_spectratype",
+    "CDR2" = "_cdr2_spectratype",
+    "CDR3" = "_cdr3_spectratype",
+    "CDR3 without outliers" = "_cdr3_spectratype_no_outliers",
+    "FR1" = "_fr1_spectratype",
+    "FR2" = "_fr2_spectratype",
+    "FR3" = "_fr3_spectratype",
+    "FR4" = "_fr4_spectratype",
+    "V domain" = "_v_spectratype"
+    )
+specOut <- lapply(seq_along(regions), function(i) {
+    line1 <- knitr::knit_expand(text = sprintf("### %s\n", names(regions)[[i]]))
+    line2 <- knitr::knit_expand(text = sprintf("\n```{r spec_out_%d, eval=params$hasDiv, fig.width=params$width, fig.height=params$height}\n", i))
+    line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(path = file.path(params$rootDir, "diversity/spectratypes"), pattern = ".*%s\\\\.Rdata")\n', regions[[i]]))
+    line4 <- knitr::knit_expand(text = '\nif (!is.na(fname)) { load(fname); if (params$interactive) { ggplotly(plot); } else { plot; } } else { cat("404!"); }')
+    line5 <- knitr::knit_expand(text = "\n```\n")
+    line6 <- knitr::knit_expand(text = sprintf("\n> Amino acid length distribution for %s region\n", names(regions)[[i]]))
+    paste(line1, line2, line3, line4, line5, line6, collapse = "\n")
+})
+```
+
+`r if (params$hasDiv) { paste(knitr::knit(text = paste(specOut, collapse = '\n'))) }`
+
+
+`r if(params$single) {"\\begin{comment}"}`
+
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+```{r, echo=FALSE, eval=(!params$single && params$hasDiv)}
+files <- list.files(path = file.path(params$rootDir, "diversity"),
+                    pattern = ".*_clone_scatter\\.Rdata",
+                    full.names = T)
+scatterOut <- lapply(seq_along(files), function(i) {
+    line1 <- knitr::knit_expand(text = sprintf("### sample %d vs sample %d\n", i, i + 1))
+    line2 <- knitr::knit_expand(text = sprintf("\n```{r scatter_out_%d, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}\n", i))
+    line3 <- knitr::knit_expand(text = sprintf('fname <- "%s"; load(fname); if (params$interactive) { ggplotly(plot); } else { plot; }', files[[i]]))
+    line4 <- knitr::knit_expand(text = "\n```\n")
+    line5 <- knitr::knit_expand(text = "\n> Clonotype counts from 2 samples\n")
+    paste(line1, line2, line3, line4, line5, collapse = "\n")
+})
+
+```
+
+`r if(!params$single && params$hasDiv) { paste(knitr::knit(text = paste(scatterOut, collapse = '\n'))) }`
+
+
+Row
+-----------------------------------------------------------------------
+
+### Distribution of top 10 (colour coded) clonotypes from each sample
+
+```{r, eval=(params$hasDiv && !params$single), fig.width=params$widthL, fig.height=params$heightL}
+fname <- .getFile(path = file.path(params$rootDir, "diversity"), pattern = ".*_top10Clonotypes\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
+} else {
+    cat("404!")
+}
+```
+
+> Clonotype distributions are scaled to top 10
+
+
+### Number of shared (and exclusive) clonotypes among samples
+
+```{r, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "diversity"), pattern = ".*_cdr3_clonotypeIntersection\\.png")
+if (!is.na(fname)) {
+    img <- readPNG(fname)
+    grid.raster(img)
+} else {
+    ggplot(data.frame()) +
+        xlim(0, 10) +
+        ylim(0, 10) +
+        annotate("text", x = 5, y = 5, label = "Can't find clonotype venn diagram, you probably have > 5 samples")
+}
+```
+
+> Counts show number of clonotypes
+
+
+`r if(params$single) {"\\end{comment}"}`
+
+
+
+`r if(!params$single) {"\\begin{comment}"}`
+
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+<!-- composition logos EXAMPLE:
+
+### CDR1 (unscaled, scaled)
+{r, eval=(params$hasDiv && params$single), fig.width=params$width*2, fig.height=params$height}
+# dont grep the IGV-X composition logos
+fname <- .getFile(path = file.path(params$rootDir, "diversity", "composition_logos", "CDR1"), pattern = ".*_cumulative_logo\\.Rdata", .callback = function(x) {
+    length(grep("-", x, fixed = T)) == 0
+})
+
+removeLegend <- FALSE
+if (!is.na(fname)) {
+    load(fname)
+    unscaled <- plot
+} else {
+    unscaled <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "404!")
+}
+
+fname <- .getFile(path = file.path(params$rootDir, "diversity", "composition_logos", "CDR1"), pattern = ".*_cumulative_logo_scaled\\.Rdata", .callback = function(x) {
+    length(grep("-", x, fixed = T)) == 0
+})
+
+if (!is.na(fname)) {
+    load(fname)
+    scaled <- plot
+    removeLegend <- TRUE
+} else {
+    scaled <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "404!")
+}
+
+if (params$interactive) {
+    if (removeLegend) {
+        unscaled <- hide_legend(ggplotly(unscaled))
+    }
+    subplot(unscaled, scaled)
+    .p <- plotly_build(p)
+    for (i in seq_along(.p$x$data)) {
+        if (length(grep("x\\d+", .p$x$data[[i]]$xaxis))) {
+            .p$x$data[[i]]$showlegend <- FALSE
+        }
+    }
+    .p
+} else {
+    grid.arrange(unscaled, scaled, nrow = 1)
+}
+
+
+> Amino acid composition logos - unscaled (sum to 1 in each individual position) and scaled (to the max number of sequences in a given position).
+-->
+
+```{r, echo = FALSE, eval = (params$single && params$hasDiv)}
+regions = c("CDR1", "CDR2", "CDR3", "FR1", "FR2", "FR3", "FR4")
+compOut <- lapply(seq_along(regions), function(i) {
+    line1 <- knitr::knit_expand(text = sprintf("### %s\n", regions[i]))
+    line2 <- knitr::knit_expand(text = sprintf("\n```{r comp_out_%d, eval=(params$hasDiv && params$single), fig.width=params$width*2, fig.height=params$height}\n", i))
+    line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(file.path(params$rootDir, "diversity", "composition_logos", "%s"), pattern = ".*_cumulative_logo\\\\.Rdata", .callback = .compositionNoGene)', regions[i]))
+    line4 <- knitr::knit_expand(text = '\nremoveLegend <- FALSE; if (!is.na(fname)) { load(fname); unscaled <- plot; } else { unscaled <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "404!"); }')
+    line5 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(file.path(params$rootDir, "diversity", "composition_logos", "%s"), pattern = ".*_cumulative_logo_scaled\\\\.Rdata", .callback = .compositionNoGene)', regions[i]))
+    line6 <- knitr::knit_expand(text = '\nif (!is.na(fname)) { load(fname); scaled <- plot; removeLegend <- TRUE; } else { scaled <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "404!"); }')
+    line7 <- knitr::knit_expand(text = '\nif (params$interactive) { if (removeLegend) { unscaled <- hide_legend(ggplotly(unscaled)) }; p <- subplot(unscaled, scaled); .p <- plotly_build(p); for (i in seq_along(.p$x$data)) { if (length(grep("x\\\\d+", .p$x$data[[i]]$xaxis))) { .p$x$data[[i]]$showlegend <- FALSE } }; .p; } else { grid.arrange(unscaled, scaled, nrow = 1) }')
+    line8 <- knitr::knit_expand(text = "\n```\n")
+    line9 <- knitr::knit_expand(text = sprintf("\n> Amino acid composition logos in %s - unscaled (sum to 1 in each individual position) and scaled (to the max number of sequences in a given position).\n", regions[i]))
+    paste(line1, line2, line3, line4, line5, line6, line7, line8, line9, collapse = "\n")
+})
+```
+
+`r if (params$single && params$hasDiv) { paste(knitr::knit(text = paste(compOut, collapse = '\n'))) }`
+
+
+`r if(!params$single) {"\\end{comment}"}`
 `r if(!params$hasDiv) {"\\end{comment}"}`
-
-
 
 <!--
 =======================================================================
 -----------------------------------------------------------------------
 -->
+

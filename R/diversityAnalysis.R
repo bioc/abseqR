@@ -608,7 +608,7 @@
         # only need top N, also take the columns we're interested in only
         df <- head(df[colNames], top)
         # append sample name to distinguish data when merged later on
-        df$round <- rep(sampleNames[i], nrow(df))
+        df$sample<- rep(sampleNames[i], nrow(df))
         # normalize percentage to top N
         df$Count <- df$Count / sum(df$Count)
         dataframes[[i]] <- df
@@ -641,7 +641,7 @@
         getPalatte <- colorRampPalette(brewer.pal(8, 'Accent'))
         palette <- getPalatte(length(unique(df.union$Clonotype)))
     }
-    g <- ggplot(df.union, aes(x = round, y = Count)) +
+    g <- ggplot(df.union, aes(x = sample, y = Count)) +
         geom_bar(stat ='identity', aes(fill = Clonotype)) +
         theme(legend.position = "bottom", legend.box = "horizontal",
               legend.title = element_blank(),
@@ -947,7 +947,7 @@
     # the amino acid character for that position - break ties on first occurance
     df.max <- merge(aggregate(count ~ position, df, max), df)
     df.max <- df.max[!duplicated(df.max[c(1,2)]), ]
-    xlabels <- df.max[with(df.max, order(position)), ]$aa
+    xlabels <- lapply(df.max[with(df.max, order(position)), ]$aa, as.character)
 
     total <- max(df.agg$count)
     if (scale) {
