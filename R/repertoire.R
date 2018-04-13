@@ -178,11 +178,15 @@ setMethod(f = "plotRepertoires",
                            primer3Files,
                            upstreamRanges)
 
+              # move Rmd to output directory for this sample - attempting to
+              # avoid overrides during parallel rmarkdown::render from sys.file(...)
+              file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
+                        outputDir)
+
               # TODO: params$has<analysis_name> should be supplied using
               # analyses variable.
-
               rmarkdown::render(
-                  system.file("extdata", "template.Rmd", package = "AbSeq"),
+                  file.path(outputDir, 'template.Rmd'),
                   output_dir = outputDir,
                   output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
                   params = list(
@@ -231,11 +235,16 @@ setMethod(f = "plotRepertoires",
                            primer3Files,
                            upstreamRanges)
 
+              # move Rmd to output directory for this sample - attempting to
+              # avoid overrides during parallel rmarkdown::render from sys.file(...)
+              file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
+                        outputDir)
+
               # TODO: params$has<analysis_name> should be supplied using
               # similarAnalyses variable.
 
               rmarkdown::render(
-                  system.file("extdata", "template.Rmd", package = "AbSeq"),
+                  file.path(outputDir, "template.Rmd"),
                   output_dir = outputDir,
                   output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
                   params = list(
