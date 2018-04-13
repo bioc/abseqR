@@ -22,9 +22,9 @@ params:
     single: TRUE
     # root output directory
     rootDir: "/newhome/jiahong/sandbox/immulator_out/output_results/report/PCR1_ACGT_L001_crossed"
-    hasAnnot: FALSE
-    hasAbun: FALSE
-    hasProd: FALSE
+    hasAnnot: TRUE
+    hasAbun: TRUE
+    hasProd: TRUE
     hasDiv: TRUE
 ---
 
@@ -461,7 +461,7 @@ if (params$interactive) {
 
 <!-- TODO: fix legend && beware of missing samples when doing so -->
 ```{r echo = FALSE, eval = TRUE}
-titles <- c("CDR1", "CDR2", "CDR3", "FR1", "FR2", "FR3")
+titles <- c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3")
 frcdrMisGaps <- lapply(seq_along(titles), function(i) {
     line1 <- knitr::knit_expand(text = sprintf("### %s\n", titles[i]))
     line2 <- knitr::knit_expand(text = sprintf("\n```{r frcdr_gap_mis_chunk_%d, eval=params$hasProd, fig.width=params$width*3, fig.height=params$height}", i))
