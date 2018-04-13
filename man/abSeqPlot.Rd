@@ -2,13 +2,21 @@
 % Please edit documentation in R/abseqLoad.R
 \name{abSeqPlot}
 \alias{abSeqPlot}
-\title{Title}
+\title{Plots all samples (and comparisons) as specified in abseq.cfg}
 \usage{
-abSeqPlot(object, BPPARAM = BiocParallel::bpparam())
+abSeqPlot(root, BPPARAM = BiocParallel::bpparam())
 }
 \arguments{
-\item{BPPARAM}{}
+\item{root}{string type. Root directory (-o / --outdir in AbSeq)}
+
+\item{BPPARAM}{BiocParallel backend}
+}
+\value{
+list type. List of Repertoire objects
 }
 \description{
-Title
+Plots all samples (and comparisons) as specified in abseq.cfg
+}
+\examples{
+todo
 }
