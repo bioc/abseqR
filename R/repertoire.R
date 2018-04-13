@@ -183,15 +183,20 @@ setMethod(f = "plotRepertoires",
               file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
                         outputDir, overwrite = T)
 
-              # TODO: params$has<analysis_name> should be supplied using
-              # analyses variable.
               rmarkdown::render(
                   file.path(outputDir, 'template.Rmd'),
                   output_dir = outputDir,
                   output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
                   params = list(
                       rootDir = outputDir,
-                      single = TRUE
+                      single = TRUE,
+                      interactive = TRUE,
+                      inclD = (object@chain == "hv"),
+                      hasAnnot = ("annot" %in% analyses),
+                      hasAbun = ("abundance" %in% analyses),
+                      hasProd = ("productivity" %in% analyses),
+                      hasDiv = ("diversity" %in% analyses),
+                      name = object@name
                   )
               )
           })
@@ -225,6 +230,9 @@ setMethod(f = "plotRepertoires",
                                        function(x) {
                                            x@upstream
                                        })
+              allChains <- lapply(object@repertoires, function(x) { x@chain })
+              # only include D gene plots if all chains only contain "hv"
+              includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
 
 
               .plotSamples(sampleNames,
@@ -240,16 +248,20 @@ setMethod(f = "plotRepertoires",
               file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
                         outputDir, overwrite = T)
 
-              # TODO: params$has<analysis_name> should be supplied using
-              # similarAnalyses variable.
-
               rmarkdown::render(
                   file.path(outputDir, "template.Rmd"),
                   output_dir = outputDir,
                   output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
                   params = list(
                       rootDir = outputDir,
-                      single = FALSE
+                      single = FALSE,
+                      interactive = TRUE,
+                      inclD = includeD,
+                      hasAnnot = ("annot" %in% similarAnalyses),
+                      hasAbun = ("abundance" %in% similarAnalyses),
+                      hasProd = ("productivity" %in% similarAnalyses),
+                      hasDiv = ("diversity" %in% similarAnalyses),
+                      name = paste(sampleNames, collapse = "_vs_")
                   )
               )
           })
