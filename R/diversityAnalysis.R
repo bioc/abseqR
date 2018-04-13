@@ -916,30 +916,30 @@
     group.colors <-
         c(
             # oranges
-            G = "#ff9900",
-            A = "#ffc266",
-            S = "#ffe0b3",
-            T = "#fff5e6",
+            G = "#cc6600",
+            A = "#ff8000",
+            S = "#ff8c1a",
+            T = "#ffa64d",
             # greens
-            C = "#145214",
-            V = "#248f24",
-            I = "#2eb82e",
-            L = "#47d147",
-            P = "#70db70",
-            F = "#99e699",
-            Y = "#c2f0c2",
-            M = "#d6f5d6",
-            W = "#ebfaeb",
+            C = "#003300",
+            V = "#145214",
+            I = "#006622",
+            L = "#1f7a1f",
+            P = "#009933",
+            F = "#29a329",
+            Y = "#00b33c",
+            M = "#2eb82e",
+            W = "#33cc33",
             # purples
-            N = "#cc00cc",
-            Q = "#ff99ff",
-            H = "#ffe6ff",
+            N = "#330066",
+            Q = "#4d0099",
+            H = "#6600cc",
             # reds
-            D = "#ff1a1a",
-            E = "#ffb3b3",
+            D = "#990000",
+            E = "#b30000",
             # blues
-            K = "#6699ff",
-            R = "#e6eeff"
+            K = "#000080",
+            R = "#0000b3"
         )
     df.agg <- aggregate(count ~ position, df, sum)
 
