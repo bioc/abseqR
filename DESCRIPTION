@@ -39,4 +39,4 @@ Collate:
     'plotter.R'
     'compositeRepertoire.R'
     'repertoire.R'
-    'abseqLoad.R'
+    'abSeqPlot.R'

@@ -19,9 +19,9 @@ params:
     # sample name
     name: "PLACEHOLDER SAMPLE NAME"
     # single sample?
-    single: TRUE
+    single: FALSE
     # root output directory
-    rootDir: "/newhome/jiahong/sandbox/immulator_out/output_results/report/PCR1_ACGT_L001_crossed"
+    rootDir: "/newhome/jiahong/sandbox/immulator_out/output_results/report/PCR1_ACGT_L001_crossed_vs_PCR2_ACGT_L001_crossed"
     hasAnnot: TRUE
     hasAbun: TRUE
     hasProd: TRUE
@@ -35,6 +35,8 @@ params:
 </style>
 
 ```{r setup, include=FALSE}
+# Buidling rmd using loops: https://github.com/rstudio/flexdashboard/issues/80
+
 library(flexdashboard)
 library(plotly)
 library(png)

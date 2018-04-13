@@ -181,7 +181,7 @@ setMethod(f = "plotRepertoires",
               # move Rmd to output directory for this sample - attempting to
               # avoid overrides during parallel rmarkdown::render from sys.file(...)
               file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
-                        outputDir)
+                        outputDir, overwrite = T)
 
               # TODO: params$has<analysis_name> should be supplied using
               # analyses variable.
@@ -238,7 +238,7 @@ setMethod(f = "plotRepertoires",
               # move Rmd to output directory for this sample - attempting to
               # avoid overrides during parallel rmarkdown::render from sys.file(...)
               file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
-                        outputDir)
+                        outputDir, overwrite = T)
 
               # TODO: params$has<analysis_name> should be supplied using
               # similarAnalyses variable.
