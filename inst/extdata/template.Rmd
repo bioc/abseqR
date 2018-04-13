@@ -834,7 +834,7 @@ Row {.tabset .tabset-fade}
 <!-- EXAMPLE:
 ### CDR1
 ```{r, eval=params$hasDiv, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "diversity/spectratypes"), pattern = ".*_cdr1_spectratype\\.Rdata")
+fname <- .getFile(path = file.path(params$rootDir, "diversity", "spectratypes"), pattern = ".*_cdr1_spectratype\\.Rdata")
 if (!is.na(fname)) { load(fname); if (params$interactive) { ggplotly(plot); } else { plot; } } else { cat("404!"); }
 ```
 
@@ -857,7 +857,7 @@ regions <-
 specOut <- lapply(seq_along(regions), function(i) {
     line1 <- knitr::knit_expand(text = sprintf("### %s\n", names(regions)[[i]]))
     line2 <- knitr::knit_expand(text = sprintf("\n```{r spec_out_%d, eval=params$hasDiv, fig.width=params$width, fig.height=params$height}\n", i))
-    line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(path = file.path(params$rootDir, "diversity/spectratypes"), pattern = ".*%s\\\\.Rdata")\n', regions[[i]]))
+    line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(path = file.path(params$rootDir, "diversity", "spectratypes"), pattern = ".*%s\\\\.Rdata")\n', regions[[i]]))
     line4 <- knitr::knit_expand(text = '\nif (!is.na(fname)) { load(fname); if (params$interactive) { ggplotly(plot); } else { plot; } } else { cat("404!"); }')
     line5 <- knitr::knit_expand(text = "\n```\n")
     line6 <- knitr::knit_expand(text = sprintf("\n> Amino acid length distribution for %s region\n", names(regions)[[i]]))
@@ -1009,6 +1009,50 @@ compOut <- lapply(seq_along(regions), function(i) {
 `r if (params$single && params$hasDiv) { paste(knitr::knit(text = paste(compOut, collapse = '\n'))) }`
 
 
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+<!-- Motifs EXAMPLE:
+### CDR1 Motifs (aligned, unaligned)
+
+```{r, eval=(params$hasDiv && params$single), fig.width=params$width*2, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "diversity", "motifs"), pattern = ".*cdr1_motif_aligned_logo\\.png")
+if (!is.na(fname)) {
+    imgAl <- rasterGrob(as.raster(readPNG(fname)), interpolate = FALSE)
+} else {
+    imgAl <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+fname <- .getFile(path = file.path(params$rootDir, "diversity", "motifs"), pattern = ".*cdr1_motif_logo\\.png")
+if (!is.na(fname)) {
+    img <- rasterGrob(as.raster(readPNG(fname)), interpolate = FALSE)
+} else {
+    img <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+grid.arrange(imgAl, img, nrow = 1)
+```
+-->
+
+```{r, echo = FALSE, eval = (params$hasDiv && params$single)}
+regions = c("CDR1", "CDR2", "CDR3", "FR1", "FR2", "FR3", "FR4")
+motifOut <- lapply(seq_along(regions), function(i) {
+    line1 <- knitr::knit_expand(text = sprintf("### %s (aligned, unaligned)\n", regions[i]))
+    line2 <- knitr::knit_expand(text = sprintf("\n```{r motif_out_%d, eval=(params$hasDiv && params$single), fig.width=params$width*2, fig.height=params$height}", i))
+    line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(path = file.path(params$rootDir, "diversity", "motifs"), pattern = ".*%s_motif_aligned_logo\\\\.png")', tolower(regions[i])))
+    line4 <- knitr::knit_expand(text = '\nif (!is.na(fname)) { imgAl <- rasterGrob(as.raster(readPNG(fname)), interpolate = FALSE) } else { imgAl <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable") }')
+    line5 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(path = file.path(params$rootDir, "diversity", "motifs"), pattern = ".*%s_motif_logo\\\\.png")', tolower(regions[i])))
+    line6 <- knitr::knit_expand(text = '\nif (!is.na(fname)) { img <- rasterGrob(as.raster(readPNG(fname)), interpolate = FALSE) } else { img <- ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable") }')
+    line7 <- knitr::knit_expand(text = "\ngrid.arrange(imgAl, img, nrow = 1)")
+    line8 <- knitr::knit_expand(text = "\n```\n")
+    line9 <- knitr::knit_expand(text = sprintf("\n> (Left) %s aligned using clustal-omega (Right) unaligned motif discovery\n", regions[i]))
+    paste(line1, line2, line3, line4, line5, line6, line7, line8, line9, collapse = "\n")
+})
+```
+
+`r if (params$single && params$hasDiv) { paste(knitr::knit(text = paste(motifOut, collapse = '\n'))) }`
+
+
+
+
 `r if(!params$single) {"\\end{comment}"}`
 `r if(!params$hasDiv) {"\\end{comment}"}`
 
@@ -1016,4 +1060,7 @@ compOut <- lapply(seq_along(regions), function(i) {
 =======================================================================
 -----------------------------------------------------------------------
 -->
+
+
+
 
