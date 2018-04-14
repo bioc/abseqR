@@ -35,7 +35,7 @@ abSeqPlot <- function(root, BPPARAM = BiocParallel::bpparam()) {
                                   # sample@outdir should be the same as
                                   if (normalizePath(sample_@outdir) != root) {
                                       message(
-                                          paste0(
+                                          paste(
                                               "Sample output directory is different from provided",
                                               "path, assuming directory was moved"
                                           )
@@ -48,7 +48,7 @@ abSeqPlot <- function(root, BPPARAM = BiocParallel::bpparam()) {
             outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
             samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
             if (normalizePath(samples@outdir) != root) {
-                message(paste0("Sample output directory is different from provided",
+                message(paste("Sample output directory is different from provided",
                         "path, assuming directory was moved"))
                 samples@outdir <- root
             }
