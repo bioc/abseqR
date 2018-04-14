@@ -203,12 +203,13 @@
 #' @param subtitle string type
 #' @param xlabel string type
 #' @param ylabel string type
+#' @param showLabel bool type. Show geom_text? - Ignored if samples > 1
 #'
 #' @return ggplot2 object
 .plotSpectratype <- function(dataframes, sampleNames, region,
                              title = "Spectratype", subtitle = "",
                              xlabel = "Length(AA)",
-                             ylabel = "Distribution") {
+                             ylabel = "Distribution", showLabel = F) {
     nsample <- length(dataframes)
     if (nsample != length(sampleNames)) {
         stop(paste("Expected equal number of sample names and dataframes, got",
@@ -252,8 +253,10 @@
     if (nsample == 1) {
         g <- g + geom_bar(stat = "identity", aes(fill = sample),
                           position = "dodge",
-                          show.legend = FALSE, fill = BLUEHEX) +
-            geom_text(aes(label = count), vjust = -1, size = 3)
+                          show.legend = FALSE, fill = BLUEHEX)
+        if (showLabel) {
+            g <- g + geom_text(aes(label = count), vjust = -1, size = 3)
+        }
     } else {
         g <- g + geom_bar(stat = "identity",
                           aes(fill = sample), position = "dodge")
