@@ -67,6 +67,9 @@ abSeqPlot <- function(root, BPPARAM = BiocParallel::bpparam()) {
                                    sampleNames[1])
             samples <-
                 .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
+            if (normalizePath(samples@outdir) != root) {
+                samples@outdir <- root
+            }
             individualSamples <-
                 c(individualSamples, samples)
         }
