@@ -380,7 +380,9 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5,
+                                                                y = 5, label =
+                                                                    "404!")
 }
 ```
 
@@ -390,7 +392,7 @@ if (!is.na(fname)) {
 
 ```{r, eval=params$hasProd, fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
-                  pattern = ".*_crossed_vjframe_dist\\.Rdata")
+                  pattern = ".*_vjframe_dist\\.Rdata")
 
 if (!is.na(fname)) {
     load(fname)
@@ -400,7 +402,9 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5,
+                                                                y = 5, label =
+                                                                    "404!")
 }
 ```
 
