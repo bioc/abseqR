@@ -70,7 +70,7 @@ Repertoire <- setClass("Repertoire", slots = c(
     lines <- tail(readLines(con), n = -2)
     close(con)
     params <- list(Class = "Repertoire")
-    skip <- c("report_interim", "rscripts")
+    skip <- c("report_interim", "yaml")
     for (line in lines) {
         tokens <- unlist(strsplit(line, "\t"))
         parameter <- trimws(strsplit(tokens[1], ":")[[1]][2])
@@ -141,6 +141,8 @@ setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), functio
 
 #' Title
 #'
+#' @import rmarkdown
+#'
 #' @include util.R
 #' @include plotter.R
 #' @include compositeRepertoire.R
@@ -175,6 +177,28 @@ setMethod(f = "plotRepertoires",
                            primer5Files,
                            primer3Files,
                            upstreamRanges)
+
+              # move Rmd to output directory for this sample - attempting to
+              # avoid overrides during parallel rmarkdown::render from sys.file(...)
+              file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
+                        outputDir, overwrite = T)
+
+              rmarkdown::render(
+                  file.path(outputDir, 'template.Rmd'),
+                  output_dir = outputDir,
+                  output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
+                  params = list(
+                      rootDir = outputDir,
+                      single = TRUE,
+                      interactive = TRUE,
+                      inclD = (object@chain == "hv"),
+                      hasAnnot = ("annot" %in% analyses),
+                      hasAbun = ("abundance" %in% analyses),
+                      hasProd = ("productivity" %in% analyses),
+                      hasDiv = ("diversity" %in% analyses),
+                      name = object@name
+                  )
+              )
           })
 
 setMethod(f = "plotRepertoires",
@@ -206,6 +230,9 @@ setMethod(f = "plotRepertoires",
                                        function(x) {
                                            x@upstream
                                        })
+              allChains <- lapply(object@repertoires, function(x) { x@chain })
+              # only include D gene plots if all chains only contain "hv"
+              includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
 
 
               .plotSamples(sampleNames,
@@ -215,4 +242,26 @@ setMethod(f = "plotRepertoires",
                            primer5Files,
                            primer3Files,
                            upstreamRanges)
+
+              # move Rmd to output directory for this sample - attempting to
+              # avoid overrides during parallel rmarkdown::render from sys.file(...)
+              file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
+                        outputDir, overwrite = T)
+
+              rmarkdown::render(
+                  file.path(outputDir, "template.Rmd"),
+                  output_dir = outputDir,
+                  output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
+                  params = list(
+                      rootDir = outputDir,
+                      single = FALSE,
+                      interactive = TRUE,
+                      inclD = includeD,
+                      hasAnnot = ("annot" %in% similarAnalyses),
+                      hasAbun = ("abundance" %in% similarAnalyses),
+                      hasProd = ("productivity" %in% similarAnalyses),
+                      hasDiv = ("diversity" %in% similarAnalyses),
+                      name = paste(sampleNames, collapse = "_vs_")
+                  )
+              )
           })

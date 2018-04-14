@@ -29,7 +29,7 @@
 #' @param upstreamRanges list type. Collection of "None"s or vector
 #' denoting upstreamStart and upstreamEnd for each sample.
 #'
-#' @return None
+#' @return none
 .plotSamples <-
     function(sampleNames,
              directories,
@@ -44,7 +44,6 @@
         }
         mashedNames <- paste(sampleNames, collapse = "_")
         combinedNames <- paste(sampleNames, collapse = ", ")
-
         ##################################################
         #                                                #
         #               ANNOTATION PLOTS                 #

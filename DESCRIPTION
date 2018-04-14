@@ -18,7 +18,13 @@ Imports:
     reshape2,
     VennDiagram,
     plyr,
-    BiocParallel (>= 1.1.25)
+    flexdashboard,
+    BiocParallel (>= 1.1.25),
+    png,
+    grid,
+    gridExtra,
+    rmarkdown,
+    knitr
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 
@@ -33,4 +39,4 @@ Collate:
     'plotter.R'
     'compositeRepertoire.R'
     'repertoire.R'
-    'abseqLoad.R'
+    'abSeqPlot.R'
