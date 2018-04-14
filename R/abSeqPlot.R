@@ -12,6 +12,7 @@
 #'
 #' @examples todo
 abSeqPlot <- function(root, BPPARAM = BiocParallel::bpparam()) {
+    root <- normalizePath(root)
     metaFile <- file.path(root, ABSEQ_CFG)
 
     con <- file(metaFile, "r")
@@ -30,14 +31,27 @@ abSeqPlot <- function(root, BPPARAM = BiocParallel::bpparam()) {
                                          collapse = "_vs_"))
             samples <- Reduce("+",
                               lapply(sampleNames, function(sampleName) {
-                                  .loadRepertoireFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
+                                  sample_ <- .loadRepertoireFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
+                                  # sample@outdir should be the same as
+                                  if (normalizePath(sample_@outdir) != root) {
+                                      message(
+                                          paste0(
+                                              "Sample output directory is different from provided",
+                                              "path, assuming directory was moved"
+                                          )
+                                      )
+                                      sample_@outdir <- root
+                                  }
+                                  return(sample_)
                               }))
         } else {
-            outputDir <- file.path(root,
-                                   RESULT_DIR,
-                                   sampleNames[1])
-            samples <-
-                .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
+            outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
+            samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
+            if (normalizePath(samples@outdir) != root) {
+                message(paste0("Sample output directory is different from provided",
+                        "path, assuming directory was moved"))
+                samples@outdir <- root
+            }
         }
         AbSeq::plotRepertoires(samples, outputDir)
     })
