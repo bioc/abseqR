@@ -70,7 +70,7 @@ Repertoire <- setClass("Repertoire", slots = c(
     lines <- tail(readLines(con), n = -2)
     close(con)
     params <- list(Class = "Repertoire")
-    skip <- c("report_interim", "rscripts")
+    skip <- c("report_interim", "yaml")
     for (line in lines) {
         tokens <- unlist(strsplit(line, "\t"))
         parameter <- trimws(strsplit(tokens[1], ":")[[1]][2])
