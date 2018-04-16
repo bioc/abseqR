@@ -205,12 +205,13 @@ setGeneric(name = "plotRepertoires",
 setMethod(f = "plotRepertoires",
           signature = "Repertoire",
           definition = function(object, outputDir) {
-              analysisDirectories = unlist(file.path(object@outdir, RESULT_DIR, object@name))
-              analyses <- unlist(.inferAnalyzed(analysisDirectories[[1]]))
+              analysisDirectories = c(file.path(object@outdir, RESULT_DIR, object@name))
+              analyses <- unlist(.inferAnalyzed(analysisDirectories[1]))
               sampleNames <- c(object@name)
               primer5Files <- list(object@primer5end)
               primer3Files <- list(object@primer3end)
               upstreamRanges <- list(object@upstream)
+
               .plotSamples(sampleNames,
                            analysisDirectories,
                            analyses,
@@ -223,6 +224,10 @@ setMethod(f = "plotRepertoires",
               # avoid overrides during parallel rmarkdown::render from sys.file(...)
               #file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
               #          outputDir, overwrite = T)
+              bitFilter <- paste(object@bitscore, collapse = " - ")
+              qsFilter <- paste(object@qstart, collapse = " - ")
+              ssFilter <- paste(object@sstart, collapse = " - ")
+              alFilter <- paste(object@alignlen, collapse = " - ")
 
               rmarkdown::render(
                   #file.path(outputDir, 'template.Rmd'),
@@ -238,7 +243,15 @@ setMethod(f = "plotRepertoires",
                       hasAbun = ("abundance" %in% analyses),
                       hasProd = ("productivity" %in% analyses),
                       hasDiv = ("diversity" %in% analyses),
-                      name = object@name
+                      name = object@name,
+                      bitfilters = bitFilter,
+                      qstartfilters = qsFilter,
+                      sstartfilters = ssFilter,
+                      alignfilters = alFilter,
+                      rawReads = .readSummary(analysisDirectories[1], "RawReads"),
+                      annotReads = .readSummary(analysisDirectories[1], "AnnotatedReads"),
+                      filteredReads = .readSummary(analysisDirectories[1], "FilteredReads"),
+                      productiveReads = .readSummary(analysisDirectories[1], "ProductiveReads")
                   )
               )
           })
@@ -290,6 +303,31 @@ setMethod(f = "plotRepertoires",
               #file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
               #          outputDir, overwrite = T)
 
+              bitFilters <- lapply(object@repertoires, function(x) {
+                  paste(x@bitscore, collapse = " - ")
+              })
+              qsFilters <- lapply(object@repertoires, function(x) {
+                  paste(x@qstart, collapse = " - ")
+              })
+              ssFilters <- lapply(object@repertoires, function(x) {
+                  paste(x@sstart, collapse = " - ")
+              })
+              alFilters <- lapply(object@repertoires, function(x) {
+                  paste(x@alignlen, collapse = " - ")
+              })
+              rawReads <- lapply(analysisDirectories, function(pth) {
+                  .readSummary(pth, "RawReads")
+              })
+              annotReads <- lapply(analysisDirectories, function(pth) {
+                  .readSummary(pth, "AnnotatedReads")
+              })
+              filteredReads <- lapply(analysisDirectories, function(pth) {
+                  .readSummary(pth, "FilteredReads")
+              })
+              productiveReads <- lapply(analysisDirectories, function(pth) {
+                  .readSummary(pth, "ProductiveReads")
+              })
+
               rmarkdown::render(
                   #file.path(outputDir, "template.Rmd"),
                   system.file("extdata", "template.Rmd", package = "AbSeq"),
@@ -304,7 +342,15 @@ setMethod(f = "plotRepertoires",
                       hasAbun = ("abundance" %in% similarAnalyses),
                       hasProd = ("productivity" %in% similarAnalyses),
                       hasDiv = ("diversity" %in% similarAnalyses),
-                      name = paste(sampleNames, collapse = "_vs_")
+                      name = paste(sampleNames, collapse = "_vs_"),
+                      bitfilters = paste(bitFilters, collapse = ","),
+                      alignfilters = paste(alFilters, collapse = ","),
+                      sstartfilters = paste(ssFilters, collapse = ","),
+                      qstartfilters = paste(qsFilters, collapse = ","),
+                      rawReads = paste(rawReads, collapse = ","),
+                      annotReads = paste(annotReads, collapse = ","),
+                      filteredReads = paste(filteredReads, collapse = ","),
+                      productiveReads = paste(productiveReads, collapse = ",")
                   )
               )
           })

@@ -15,6 +15,7 @@ RESULT_DIR <- "report"
 AUX_DIR <- "auxiliary"
 ANALYSIS_PARAMS <- "analysis.params"
 ABSEQ_CFG <- "abseq.cfg"
+ABSEQ_SUMMARY <- "summary.txt"
 
 
 .checkVert <- function(filename) {
@@ -155,4 +156,31 @@ ABSEQ_CFG <- "abseq.cfg"
         fname <- sub(tools::file_ext(filename), "Rdata", filename)
         save(file = fname, list = c("plot"))
     }
+}
+
+
+#' Return value specifed by key from AbSeq's summary file
+#'
+#' @param sampleRoot sample's root directory. For example,
+#' \code{/path/to/<outputdir>/reports/<sample_name>}.
+#' @param key character type. Possible values are
+#' \itemize{
+#'    \item{RawReads}
+#'    \item{AnnotatedReads}
+#'    \item{FilteredReads}
+#'    \item{ProductiveReads}
+#' }
+#' @return value associated with key from summary file. "NA" (in string) if the field
+#' is not available
+.readSummary <- function(sampleRoot, key) {
+    fname <- file.path(sampleRoot, ABSEQ_SUMMARY)
+    con <- file(fname, "r")
+    lines <- readLines(con)
+    close(con)
+    for (line in lines) {
+        if (grepl(key, line, fixed = T)) {
+            return(strsplit(line, ":")[[1]][2])
+        }
+    }
+    return("NA")
 }
