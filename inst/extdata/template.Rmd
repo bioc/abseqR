@@ -21,7 +21,7 @@ params:
     # single sample?
     single: FALSE
     # root output directory
-    rootDir: "/newhome/jiahong/sandbox/immulator_out/output_results/report/PCR1_ACGT_L001_crossed_vs_PCR2_ACGT_L001_crossed"
+    rootDir: ""
     hasAnnot: TRUE
     hasAbun: TRUE
     hasProd: TRUE
