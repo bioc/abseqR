@@ -66,7 +66,8 @@
         df <- read.csv(filename)
 
         # output file
-        png(gsub(".csv", ".png", filename))
+        png(gsub(".csv", ".png", filename), width = V_WIDTH, height = V_HEIGHT,
+            units = "in", res = 1200, pointsize = 10)
 
         # circos theme setup
         #if (length(unique(df[[1]]))-1 < 8 && length(unique(df[[2]]))-1 < 8)  {
@@ -81,7 +82,7 @@
         chordDiagram(df, annotationTrack = "grid",
                      preAllocateTracks = list(track.height = 0.2),
                      grid.col = c(row,col))
-        title(sampleName, cex = 0.8)
+        title(sampleName, cex = 8)
         circos.trackPlotRegion(track.index = 1, bg.border = NA,
                                panel.fun = function(x, y) {
                                    sector.name =
