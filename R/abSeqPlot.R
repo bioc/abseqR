@@ -1,13 +1,17 @@
-#' Plots all samples (and comparisons) as specified in abseq.cfg
+#' Plots all samples and comparisons as specified in \code{abseq.cfg}
 #'
 #' @include util.R
 #' @include repertoire.R
 #' @import BiocParallel
 #'
-#' @param root string type. Root directory (-o / --outdir in AbSeq)
-#' @param BPPARAM BiocParallel backend
+#' @param root string type. Root directory as specified in
+#' \code{-o} or \code{--outdir} in AbSeqPy.
+#' @param BPPARAM BiocParallel backend. Configures the parallel implementation.
+#' Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.html}{BiocParallel}
+#' for more information.
 #'
-#' @return list type. List of Repertoire objects
+#' @return list type. List of \code{\linkS4class{Repertoire}} objects
+#' @seealso \code{\linkS4class{Repertoire}}
 #' @export
 #'
 #' @examples todo

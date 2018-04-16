@@ -2,21 +2,27 @@
 % Please edit documentation in R/abSeqPlot.R
 \name{abSeqPlot}
 \alias{abSeqPlot}
-\title{Plots all samples (and comparisons) as specified in abseq.cfg}
+\title{Plots all samples and comparisons as specified in \code{abseq.cfg}}
 \usage{
 abSeqPlot(root, BPPARAM = BiocParallel::bpparam())
 }
 \arguments{
-\item{root}{string type. Root directory (-o / --outdir in AbSeq)}
+\item{root}{string type. Root directory as specified in
+\code{-o} or \code{--outdir} in AbSeqPy.}
 
-\item{BPPARAM}{BiocParallel backend}
+\item{BPPARAM}{BiocParallel backend. Configures the parallel implementation.
+Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.html}{BiocParallel}
+for more information.}
 }
 \value{
-list type. List of Repertoire objects
+list type. List of \code{\linkS4class{Repertoire}} objects
 }
 \description{
-Plots all samples (and comparisons) as specified in abseq.cfg
+Plots all samples and comparisons as specified in \code{abseq.cfg}
 }
 \examples{
 todo
+}
+\seealso{
+\code{\linkS4class{Repertoire}}
 }

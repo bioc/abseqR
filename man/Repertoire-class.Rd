@@ -4,67 +4,114 @@
 \name{Repertoire-class}
 \alias{Repertoire-class}
 \alias{Repertoire}
-\title{Title}
+\title{AbSeq analysis object.}
+\value{
+none
+}
 \description{
-Title
+The Repertoire object contains all metadata associated with the AbSeq (python backend)
+run conducted on it. For further information, refer to AbSeq's python help.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{f1}}{character.}
+\item{\code{f1}}{character. Path to FASTA/FASTQ file 1.}
 
-\item{\code{f2}}{character.}
+\item{\code{f2}}{character. Path to FASTA/FASTQ file 1.}
 
-\item{\code{chain}}{character.}
+\item{\code{chain}}{character. Type of chain, possible values:
+\itemize{
+  \item{hv}
+  \item{lv}
+  \item{kv}
+}
+each representing \bold{H}eavy, \bold{L}ambda and \bold{K}appa respectively.}
 
-\item{\code{task}}{character.}
-
-\item{\code{name}}{character.}
-
-\item{\code{bitscore}}{numeric.}
-
-\item{\code{qstart}}{numeric.}
-
-\item{\code{sstart}}{numeric.}
-
-\item{\code{alignlen}}{numeric.}
-
-\item{\code{clonelimit}}{numeric.}
-
-\item{\code{log}}{character.}
-
-\item{\code{merger}}{character.}
-
-\item{\code{fmt}}{character.}
-
-\item{\code{sites}}{character.}
-
-\item{\code{primer5end}}{ANY.}
-
-\item{\code{primer3end}}{ANY.}
-
-\item{\code{trim5}}{numeric.}
-
-\item{\code{trim3}}{numeric.}
-
-\item{\code{outdir}}{character.}
-
-\item{\code{primer5endoffset}}{numeric.}
-
-\item{\code{threads}}{numeric.}
-
-\item{\code{upstream}}{character.}
-
-\item{\code{seqtype}}{character.}
-
-\item{\code{database}}{character.}
-
-\item{\code{actualqstart}}{numeric.}
-
-\item{\code{fr4cut}}{logical.}
-
-\item{\code{domainSystem}}{character.}
-
-\item{\code{primer}}{numeric.}
+\item{\code{task}}{character. Type of analysis conducted, possible values:
+\itemize{
+  \item{all}
+  \item{annotate}
+  \item{abundance}
+  \item{diversity}
+  \item{productivity}
+  \item{fastqc}
+  \item{primer}
+  \item{5utr}
+  \item{rsasimple}
+  \item{seqlen}
+  \item{secretion}
+  \item{seqlenclass}
 }}
 
+\item{\code{name}}{character. Name of analysis.}
+
+\item{\code{bitscore}}{numeric. Part of filtering criteria: V gene bitscore filter value.}
+
+\item{\code{qstart}}{numeric. Part of filtering criteria: V gene query start filter value.}
+
+\item{\code{sstart}}{numeric. Part of filtering criteria: V gene subject start filter value.}
+
+\item{\code{alignlen}}{numeric. Part of filtering criteria: V gene alignment length filter value.}
+
+\item{\code{clonelimit}}{numeric. Number of clones to export into csv file. This is
+only relevant in \code{-t all} or \code{-t diversity} where clonotypes
+are exported into \code{<outdir>/<name>/diversity/clonotypes}}
+
+\item{\code{log}}{character. Path to log file.}
+
+\item{\code{merger}}{character. Merger used to merge paired-end reads.}
+
+\item{\code{fmt}}{character. File format of \code{file1} and (if present) \code{file2}.
+Possible values are FASTA or FASTQ.}
+
+\item{\code{sites}}{character. Path to restriction sites \code{txt} file.
+This option is only used if \code{-t rsasimple}}
+
+\item{\code{primer5end}}{ANY. Path to 5' end primer FASTA file.}
+
+\item{\code{primer3end}}{ANY. Path to 3' end primer FASTA file.}
+
+\item{\code{trim5}}{numeric. Number of nucleotides to trimd at the 5' end;}
+
+\item{\code{trim3}}{numeric. Number of nucleotides to trimd at the 3' end;}
+
+\item{\code{outdir}}{character. Path to output directory}
+
+\item{\code{primer5endoffset}}{numeric. Number of nucleotides to offset before aligning
+5' end primers in \code{primer5end} FASTA file.}
+
+\item{\code{threads}}{numeric. Number of threads to run.}
+
+\item{\code{upstream}}{character. Index (range) of upstream nucleotides to analyze.
+This option is only used if \code{-t 5utr} or \code{-t secretion}.}
+
+\item{\code{seqtype}}{character. Sequence type, possible values are either \code{dna}
+or \code{protein}.}
+
+\item{\code{database}}{character. Path to IgBLAST database.}
+
+\item{\code{actualqstart}}{numeric. Query sequence's starting index (indexing starts from 1).
+This value overrides the inferred query start position by AbSeq.}
+
+\item{\code{fr4cut}}{logical. The end of FR4 is marked as the end of the sequence if
+set to TRUE, otherwise the end of the sequence is either the end of the read
+itself, or trimmed to \code{--trim3 <num>}.}
+
+\item{\code{domainSystem}}{character. Domain system to use in IgBLAST, possible
+values are either \code{imgt} or \code{kabat}.}
+
+\item{\code{primer}}{numeric. Dummy value - not implemented yet.}
+}}
+
+\examples{
+\dontrun{
+# this class is (usually) not directly constructed by users, but as a return
+# value from the \\code{abSeqPlot} method.
+samples <- abSeqPlot("/path/to/output/directory/")
+samples[[1]]@name     # gives the name of the first repertoire object returned by abSeqPlot
+}
+}
+\seealso{
+\code{\link{abSeqPlot}} returns a \code{list} of \code{Repertoire}
+objects.
+}
