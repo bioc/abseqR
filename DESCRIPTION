@@ -40,3 +40,4 @@ Collate:
     'compositeRepertoire.R'
     'repertoire.R'
     'abSeqPlot.R'
+SystemRequirements: pandoc
