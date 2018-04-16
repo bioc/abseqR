@@ -221,11 +221,12 @@ setMethod(f = "plotRepertoires",
 
               # move Rmd to output directory for this sample - attempting to
               # avoid overrides during parallel rmarkdown::render from sys.file(...)
-              file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
-                        outputDir, overwrite = T)
+              #file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
+              #          outputDir, overwrite = T)
 
               rmarkdown::render(
-                  file.path(outputDir, 'template.Rmd'),
+                  #file.path(outputDir, 'template.Rmd'),
+                  system.file("extdata", "template.Rmd", package = "AbSeq"),
                   output_dir = outputDir,
                   output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
                   params = list(
@@ -286,11 +287,12 @@ setMethod(f = "plotRepertoires",
 
               # move Rmd to output directory for this sample - attempting to
               # avoid overrides during parallel rmarkdown::render from sys.file(...)
-              file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
-                        outputDir, overwrite = T)
+              #file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
+              #          outputDir, overwrite = T)
 
               rmarkdown::render(
-                  file.path(outputDir, "template.Rmd"),
+                  #file.path(outputDir, "template.Rmd"),
+                  system.file("extdata", "template.Rmd", package = "AbSeq"),
                   output_dir = outputDir,
                   output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
                   params = list(
