@@ -28,15 +28,15 @@ abSeqPlot <- function(root, BPPARAM = BiocParallel::bpparam()) {
     #BiocParallel::bplapply(pairings, function(pair) {
         sampleNames <- unlist(strsplit(pair, ","))
 
+        # depending on the number of samples requested to plot, outputDir
+        # is either a <sample>_vs_<sample> format or just <sample> meanwhile,
+        # samples will either be a CompositeRepertoire or just Repertoire.
         if (length(sampleNames) > 1) {
-            outputDir <- file.path(root,
-                                   RESULT_DIR,
-                                   paste(sampleNames,
-                                         collapse = "_vs_"))
+            outputDir <- file.path(root, RESULT_DIR, paste(sampleNames, collapse = "_vs_"))
             samples <- Reduce("+",
                               lapply(sampleNames, function(sampleName) {
                                   sample_ <- .loadRepertoireFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
-                                  # sample@outdir should be the same as
+                                  # sample@outdir should be the same as root
                                   if (normalizePath(sample_@outdir) != root) {
                                       message(
                                           paste(
@@ -66,11 +66,8 @@ abSeqPlot <- function(root, BPPARAM = BiocParallel::bpparam()) {
     for (pair in pairings) {
         sampleNames <- unlist(strsplit(pair, ","))
         if (length(sampleNames) == 1) {
-            outputDir <- file.path(root,
-                                   RESULT_DIR,
-                                   sampleNames[1])
-            samples <-
-                .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
+            outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
+            samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
             if (normalizePath(samples@outdir) != root) {
                 samples@outdir <- root
             }

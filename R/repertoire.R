@@ -299,8 +299,15 @@ setMethod(f = "plotRepertoires",
                                        function(x) {
                                            x@upstream
                                        })
+
+              # define variables for template.Rmd's param list
+              allChains <- lapply(object@repertoires, function(x) { x@chain })
+              # only include D gene plots if all chains only contain "hv"
+              includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
+
               .plotSamples(sampleNames, analysisDirectories, similarAnalyses,
-                           outputDir, primer5Files, primer3Files, upstreamRanges)
+                           outputDir, primer5Files, primer3Files, upstreamRanges,
+                           skipDgene = !includeD)
 
               # move Rmd to output directory for this sample - attempting to
               # avoid overrides during parallel rmarkdown::render from sys.file(...)
@@ -308,10 +315,6 @@ setMethod(f = "plotRepertoires",
               #          outputDir, overwrite = T)
 
 
-              # define variables for template.Rmd's param list
-              allChains <- lapply(object@repertoires, function(x) { x@chain })
-              # only include D gene plots if all chains only contain "hv"
-              includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
               bitFilters <- lapply(object@repertoires, function(x) {
                   paste(x@bitscore, collapse = " - ")
               })
