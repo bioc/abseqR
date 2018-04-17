@@ -10,8 +10,8 @@
 #' Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.html}{BiocParallel}
 #' for more information.
 #'
-#' @return list type. List of \code{\linkS4class{Repertoire}} objects
-#' @seealso \code{\linkS4class{Repertoire}}
+#' @return list type. List of \linkS4class{Repertoire} objects
+#' @seealso \linkS4class{Repertoire}
 #' @export
 #'
 #' @examples todo

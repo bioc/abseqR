@@ -1,4 +1,4 @@
-# single plot uses blue
+# single plot uses light blue colour
 BLUEHEX <- "#56B4E9"
 
 # plot sizes
@@ -11,11 +11,28 @@ VENN_HEIGHT <- 8
 V_WIDTH_L <- 12
 V_HEIGHT_L <- 7.5
 
+# AbSeq's output directory structure(s)
 RESULT_DIR <- "report"
 AUX_DIR <- "auxiliary"
+
+# parameter file from AbSeq's run
 ANALYSIS_PARAMS <- "analysis.params"
+
+# sample comparison configuration file - only used in AbSeqR (to know what
+# samples must be compared against each other when abSeqPlot() is called)
 ABSEQ_CFG <- "abseq.cfg"
+
+# AbSeq's summary file about the repertoire - raw/annot/prod counts
 ABSEQ_SUMMARY <- "summary.txt"
+
+# These are the "key"s from ABSEQ_SUMMARY file
+# They should be in the format of: (for example)
+# RawReads:<number>
+# AnnotatedReads:<number>
+ABSEQ_RAW_READ_COUNT_KEY <- "RawReads"
+ABSEQ_ANNOT_READ_COUNT_KEY <- "AnnotatedReads"
+ABSEQ_FILT_READ_COUNT_KEY <- "FilteredReads"
+ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
 
 
 .checkVert <- function(filename) {
@@ -142,15 +159,19 @@ ABSEQ_SUMMARY <- "summary.txt"
 }
 
 
-#' Title
+#' Saves ggplot object as a Rdata file.
+#'
+#' @description It's a convinient function that does the check and saves
+#' at the same time, for brevity within other areas of the code (to eliminate
+#' repeated if checks).
 #'
 #' @import tools
 #'
-#' @param .save
-#' @param filename
-#' @param plot
+#' @param .save logical type. Whether or not we should save.
+#' @param filename string.
+#' @param plot ggplot object.
 #'
-#' @return
+#' @return nothing
 .saveAs <- function(.save, filename, plot) {
     if (.save) {
         fname <- sub(tools::file_ext(filename), "Rdata", filename)
@@ -163,7 +184,7 @@ ABSEQ_SUMMARY <- "summary.txt"
 #'
 #' @param sampleRoot sample's root directory. For example,
 #' \code{/path/to/<outputdir>/reports/<sample_name>}.
-#' @param key character type. Possible values are
+#' @param key character type. Possible values are (though they might change)
 #' \itemize{
 #'    \item{RawReads}
 #'    \item{AnnotatedReads}
@@ -172,6 +193,7 @@ ABSEQ_SUMMARY <- "summary.txt"
 #' }
 #' @return value associated with key from summary file. "NA" (in string) if the field
 #' is not available
+#' refer to \code{util.R} for the key values
 .readSummary <- function(sampleRoot, key) {
     fname <- file.path(sampleRoot, ABSEQ_SUMMARY)
     con <- file(fname, "r")

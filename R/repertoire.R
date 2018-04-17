@@ -180,7 +180,8 @@ setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), functio
     new("CompositeRepertoire", repertoires = unique(c(e1, e2@repertoires)))
 })
 
-#' Title
+#' Plots \linkS4class{Repertoire} or
+#' \linkS4class{CompositeRepertoire} object to the specfied directory
 #'
 #' @import rmarkdown
 #'
@@ -188,13 +189,13 @@ setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), functio
 #' @include plotter.R
 #' @include compositeRepertoire.R
 #'
-#' @param object
-#' @param outputDir
+#' @param object repertoire or composite repertoire object to plot
+#' @param outputDir string type. where to save the files to
 #'
-#' @return
+#' @return nothing
 #' @export
 #'
-#' @examples
+#' @examples todo
 setGeneric(name = "plotRepertoires",
            def = function(object, outputDir) {
                standardGeneric("plotRepertoires")
@@ -205,35 +206,44 @@ setGeneric(name = "plotRepertoires",
 setMethod(f = "plotRepertoires",
           signature = "Repertoire",
           definition = function(object, outputDir) {
-              analysisDirectories = c(file.path(object@outdir, RESULT_DIR, object@name))
+
+              analysisDirectories = c(file.path(object@outdir,
+                                                RESULT_DIR, object@name))
+              # get analysis that were conducted by looking at the directory
+              # structure - is this the best way?
               analyses <- unlist(.inferAnalyzed(analysisDirectories[1]))
               sampleNames <- c(object@name)
               primer5Files <- list(object@primer5end)
               primer3Files <- list(object@primer3end)
               upstreamRanges <- list(object@upstream)
 
-              .plotSamples(sampleNames,
-                           analysisDirectories,
-                           analyses,
-                           outputDir,
-                           primer5Files,
-                           primer3Files,
-                           upstreamRanges)
+              .plotSamples(sampleNames, analysisDirectories, analyses, outputDir,
+                           primer5Files, primer3Files, upstreamRanges)
 
               # move Rmd to output directory for this sample - attempting to
               # avoid overrides during parallel rmarkdown::render from sys.file(...)
               #file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
               #          outputDir, overwrite = T)
+
+              # define parameters for template.Rmd's param list
               bitFilter <- paste(object@bitscore, collapse = " - ")
               qsFilter <- paste(object@qstart, collapse = " - ")
               ssFilter <- paste(object@sstart, collapse = " - ")
               alFilter <- paste(object@alignlen, collapse = " - ")
+              rawReadCount <- .readSummary(analysisDirectories[1],
+                                           ABSEQ_RAW_READ_COUNT_KEY)
+              annotReadCount <- .readSummary(analysisDirectories[1],
+                                             ABSEQ_ANNOT_READ_COUNT_KEY)
+              filteredReadCount <- .readSummary(analysisDirectories[1],
+                                                ABSEQ_FILT_READ_COUNT_KEY)
+              productiveReadCount <- .readSummary(analysisDirectories[1],
+                                                  ABSEQ_PROD_READ_COUNT_KEY)
 
               rmarkdown::render(
-                  #file.path(outputDir, 'template.Rmd'),
                   system.file("extdata", "template.Rmd", package = "AbSeq"),
                   output_dir = outputDir,
-                  output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
+                  output_file = paste0(paste(sampleNames,
+                                             collapse = "_vs_"), "_report.html"),
                   params = list(
                       rootDir = outputDir,
                       single = TRUE,
@@ -248,10 +258,10 @@ setMethod(f = "plotRepertoires",
                       qstartfilters = qsFilter,
                       sstartfilters = ssFilter,
                       alignfilters = alFilter,
-                      rawReads = .readSummary(analysisDirectories[1], "RawReads"),
-                      annotReads = .readSummary(analysisDirectories[1], "AnnotatedReads"),
-                      filteredReads = .readSummary(analysisDirectories[1], "FilteredReads"),
-                      productiveReads = .readSummary(analysisDirectories[1], "ProductiveReads")
+                      rawReads = rawReadCount,
+                      annotReads = annotReadCount,
+                      filteredReads = filteredReadCount,
+                      productiveReads = productiveReadCount
                   )
               )
           })
@@ -259,11 +269,14 @@ setMethod(f = "plotRepertoires",
 setMethod(f = "plotRepertoires",
           signature = "CompositeRepertoire",
           definition = function(object, outputDir) {
+
               analysisDirectories = unlist(lapply(object@repertoires, function(x) {
                   # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
                   file.path(x@outdir, RESULT_DIR, x@name)
               }))
-              # get all analyses conducted by each repertoire
+
+              # get all analyses conducted by each repertoire by looking
+              # at the directory structure created by AbSeqPy
               analysesConducted <- lapply(analysisDirectories, .inferAnalyzed)
 
               # find the intersection of all analysis, because it makes no
@@ -285,47 +298,42 @@ setMethod(f = "plotRepertoires",
                                        function(x) {
                                            x@upstream
                                        })
-              allChains <- lapply(object@repertoires, function(x) { x@chain })
-              # only include D gene plots if all chains only contain "hv"
-              includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
-
-
-              .plotSamples(sampleNames,
-                           analysisDirectories,
-                           similarAnalyses,
-                           outputDir,
-                           primer5Files,
-                           primer3Files,
-                           upstreamRanges)
+              .plotSamples(sampleNames, analysisDirectories, similarAnalyses,
+                           outputDir, primer5Files, primer3Files, upstreamRanges)
 
               # move Rmd to output directory for this sample - attempting to
               # avoid overrides during parallel rmarkdown::render from sys.file(...)
               #file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
               #          outputDir, overwrite = T)
 
+
+              # define variables for template.Rmd's param list
+              allChains <- lapply(object@repertoires, function(x) { x@chain })
+              # only include D gene plots if all chains only contain "hv"
+              includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
               bitFilters <- lapply(object@repertoires, function(x) {
                   paste(x@bitscore, collapse = " - ")
-              })
-              qsFilters <- lapply(object@repertoires, function(x) {
-                  paste(x@qstart, collapse = " - ")
-              })
-              ssFilters <- lapply(object@repertoires, function(x) {
-                  paste(x@sstart, collapse = " - ")
               })
               alFilters <- lapply(object@repertoires, function(x) {
                   paste(x@alignlen, collapse = " - ")
               })
-              rawReads <- lapply(analysisDirectories, function(pth) {
-                  .readSummary(pth, "RawReads")
+              ssFilters <- lapply(object@repertoires, function(x) {
+                  paste(x@sstart, collapse = " - ")
               })
-              annotReads <- lapply(analysisDirectories, function(pth) {
-                  .readSummary(pth, "AnnotatedReads")
+              qsFilters <- lapply(object@repertoires, function(x) {
+                  paste(x@qstart, collapse = " - ")
               })
-              filteredReads <- lapply(analysisDirectories, function(pth) {
-                  .readSummary(pth, "FilteredReads")
+              rawReadCounts <- lapply(analysisDirectories, function(pth) {
+                  .readSummary(pth, ABSEQ_RAW_READ_COUNT_KEY)
               })
-              productiveReads <- lapply(analysisDirectories, function(pth) {
-                  .readSummary(pth, "ProductiveReads")
+              annotReadCounts <- lapply(analysisDirectories, function(pth) {
+                  .readSummary(pth, ABSEQ_ANNOT_READ_COUNT_KEY)
+              })
+              filteredReadCounts <- lapply(analysisDirectories, function(pth) {
+                  .readSummary(pth, ABSEQ_FILT_READ_COUNT_KEY)
+              })
+              productiveReadCounts <- lapply(analysisDirectories, function(pth) {
+                  .readSummary(pth, ABSEQ_PROD_READ_COUNT_KEY)
               })
 
               rmarkdown::render(
@@ -347,10 +355,10 @@ setMethod(f = "plotRepertoires",
                       alignfilters = paste(alFilters, collapse = ","),
                       sstartfilters = paste(ssFilters, collapse = ","),
                       qstartfilters = paste(qsFilters, collapse = ","),
-                      rawReads = paste(rawReads, collapse = ","),
-                      annotReads = paste(annotReads, collapse = ","),
-                      filteredReads = paste(filteredReads, collapse = ","),
-                      productiveReads = paste(productiveReads, collapse = ",")
+                      rawReads = paste(rawReadCounts, collapse = ","),
+                      annotReads = paste(annotReadCounts, collapse = ","),
+                      filteredReads = paste(filteredReadCounts, collapse = ","),
+                      productiveReads = paste(productiveReadCounts, collapse = ",")
                   )
               )
           })
