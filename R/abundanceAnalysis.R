@@ -6,13 +6,18 @@
 #'
 #' @param files list type. list of files in abundance directory
 #' @param sampleNames vector type. 1-1 correspondance to files
-#' @param outputDir string type
+#' @param outputDir string type.
+#' @param skipDgene logical type. Skip D germline abundance plot if TRUE.
 #' @param .save logical type. Save Rdata ggplot item
 #'
 #' @return None
-.abundancePlot <- function(files, sampleNames, outputDir, .save = TRUE) {
+.abundancePlot <- function(files, sampleNames, outputDir,
+                           skipDgene = FALSE, .save = TRUE) {
+
+    vdj <- if (skipDgene) c("v", "j") else c("v", "d", "j")
+
     for (expression in c("family", "gene")) {
-        for (gene in c("v", "d", "j")) {
+        for (gene in vdj) {
             # correction, J has no "gene" but rather variant
             if (gene == 'j' && expression == 'gene') {
                 expression <- 'variant'
@@ -115,12 +120,13 @@
 #' @param sampleNames vector type. 1-1 correspondence with abundanceDirectories
 #' @param combinedNames string type. Title "combined" sample names
 #' @param mashedNames string type. File "mashed" names - avoid special chars
+#' @param skipDgene logical type. Skip D gene plots?
 #' @param .save logical type. Save ggplot as Rdata
 #'
 #' @return None
 .abundanceAnalysis <- function(abundanceDirectories, abunOut,
                                sampleNames, combinedNames, mashedNames,
-                               .save = TRUE) {
+                               skipDgene = FALSE, .save = TRUE) {
     # where to find the files
     # 3 each from V and D, then 2 from J (no gene) or 5 (exclude the 3 from D)
     searchFiles <-
@@ -135,7 +141,9 @@
             # what are the sample names (in-order)
             sampleNames,
             # output directory
-            abunOut
+            abunOut,
+            # whether or not to ignore D gene plots
+            skipDgene = skipDgene
         )
     } else {
         warning(paste("Could not find V(D)J abundance CSV files in",

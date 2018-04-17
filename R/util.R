@@ -14,6 +14,14 @@ V_HEIGHT_L <- 7.5
 # AbSeq's output directory structure(s)
 RESULT_DIR <- "report"
 AUX_DIR <- "auxiliary"
+# AbSeq's analysis directory names
+ABSEQ_DIR_ANNOT <- "annot"
+ABSEQ_DIR_PROD <- "productivity"
+ABSEQ_DIR_ABUN <- "abundance"
+ABSEQ_DIR_DIV <- "diversity"
+ABSEQ_DIR_PRIM <- "primer_specificity"
+ABSEQ_DIR_5UTR <- "utr5"
+ABSEQ_DIR_SEC <- "secretion"
 
 # parameter file from AbSeq's run
 ANALYSIS_PARAMS <- "analysis.params"

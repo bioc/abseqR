@@ -28,6 +28,7 @@
 #' leave it as anthing but a valid file path.
 #' @param upstreamRanges list type. Collection of "None"s or vector
 #' denoting upstreamStart and upstreamEnd for each sample.
+#' @param skipDgene logical type. Whether or not to skip D gene distribution plot
 #'
 #' @return none
 .plotSamples <-
@@ -37,7 +38,8 @@
              outputDir,
              primer5Files,
              primer3Files,
-             upstreamRanges) {
+             upstreamRanges,
+             skipDgene = FALSE) {
 
         if (!dir.exists(outputDir)) {
             dir.create(outputDir)
@@ -49,12 +51,12 @@
         #               ANNOTATION PLOTS                 #
         #                                                #
         ##################################################
-        if ("annot" %in% analysis) {
-            annotOut <- file.path(outputDir, "annot")
+        if (ABSEQ_DIR_ANNOT %in% analysis) {
+            annotOut <- file.path(outputDir, ABSEQ_DIR_ANNOT)
             if (!file.exists(annotOut)) {
                 dir.create(annotOut)
             }
-            annotDirectories <- sapply(directories, file.path, "annot",
+            annotDirectories <- sapply(directories, file.path, ABSEQ_DIR_ANNOT,
                                        USE.NAMES = F)
             .annotAnalysis(annotDirectories, annotOut, sampleNames, mashedNames)
         }
@@ -64,19 +66,19 @@
         #               ABUNDANCE PLOTS                  #
         #                                                #
         ##################################################
-        if ("abundance" %in% analysis) {
-            abunOut <- file.path(outputDir, "abundance")
+        if (ABSEQ_DIR_ABUN %in% analysis) {
+            abunOut <- file.path(outputDir, ABSEQ_DIR_ABUN)
             if (!file.exists(abunOut)) {
                 dir.create(abunOut)
             }
             abundanceDirectories <-
-                sapply(directories, file.path, "abundance",
+                sapply(directories, file.path, ABSEQ_DIR_ABUN,
                        USE.NAMES = F)
             .abundanceAnalysis(abundanceDirectories,
                                abunOut,
                                sampleNames,
                                combinedNames,
-                               mashedNames)
+                               mashedNames, skipDgene = skipDgene)
         }
 
         ##################################################
@@ -84,13 +86,13 @@
         #              PRODUCTIVITY PLOTS                #
         #                                                #
         ##################################################
-        if ("productivity" %in% analysis) {
-            prodOut <- file.path(outputDir, "productivity")
+        if (ABSEQ_DIR_PROD %in% analysis) {
+            prodOut <- file.path(outputDir, ABSEQ_DIR_PROD)
             if (!file.exists(prodOut)) {
                 dir.create(prodOut)
             }
             productivityDirectories <- sapply(directories, file.path,
-                                              "productivity", USE.NAMES = F)
+                                              ABSEQ_DIR_PROD, USE.NAMES = F)
             .productivityAnalysis(productivityDirectories,
                                   prodOut,
                                   sampleNames,
@@ -103,14 +105,13 @@
         #               DIVERSITY PLOTS                  #
         #                                                #
         ##################################################
-        if ("diversity" %in% analysis) {
-            diversityOut <- file.path(outputDir, "diversity")
+        if (ABSEQ_DIR_DIV %in% analysis) {
+            diversityOut <- file.path(outputDir, ABSEQ_DIR_DIV)
             if (!file.exists(diversityOut)) {
                 dir.create(diversityOut)
             }
             diversityDirectories <-
-                sapply(directories, file.path, "diversity",
-                       USE.NAMES = F)
+                sapply(directories, file.path, ABSEQ_DIR_DIV, USE.NAMES = F)
             .diversityAnalysis(diversityDirectories,
                                diversityOut,
                                sampleNames,
@@ -122,14 +123,14 @@
         #               PRIMER.S  PLOTS                  #
         #                                                #
         ##################################################
-        if ("primer_specificity" %in% analysis) {
-            primerOut <- file.path(outputDir, "primer_specificity")
+        if (ABSEQ_DIR_PRIM %in% analysis) {
+            primerOut <- file.path(outputDir, ABSEQ_DIR_PRIM)
             if (!file.exists(primerOut)) {
                 dir.create(primerOut)
             }
             primerDirectories <- sapply(directories,
                                         file.path,
-                                        "primer_specificity",
+                                        ABSEQ_DIR_PRIM,
                                         USE.NAMES = F)
             .primerAnalysis(
                 primerDirectories,
@@ -147,12 +148,12 @@
         #               UPSTREAM 5UTR PLOTS              #
         #                                                #
         ##################################################
-        if ("utr5" %in% analysis) {
-            utr5Out <- file.path(outputDir, "utr5")
+        if (ABSEQ_DIR_5UTR %in% analysis) {
+            utr5Out <- file.path(outputDir, ABSEQ_DIR_5UTR)
             if (!file.exists(utr5Out)) {
                 dir.create(utr5Out)
             }
-            utr5Directories <- sapply(directories, file.path, "utr5",
+            utr5Directories <- sapply(directories, file.path, ABSEQ_DIR_5UTR,
                                       USE.NAMES = F)
             .UTR5Analysis(utr5Directories, utr5Out, sampleNames, combinedNames,
                           mashedNames, upstreamRanges)
@@ -163,13 +164,13 @@
         #               UPSTREAM SEC.S PLOTS             #
         #                                                #
         ##################################################
-        if ("secretion" %in% analysis) {
-            secOut <- file.path(outputDir, "secretion")
+        if (ABSEQ_DIR_SEC %in% analysis) {
+            secOut <- file.path(outputDir, ABSEQ_DIR_SEC)
             if (!file.exists(secOut)) {
                 dir.create(secOut)
             }
             secDirectories <-
-                sapply(directories, file.path, "secretion",
+                sapply(directories, file.path, ABSEQ_DIR_SEC,
                        USE.NAMES = F)
             .secretionSignalAnalysis(secDirectories, secOut, sampleNames,
                                      combinedNames, mashedNames, upstreamRanges)

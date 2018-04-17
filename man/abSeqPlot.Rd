@@ -15,7 +15,7 @@ Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.
 for more information.}
 }
 \value{
-list type. List of \code{\linkS4class{Repertoire}} objects
+list type. List of \linkS4class{Repertoire} objects
 }
 \description{
 Plots all samples and comparisons as specified in \code{abseq.cfg}
@@ -24,5 +24,5 @@ Plots all samples and comparisons as specified in \code{abseq.cfg}
 todo
 }
 \seealso{
-\code{\linkS4class{Repertoire}}
+\linkS4class{Repertoire}
 }

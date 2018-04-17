@@ -2,13 +2,23 @@
 % Please edit documentation in R/repertoire.R
 \name{plotRepertoires}
 \alias{plotRepertoires}
-\title{Title}
+\title{Plots \linkS4class{Repertoire} or
+\linkS4class{CompositeRepertoire} object to the specfied directory}
 \usage{
 plotRepertoires(object, outputDir)
 }
 \arguments{
-\item{outputDir}{}
+\item{object}{repertoire or composite repertoire object to plot}
+
+\item{outputDir}{string type. where to save the files to}
+}
+\value{
+nothing
 }
 \description{
-Title
+Plots \linkS4class{Repertoire} or
+\linkS4class{CompositeRepertoire} object to the specfied directory
+}
+\examples{
+todo
 }
