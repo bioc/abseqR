@@ -4,11 +4,17 @@
 \alias{abSeqPlot}
 \title{Plots all samples and comparisons as specified in \code{abseq.cfg}}
 \usage{
-abSeqPlot(root, BPPARAM = BiocParallel::bpparam())
+abSeqPlot(root, report = TRUE, interactivePlot = TRUE,
+  BPPARAM = BiocParallel::bpparam())
 }
 \arguments{
 \item{root}{string type. Root directory as specified in
 \code{-o} or \code{--outdir} in AbSeqPy.}
+
+\item{report}{logical type. Generate HTML report(s) for sample(s)?}
+
+\item{interactivePlot}{logical type. Use interactive plots (plotly) when generating
+HTML report? (This argument is ignored if \code{report} is \code{FALSE})}
 
 \item{BPPARAM}{BiocParallel backend. Configures the parallel implementation.
 Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.html}{BiocParallel}

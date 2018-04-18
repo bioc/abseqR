@@ -191,13 +191,17 @@ setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), functio
 #'
 #' @param object repertoire or composite repertoire object to plot
 #' @param outputDir string type. where to save the files to
+#' @param report logical type. Should HTML report be generated
+#' @param interactivePlot logical type. Should the HTML report's plots be
+#' interactive (using plotly)? This argument will be ignored if \code{report}
+#' is \code{FALSE}
 #'
 #' @return nothing
 #' @export
 #'
 #' @examples todo
 setGeneric(name = "plotRepertoires",
-           def = function(object, outputDir) {
+           def = function(object, outputDir, report = TRUE, interactivePlot = TRUE) {
                standardGeneric("plotRepertoires")
            })
 
@@ -205,7 +209,10 @@ setGeneric(name = "plotRepertoires",
 
 setMethod(f = "plotRepertoires",
           signature = "Repertoire",
-          definition = function(object, outputDir) {
+          definition = function(object, outputDir, report = TRUE, interactivePlot = TRUE) {
+              if (!report && interactivePlot) {
+                  warning("report is FALSE, ignoring interactivePlot argument")
+              }
 
               analysisDirectories = c(file.path(object@outdir,
                                                 RESULT_DIR, object@name))
@@ -221,60 +228,17 @@ setMethod(f = "plotRepertoires",
                            primer5Files, primer3Files, upstreamRanges,
                            skipDgene = (object@chain != "hv"))
 
-              # move Rmd to output directory for this sample - attempting to
-              # avoid overrides during parallel rmarkdown::render from sys.file(...)
-              #file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
-              #          outputDir, overwrite = T)
-
-              # define parameters for template.Rmd's param list
-              bitFilter <- paste(object@bitscore, collapse = " - ")
-              qsFilter <- paste(object@qstart, collapse = " - ")
-              ssFilter <- paste(object@sstart, collapse = " - ")
-              alFilter <- paste(object@alignlen, collapse = " - ")
-              rawReadCount <- .readSummary(analysisDirectories[1],
-                                           ABSEQ_RAW_READ_COUNT_KEY)
-              annotReadCount <- .readSummary(analysisDirectories[1],
-                                             ABSEQ_ANNOT_READ_COUNT_KEY)
-              filteredReadCount <- .readSummary(analysisDirectories[1],
-                                                ABSEQ_FILT_READ_COUNT_KEY)
-              productiveReadCount <- .readSummary(analysisDirectories[1],
-                                                  ABSEQ_PROD_READ_COUNT_KEY)
-
-              if (pandoc_available()) {
-                  rmarkdown::render(
-                      system.file("extdata", "template.Rmd", package = "AbSeq"),
-                      output_dir = outputDir,
-                      output_file = paste0(paste(sampleNames,
-                                                 collapse = "_vs_"), "_report.html"),
-                      params = list(
-                          rootDir = outputDir,
-                          single = TRUE,
-                          interactive = TRUE,
-                          inclD = (object@chain == "hv"),
-                          hasAnnot = (ABSEQ_DIR_ANNOT %in% analyses),
-                          hasAbun = (ABSEQ_DIR_ABUN %in% analyses),
-                          hasProd = (ABSEQ_DIR_PROD %in% analyses),
-                          hasDiv = (ABSEQ_DIR_DIV %in% analyses),
-                          name = object@name,
-                          bitfilters = bitFilter,
-                          qstartfilters = qsFilter,
-                          sstartfilters = ssFilter,
-                          alignfilters = alFilter,
-                          rawReads = rawReadCount,
-                          annotReads = annotReadCount,
-                          filteredReads = filteredReadCount,
-                          productiveReads = productiveReadCount
-                      )
-                  )
-              } else {
-                  warning("Pandoc cannot be detected on system, skipping HTML report")
+              if (report) {
+                  .generateReport(object, outputDir, interactivePlot)
               }
           })
 
 setMethod(f = "plotRepertoires",
           signature = "CompositeRepertoire",
-          definition = function(object, outputDir) {
-
+          definition = function(object, outputDir, report = TRUE, interactivePlot = TRUE) {
+              if (!report && interactivePlot) {
+                  warning("report is FALSE, ignoring interactivePlot argument")
+              }
               analysisDirectories = unlist(lapply(object@repertoires, function(x) {
                   # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
                   file.path(x@outdir, RESULT_DIR, x@name)
@@ -304,56 +268,100 @@ setMethod(f = "plotRepertoires",
                                            x@upstream
                                        })
 
-              # define variables for template.Rmd's param list
               allChains <- lapply(object@repertoires, function(x) { x@chain })
               # only include D gene plots if all chains only contain "hv"
-              includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
+              skipD <- (("kv" %in% allChains) || ("lv" %in% allChains))
 
               .plotSamples(sampleNames, analysisDirectories, similarAnalyses,
                            outputDir, primer5Files, primer3Files, upstreamRanges,
-                           skipDgene = !includeD)
+                           skipDgene = skipD)
 
-              # move Rmd to output directory for this sample - attempting to
-              # avoid overrides during parallel rmarkdown::render from sys.file(...)
-              #file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"),
-              #          outputDir, overwrite = T)
+              if (report) {
+                  .generateReport(object, outputDir, interactivePlot)
+              }
+          })
 
 
-              bitFilters <- lapply(object@repertoires, function(x) {
-                  paste(x@bitscore, collapse = " - ")
-              })
-              alFilters <- lapply(object@repertoires, function(x) {
-                  paste(x@alignlen, collapse = " - ")
-              })
-              ssFilters <- lapply(object@repertoires, function(x) {
-                  paste(x@sstart, collapse = " - ")
-              })
-              qsFilters <- lapply(object@repertoires, function(x) {
-                  paste(x@qstart, collapse = " - ")
-              })
-              rawReadCounts <- lapply(analysisDirectories, function(pth) {
-                  .readSummary(pth, ABSEQ_RAW_READ_COUNT_KEY)
-              })
-              annotReadCounts <- lapply(analysisDirectories, function(pth) {
-                  .readSummary(pth, ABSEQ_ANNOT_READ_COUNT_KEY)
-              })
-              filteredReadCounts <- lapply(analysisDirectories, function(pth) {
-                  .readSummary(pth, ABSEQ_FILT_READ_COUNT_KEY)
-              })
-              productiveReadCounts <- lapply(analysisDirectories, function(pth) {
-                  .readSummary(pth, ABSEQ_PROD_READ_COUNT_KEY)
-              })
+#' Title
+#'
+#' @import rmarkdown
+#' @include util.R
+#'
+#' @param object CompositeRepertoire type.
+#' @param outputDir string type. Root directory of the sample(s) and also
+#' the path where the HTML will be generated
+#' @param interactivePlot logical type. Interactive or not
+#'
+#' @return path (including HTML name) where the report (HTML file) was saved to
+setGeneric(name = ".generateReport",
+           def = function(object, outputDir, interactivePlot = TRUE) {
+               standardGeneric(".generateReport")
+           })
 
-              if (pandoc_available()) {
+setMethod(f = ".generateReport",
+          signature = "CompositeRepertoire",
+          definition = function(object, outputDir, interactivePlot = TRUE) {
+              if (rmarkdown::pandoc_available()) {
+                  analysisDirectories = unlist(lapply(object@repertoires, function(x) {
+                      # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
+                      file.path(x@outdir, RESULT_DIR, x@name)
+                  }))
+                  sampleNames <- unlist(lapply(object@repertoires, function(x) {
+                      x@name
+                  }))
+                  message(paste("Generating HTML report for", paste(sampleNames, collapse = "_vs_")))
+
+                  # get all analyses conducted by each repertoire by looking
+                  # at the directory structure created by AbSeqPy
+                  analysesConducted <- lapply(analysisDirectories, .inferAnalyzed)
+
+                  # find the intersection of all analysis, because it makes no
+                  # sense to compare samples if they don't have the same analysis
+                  similarAnalyses <- unlist(Reduce(intersect, analysesConducted))
+
+                  # template.Rmd param list
+                  bitFilters <- lapply(object@repertoires, function(x) {
+                      paste(x@bitscore, collapse = " - ")
+                  })
+                  alFilters <- lapply(object@repertoires, function(x) {
+                      paste(x@alignlen, collapse = " - ")
+                  })
+                  ssFilters <- lapply(object@repertoires, function(x) {
+                      paste(x@sstart, collapse = " - ")
+                  })
+                  qsFilters <- lapply(object@repertoires, function(x) {
+                      paste(x@qstart, collapse = " - ")
+                  })
+                  rawReadCounts <- lapply(analysisDirectories, function(pth) {
+                      .readSummary(pth, ABSEQ_RAW_READ_COUNT_KEY)
+                  })
+                  annotReadCounts <- lapply(analysisDirectories, function(pth) {
+                      .readSummary(pth, ABSEQ_ANNOT_READ_COUNT_KEY)
+                  })
+                  filteredReadCounts <- lapply(analysisDirectories, function(pth) {
+                      .readSummary(pth, ABSEQ_FILT_READ_COUNT_KEY)
+                  })
+                  productiveReadCounts <- lapply(analysisDirectories, function(pth) {
+                      .readSummary(pth, ABSEQ_PROD_READ_COUNT_KEY)
+                  })
+
+                  # define variables for template.Rmd's param list
+                  allChains <- lapply(object@repertoires, function(x) {
+                      x@chain
+                  })
+
+                  # only include D gene plots if all chains only contain "hv"
+                  includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
+
+                  savedTo <- paste0(paste(sampleNames, collapse = "_vs_"), "_report.html")
                   rmarkdown::render(
-                      #file.path(outputDir, "template.Rmd"),
                       system.file("extdata", "template.Rmd", package = "AbSeq"),
                       output_dir = outputDir,
-                      output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
+                      output_file = savedTo,
                       params = list(
                           rootDir = outputDir,
                           single = FALSE,
-                          interactive = TRUE,
+                          interactive = interactivePlot,
                           inclD = includeD,
                           hasAnnot = (ABSEQ_DIR_ANNOT %in% similarAnalyses),
                           hasAbun = (ABSEQ_DIR_ABUN %in% similarAnalyses),
@@ -370,7 +378,66 @@ setMethod(f = "plotRepertoires",
                           productiveReads = paste(productiveReadCounts, collapse = ",")
                       )
                   )
+                  return(file.path(outputDir, savedTo))
               } else {
                   warning("Pandoc cannot be detected on system, skipping HTML report")
+                  return(NA)
               }
+
           })
+
+
+setMethod(f = ".generateReport",
+          signature = "Repertoire",
+          definition = function(object, outputDir, interactivePlot = TRUE) {
+              if (rmarkdown::pandoc_available()) {
+                  message(paste("Generating HTML report for", object@name))
+                  analysisDirectory = file.path(object@outdir, RESULT_DIR, object@name)
+                  analyses <- unlist(.inferAnalyzed(analysisDirectory))
+
+                  # define parameters for template.Rmd's param list
+                  bitFilter <- paste(object@bitscore, collapse = " - ")
+                  qsFilter <- paste(object@qstart, collapse = " - ")
+                  ssFilter <- paste(object@sstart, collapse = " - ")
+                  alFilter <- paste(object@alignlen, collapse = " - ")
+                  rawReadCount <- .readSummary(analysisDirectory,
+                                               ABSEQ_RAW_READ_COUNT_KEY)
+                  annotReadCount <- .readSummary(analysisDirectory,
+                                                 ABSEQ_ANNOT_READ_COUNT_KEY)
+                  filteredReadCount <- .readSummary(analysisDirectory,
+                                                    ABSEQ_FILT_READ_COUNT_KEY)
+                  productiveReadCount <- .readSummary(analysisDirectory,
+                                                      ABSEQ_PROD_READ_COUNT_KEY)
+
+                  savedAs <- paste0(object@name, "_report.html")
+
+                  rmarkdown::render(
+                      system.file("extdata", "template.Rmd", package = "AbSeq"),
+                      output_dir = outputDir,
+                      output_file = savedAs,
+                      params = list(
+                          rootDir = outputDir,
+                          single = TRUE,
+                          interactive = interactivePlot,
+                          inclD = (object@chain == "hv"),
+                          hasAnnot = (ABSEQ_DIR_ANNOT %in% analyses),
+                          hasAbun = (ABSEQ_DIR_ABUN %in% analyses),
+                          hasProd = (ABSEQ_DIR_PROD %in% analyses),
+                          hasDiv = (ABSEQ_DIR_DIV %in% analyses),
+                          name = object@name,
+                          bitfilters = bitFilter,
+                          qstartfilters = qsFilter,
+                          sstartfilters = ssFilter,
+                          alignfilters = alFilter,
+                          rawReads = rawReadCount,
+                          annotReads = annotReadCount,
+                          filteredReads = filteredReadCount,
+                          productiveReads = productiveReadCount
+                      )
+                  )
+                  return(file.path(outputDir, savedAs))
+              } else {
+                  warning("Pandoc cannot be detected on system, skipping HTML report")
+                  return(NA)
+              }
+         })

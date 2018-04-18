@@ -6,6 +6,9 @@
 #'
 #' @param root string type. Root directory as specified in
 #' \code{-o} or \code{--outdir} in AbSeqPy.
+#' @param report logical type. Generate HTML report(s) for sample(s)?
+#' @param interactivePlot logical type. Use interactive plots (plotly) when generating
+#' HTML report? (This argument is ignored if \code{report} is \code{FALSE})
 #' @param BPPARAM BiocParallel backend. Configures the parallel implementation.
 #' Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.html}{BiocParallel}
 #' for more information.
@@ -15,7 +18,12 @@
 #' @export
 #'
 #' @examples todo
-abSeqPlot <- function(root, BPPARAM = BiocParallel::bpparam()) {
+abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
+                      BPPARAM = BiocParallel::bpparam()) {
+    if (!report && interactivePlot) {
+        warning("report is set to FALSE, ignoring interactivePlots argument")
+    }
+
     root <- normalizePath(root)
     metaFile <- file.path(root, ABSEQ_CFG)
 
@@ -24,8 +32,8 @@ abSeqPlot <- function(root, BPPARAM = BiocParallel::bpparam()) {
     pairings <- rev(tail(readLines(con), n = -1))
     close(con)
 
-    lapply(pairings, function(pair) {
-    #BiocParallel::bplapply(pairings, function(pair) {
+    #lapply(pairings, function(pair) {
+    BiocParallel::bplapply(pairings, function(pair) {
         sampleNames <- unlist(strsplit(pair, ","))
 
         # depending on the number of samples requested to plot, outputDir
@@ -57,12 +65,14 @@ abSeqPlot <- function(root, BPPARAM = BiocParallel::bpparam()) {
                 samples@outdir <- root
             }
         }
-        AbSeq::plotRepertoires(samples, outputDir)
-    })
-    #}, BPPARAM = BPPARAM)
+        AbSeq::plotRepertoires(samples, outputDir, report = FALSE)
+    #})
+    }, BPPARAM = BPPARAM)
 
     individualSamples <- list()
-    # populate individualSample list with samples for user to browse
+    individualReports <- list()
+    # populate individualSample list with samples for user to browse and
+    # create report if asked to.
     for (pair in pairings) {
         sampleNames <- unlist(strsplit(pair, ","))
         if (length(sampleNames) == 1) {
@@ -71,9 +81,29 @@ abSeqPlot <- function(root, BPPARAM = BiocParallel::bpparam()) {
             if (normalizePath(samples@outdir) != root) {
                 samples@outdir <- root
             }
-            individualSamples <-
-                c(individualSamples, samples)
+            individualSamples <- c(individualSamples, samples)
+        } else {
+            outputDir <- file.path(root, RESULT_DIR, paste(sampleNames, collapse = "_vs_"))
+            samples <- Reduce("+",
+                              lapply(sampleNames, function(sampleName) {
+                                  tmpsample <- .loadRepertoireFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
+                                  if (normalizePath(tmpsample@outdir) != root) {
+                                      tmpsample@outdir <- root
+                                  }
+                                  return(tmpsample)
+                              }))
+        }
+        if (report) {
+            pth <- .generateReport(samples, outputDir, interactivePlot = interactivePlot)
+            if (!is.na(pth)) {
+                individualReports <- c(individualReports, pth)
+            }
         }
     }
+
+    if (length(individualReports)) {
+        # todo - collate into index.html
+    }
+
     return(individualSamples)
 }

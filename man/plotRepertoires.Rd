@@ -5,12 +5,18 @@
 \title{Plots \linkS4class{Repertoire} or
 \linkS4class{CompositeRepertoire} object to the specfied directory}
 \usage{
-plotRepertoires(object, outputDir)
+plotRepertoires(object, outputDir, report = TRUE, interactivePlot = TRUE)
 }
 \arguments{
 \item{object}{repertoire or composite repertoire object to plot}
 
 \item{outputDir}{string type. where to save the files to}
+
+\item{report}{logical type. Should HTML report be generated}
+
+\item{interactivePlot}{logical type. Should the HTML report's plots be
+interactive (using plotly)? This argument will be ignored if \code{report}
+is \code{FALSE}}
 }
 \value{
 nothing
