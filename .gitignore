@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 inst/extdata/template.html
+inst/extdata/index.html
 **/._*
 **/.DS_Store
 .DS_Store
