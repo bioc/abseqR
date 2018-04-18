@@ -22,6 +22,8 @@ ABSEQ_DIR_DIV <- "diversity"
 ABSEQ_DIR_PRIM <- "primer_specificity"
 ABSEQ_DIR_5UTR <- "utr5"
 ABSEQ_DIR_SEC <- "secretion"
+ABSEQ_HTML_DIR <- "html"
+ABSEQ_NESTED_HTML_DIR <- "html_files"
 
 # parameter file from AbSeq's run
 ANALYSIS_PARAMS <- "analysis.params"

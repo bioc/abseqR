@@ -319,6 +319,14 @@ setMethod(f = ".generateReport",
                   # sense to compare samples if they don't have the same analysis
                   similarAnalyses <- unlist(Reduce(intersect, analysesConducted))
 
+                  # define variables for template.Rmd's param list
+                  allChains <- lapply(object@repertoires, function(x) {
+                      x@chain
+                  })
+                  # only include D gene plots if all chains only contain "hv"
+                  includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
+
+
                   # template.Rmd param list
                   bitFilters <- lapply(object@repertoires, function(x) {
                       paste(x@bitscore, collapse = " - ")
@@ -345,40 +353,35 @@ setMethod(f = ".generateReport",
                       .readSummary(pth, ABSEQ_PROD_READ_COUNT_KEY)
                   })
 
-                  # define variables for template.Rmd's param list
-                  allChains <- lapply(object@repertoires, function(x) {
-                      x@chain
-                  })
+                  renderParams <- list(
+                      rootDir = outputDir,
+                      single = FALSE,
+                      interactive = interactivePlot,
+                      inclD = includeD,
+                      hasAnnot = (ABSEQ_DIR_ANNOT %in% similarAnalyses),
+                      hasAbun = (ABSEQ_DIR_ABUN %in% similarAnalyses),
+                      hasProd = (ABSEQ_DIR_PROD %in% similarAnalyses),
+                      hasDiv = (ABSEQ_DIR_DIV %in% similarAnalyses),
+                      name = paste(sampleNames, collapse = "_vs_"),
+                      bitfilters = paste(bitFilters, collapse = ","),
+                      alignfilters = paste(alFilters, collapse = ","),
+                      sstartfilters = paste(ssFilters, collapse = ","),
+                      qstartfilters = paste(qsFilters, collapse = ","),
+                      rawReads = paste(rawReadCounts, collapse = ","),
+                      annotReads = paste(annotReadCounts, collapse = ","),
+                      filteredReads = paste(filteredReadCounts, collapse = ","),
+                      productiveReads = paste(productiveReadCounts, collapse = ",")
+                  )
 
-                  # only include D gene plots if all chains only contain "hv"
-                  includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
+                  saveAs <- paste0(paste(sampleNames, collapse = "_vs_"), "_report.html")
 
-                  savedTo <- paste0(paste(sampleNames, collapse = "_vs_"), "_report.html")
                   rmarkdown::render(
                       system.file("extdata", "template.Rmd", package = "AbSeq"),
                       output_dir = outputDir,
-                      output_file = savedTo,
-                      params = list(
-                          rootDir = outputDir,
-                          single = FALSE,
-                          interactive = interactivePlot,
-                          inclD = includeD,
-                          hasAnnot = (ABSEQ_DIR_ANNOT %in% similarAnalyses),
-                          hasAbun = (ABSEQ_DIR_ABUN %in% similarAnalyses),
-                          hasProd = (ABSEQ_DIR_PROD %in% similarAnalyses),
-                          hasDiv = (ABSEQ_DIR_DIV %in% similarAnalyses),
-                          name = paste(sampleNames, collapse = "_vs_"),
-                          bitfilters = paste(bitFilters, collapse = ","),
-                          alignfilters = paste(alFilters, collapse = ","),
-                          sstartfilters = paste(ssFilters, collapse = ","),
-                          qstartfilters = paste(qsFilters, collapse = ","),
-                          rawReads = paste(rawReadCounts, collapse = ","),
-                          annotReads = paste(annotReadCounts, collapse = ","),
-                          filteredReads = paste(filteredReadCounts, collapse = ","),
-                          productiveReads = paste(productiveReadCounts, collapse = ",")
-                      )
+                      output_file = saveAs,
+                      params = renderParams
                   )
-                  return(file.path(outputDir, savedTo))
+                  return(file.path(outputDir, saveAs))
               } else {
                   warning("Pandoc cannot be detected on system, skipping HTML report")
                   return(NA)
@@ -409,33 +412,35 @@ setMethod(f = ".generateReport",
                   productiveReadCount <- .readSummary(analysisDirectory,
                                                       ABSEQ_PROD_READ_COUNT_KEY)
 
-                  savedAs <- paste0(object@name, "_report.html")
+                  saveAs <- paste0(object@name, "_report.html")
+
+                  renderParams <- list(
+                      rootDir = outputDir,
+                      single = TRUE,
+                      interactive = interactivePlot,
+                      inclD = (object@chain == "hv"),
+                      hasAnnot = (ABSEQ_DIR_ANNOT %in% analyses),
+                      hasAbun = (ABSEQ_DIR_ABUN %in% analyses),
+                      hasProd = (ABSEQ_DIR_PROD %in% analyses),
+                      hasDiv = (ABSEQ_DIR_DIV %in% analyses),
+                      name = object@name,
+                      bitfilters = bitFilter,
+                      qstartfilters = qsFilter,
+                      sstartfilters = ssFilter,
+                      alignfilters = alFilter,
+                      rawReads = rawReadCount,
+                      annotReads = annotReadCount,
+                      filteredReads = filteredReadCount,
+                      productiveReads = productiveReadCount
+                  )
 
                   rmarkdown::render(
                       system.file("extdata", "template.Rmd", package = "AbSeq"),
                       output_dir = outputDir,
-                      output_file = savedAs,
-                      params = list(
-                          rootDir = outputDir,
-                          single = TRUE,
-                          interactive = interactivePlot,
-                          inclD = (object@chain == "hv"),
-                          hasAnnot = (ABSEQ_DIR_ANNOT %in% analyses),
-                          hasAbun = (ABSEQ_DIR_ABUN %in% analyses),
-                          hasProd = (ABSEQ_DIR_PROD %in% analyses),
-                          hasDiv = (ABSEQ_DIR_DIV %in% analyses),
-                          name = object@name,
-                          bitfilters = bitFilter,
-                          qstartfilters = qsFilter,
-                          sstartfilters = ssFilter,
-                          alignfilters = alFilter,
-                          rawReads = rawReadCount,
-                          annotReads = annotReadCount,
-                          filteredReads = filteredReadCount,
-                          productiveReads = productiveReadCount
-                      )
+                      output_file = saveAs,
+                      params = renderParams
                   )
-                  return(file.path(outputDir, savedAs))
+                  return(file.path(outputDir, saveAs))
               } else {
                   warning("Pandoc cannot be detected on system, skipping HTML report")
                   return(NA)
