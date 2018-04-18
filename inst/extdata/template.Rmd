@@ -119,7 +119,8 @@ overviewOut <- lapply(seq_along(sampleNames), function(i) {
     rawR <- as.numeric(splitRaw[i])
     annotR <- as.numeric(splitAnnot[i])
     filtR <- as.numeric(splitFiltered[i])
-    prodR <- as.numeric(splitProd[i])
+    # might be NA if productivity analysis wasn't conducted
+    prodR <- suppressWarnings(as.numeric(splitProd[i]))
     line1 <- knitr::knit_expand(text = sprintf("#### %s\n\n", sampleNames[i]))
     line2 <- knitr::knit_expand(text = sprintf("* Number of raw reads %s\n", prettyNum(rawR, big.mark = ",")))
     line3 <- knitr::knit_expand(text = sprintf("* Number of annotated reads %s%% (%s/%s)\n", round((annotR/rawR)*100, 2) , prettyNum(annotR, big.mark = ","), prettyNum(rawR, big.mark = ",")))
