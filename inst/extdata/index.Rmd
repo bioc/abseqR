@@ -33,7 +33,7 @@ knitr::opts_chunk$set(echo = FALSE)
 }
 ```
 
-generated on `r format(Sys.time(), "%a %b %d %X %Y")`
+generated on `r format(Sys.time(), "%a %b %d %Y %X")`
 
 <!-- number of samples:, indv, comp -->
 # Summary
