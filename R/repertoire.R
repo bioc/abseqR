@@ -240,31 +240,35 @@ setMethod(f = "plotRepertoires",
               productiveReadCount <- .readSummary(analysisDirectories[1],
                                                   ABSEQ_PROD_READ_COUNT_KEY)
 
-              rmarkdown::render(
-                  system.file("extdata", "template.Rmd", package = "AbSeq"),
-                  output_dir = outputDir,
-                  output_file = paste0(paste(sampleNames,
-                                             collapse = "_vs_"), "_report.html"),
-                  params = list(
-                      rootDir = outputDir,
-                      single = TRUE,
-                      interactive = TRUE,
-                      inclD = (object@chain == "hv"),
-                      hasAnnot = (ABSEQ_DIR_ANNOT %in% analyses),
-                      hasAbun = (ABSEQ_DIR_ABUN %in% analyses),
-                      hasProd = (ABSEQ_DIR_PROD %in% analyses),
-                      hasDiv = (ABSEQ_DIR_DIV %in% analyses),
-                      name = object@name,
-                      bitfilters = bitFilter,
-                      qstartfilters = qsFilter,
-                      sstartfilters = ssFilter,
-                      alignfilters = alFilter,
-                      rawReads = rawReadCount,
-                      annotReads = annotReadCount,
-                      filteredReads = filteredReadCount,
-                      productiveReads = productiveReadCount
+              if (pandoc_available()) {
+                  rmarkdown::render(
+                      system.file("extdata", "template.Rmd", package = "AbSeq"),
+                      output_dir = outputDir,
+                      output_file = paste0(paste(sampleNames,
+                                                 collapse = "_vs_"), "_report.html"),
+                      params = list(
+                          rootDir = outputDir,
+                          single = TRUE,
+                          interactive = TRUE,
+                          inclD = (object@chain == "hv"),
+                          hasAnnot = (ABSEQ_DIR_ANNOT %in% analyses),
+                          hasAbun = (ABSEQ_DIR_ABUN %in% analyses),
+                          hasProd = (ABSEQ_DIR_PROD %in% analyses),
+                          hasDiv = (ABSEQ_DIR_DIV %in% analyses),
+                          name = object@name,
+                          bitfilters = bitFilter,
+                          qstartfilters = qsFilter,
+                          sstartfilters = ssFilter,
+                          alignfilters = alFilter,
+                          rawReads = rawReadCount,
+                          annotReads = annotReadCount,
+                          filteredReads = filteredReadCount,
+                          productiveReads = productiveReadCount
+                      )
                   )
-              )
+              } else {
+                  warning("Pandoc cannot be detected on system, skipping HTML report")
+              }
           })
 
 setMethod(f = "plotRepertoires",
@@ -340,29 +344,33 @@ setMethod(f = "plotRepertoires",
                   .readSummary(pth, ABSEQ_PROD_READ_COUNT_KEY)
               })
 
-              rmarkdown::render(
-                  #file.path(outputDir, "template.Rmd"),
-                  system.file("extdata", "template.Rmd", package = "AbSeq"),
-                  output_dir = outputDir,
-                  output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
-                  params = list(
-                      rootDir = outputDir,
-                      single = FALSE,
-                      interactive = TRUE,
-                      inclD = includeD,
-                      hasAnnot = (ABSEQ_DIR_ANNOT %in% similarAnalyses),
-                      hasAbun = (ABSEQ_DIR_ABUN %in% similarAnalyses),
-                      hasProd = (ABSEQ_DIR_PROD %in% similarAnalyses),
-                      hasDiv = (ABSEQ_DIR_DIV %in% similarAnalyses),
-                      name = paste(sampleNames, collapse = "_vs_"),
-                      bitfilters = paste(bitFilters, collapse = ","),
-                      alignfilters = paste(alFilters, collapse = ","),
-                      sstartfilters = paste(ssFilters, collapse = ","),
-                      qstartfilters = paste(qsFilters, collapse = ","),
-                      rawReads = paste(rawReadCounts, collapse = ","),
-                      annotReads = paste(annotReadCounts, collapse = ","),
-                      filteredReads = paste(filteredReadCounts, collapse = ","),
-                      productiveReads = paste(productiveReadCounts, collapse = ",")
+              if (pandoc_available()) {
+                  rmarkdown::render(
+                      #file.path(outputDir, "template.Rmd"),
+                      system.file("extdata", "template.Rmd", package = "AbSeq"),
+                      output_dir = outputDir,
+                      output_file = paste0(paste(sampleNames, collapse = "_vs_"), "_report.html"),
+                      params = list(
+                          rootDir = outputDir,
+                          single = FALSE,
+                          interactive = TRUE,
+                          inclD = includeD,
+                          hasAnnot = (ABSEQ_DIR_ANNOT %in% similarAnalyses),
+                          hasAbun = (ABSEQ_DIR_ABUN %in% similarAnalyses),
+                          hasProd = (ABSEQ_DIR_PROD %in% similarAnalyses),
+                          hasDiv = (ABSEQ_DIR_DIV %in% similarAnalyses),
+                          name = paste(sampleNames, collapse = "_vs_"),
+                          bitfilters = paste(bitFilters, collapse = ","),
+                          alignfilters = paste(alFilters, collapse = ","),
+                          sstartfilters = paste(ssFilters, collapse = ","),
+                          qstartfilters = paste(qsFilters, collapse = ","),
+                          rawReads = paste(rawReadCounts, collapse = ","),
+                          annotReads = paste(annotReadCounts, collapse = ","),
+                          filteredReads = paste(filteredReadCounts, collapse = ","),
+                          productiveReads = paste(productiveReadCounts, collapse = ",")
+                      )
                   )
-              )
+              } else {
+                  warning("Pandoc cannot be detected on system, skipping HTML report")
+              }
           })
