@@ -229,7 +229,9 @@ setMethod(f = "plotRepertoires",
                            skipDgene = (object@chain != "hv"))
 
               if (report) {
-                  .generateReport(object, outputDir, interactivePlot)
+                  .generateReport(object, root = outputDir,
+                                  outputDir = outputDir,
+                                  interactivePlot = interactivePlot)
               }
           })
 
@@ -277,7 +279,9 @@ setMethod(f = "plotRepertoires",
                            skipDgene = skipD)
 
               if (report) {
-                  .generateReport(object, outputDir, interactivePlot)
+                  .generateReport(object, root = outputDir,
+                                  outputDir = outputDir,
+                                  interactivePlot = interactivePlot)
               }
           })
 
@@ -288,19 +292,19 @@ setMethod(f = "plotRepertoires",
 #' @include util.R
 #'
 #' @param object CompositeRepertoire type.
-#' @param outputDir string type. Root directory of the sample(s) and also
-#' the path where the HTML will be generated
+#' @param root string type. Root directory of the sample(s)
+#' @param outputDir string type. The path where the HTML will be generated
 #' @param interactivePlot logical type. Interactive or not
 #'
 #' @return path (including HTML name) where the report (HTML file) was saved to
 setGeneric(name = ".generateReport",
-           def = function(object, outputDir, interactivePlot = TRUE) {
+           def = function(object, root, outputDir, interactivePlot = TRUE) {
                standardGeneric(".generateReport")
            })
 
 setMethod(f = ".generateReport",
           signature = "CompositeRepertoire",
-          definition = function(object, outputDir, interactivePlot = TRUE) {
+          definition = function(object, root, outputDir, interactivePlot = TRUE) {
               if (rmarkdown::pandoc_available()) {
                   analysisDirectories = unlist(lapply(object@repertoires, function(x) {
                       # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
@@ -354,7 +358,7 @@ setMethod(f = ".generateReport",
                   })
 
                   renderParams <- list(
-                      rootDir = outputDir,
+                      rootDir = root,
                       single = FALSE,
                       interactive = interactivePlot,
                       inclD = includeD,
@@ -392,7 +396,7 @@ setMethod(f = ".generateReport",
 
 setMethod(f = ".generateReport",
           signature = "Repertoire",
-          definition = function(object, outputDir, interactivePlot = TRUE) {
+          definition = function(object, root, outputDir, interactivePlot = TRUE) {
               if (rmarkdown::pandoc_available()) {
                   message(paste("Generating HTML report for", object@name))
                   analysisDirectory = file.path(object@outdir, RESULT_DIR, object@name)
@@ -415,7 +419,7 @@ setMethod(f = ".generateReport",
                   saveAs <- paste0(object@name, "_report.html")
 
                   renderParams <- list(
-                      rootDir = outputDir,
+                      rootDir = root,
                       single = TRUE,
                       interactive = interactivePlot,
                       inclD = (object@chain == "hv"),

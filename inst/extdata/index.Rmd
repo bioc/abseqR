@@ -33,12 +33,14 @@ knitr::opts_chunk$set(echo = FALSE)
 }
 ```
 
-This report is generated on `r format(Sys.time(), "%a %b %d %X %Y")`
+generated on `r format(Sys.time(), "%a %b %d %X %Y")`
 
 <!-- number of samples:, indv, comp -->
 # Summary
 
-Individual samples are listed in the following table with a brief summary.
+Individual samples are listed in the following table.
+
+Click on the sample names for more details.
 
 The comparative analysis (if any) will appear [after the table](#comparative-reports).
 
@@ -56,7 +58,15 @@ annotReads <- unlist(strsplit(params$annotReads, ","))
 prodReads <- unlist(strsplit(params$prodReads, ","))
 filters <- unlist(strsplit(params$filters, params$filterSplitter, fixed = T))
 if (length(samples) * 7 != (length(samples) + length(links) + length(chains) + length(rawReads) + length(annotReads) + length(prodReads)) + length(filters)) {
-    stop("Expected same argument length for singleSamples, chains, rawReads, annotReads, prodReads and filters")
+    stop(sprintf("Expected same argument length for singleSamples (%d), links (%d), chains (%d), rawReads (%d), annotReads (%d), prodReads (%d) and filters (%d)",
+                 length(samples),
+                 length(links),
+                 length(chains),
+                 length(rawReads),
+                 length(annotReads),
+                 length(prodReads),
+                 length(filters)
+                 ))
 }
 singleTableInfo <- lapply(seq_along(samples), function(i) {
     reads <- prettyNum(rawReads[i], big.mark = ",")

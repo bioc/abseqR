@@ -64,9 +64,31 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
                 samples@outdir <- root
             }
         }
+        # due to the cache/shared user issue (see render() parallel github issue)
+        # we delay the report generation until AFTER the multiprocessing part
+        # has completed
         AbSeq::plotRepertoires(samples, outputDir, report = FALSE)
     #})
     }, BPPARAM = BPPARAM)
+
+    # before we start creating reports, create the report directory
+    if (report) {
+        # create report directory
+        reportDir <- file.path(root, ABSEQ_HTML_DIR)
+        if (!dir.exists(reportDir)) {
+            dir.create(reportDir)
+        } else {
+            warning(paste(reportDir, "found, overriding contents."))
+        }
+
+        # create nested HTML directory for all html files except index.html
+        nestedHTMLdir <- file.path(reportDir, ABSEQ_NESTED_HTML_DIR)
+        if (!dir.exists(nestedHTMLdir)) {
+            dir.create(nestedHTMLdir)
+        } else {
+            warning(paste(nestedHTMLdir, "found, overriding contents."))
+        }
+    }
 
     individualSamples <- list()
     individualReports <- list()
@@ -93,7 +115,9 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
                               }))
         }
         if (report) {
-            pth <- .generateReport(samples, outputDir, interactivePlot = interactivePlot)
+            pth <- .generateReport(samples, root = outputDir,
+                                   outputDir = file.path(root, ABSEQ_HTML_DIR, ABSEQ_NESTED_HTML_DIR),
+                                   interactivePlot = interactivePlot)
             if (!is.na(pth)) {
                 individualReports[paste(sampleNames, collapse = "_vs_")] <- pth
             }
@@ -102,9 +126,8 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
 
     if (length(individualReports)) {
         .collateReports(individualReports, individualSamples,
-                        outputDirectory = root)
+                        outputDirectory = file.path(root, ABSEQ_HTML_DIR))
     }
-
     return(individualSamples)
 }
 
@@ -118,33 +141,13 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
 #' to <sample>_report.html
 #' @param individualSamples list type. list of Repertoire objects. Used to
 #' extract filtering information and % read counts.
-#' @param root string type. Root directory, same string as \code{-o} or
-#' \code{--outdir} of AbSeqPy
-.collateReports <- function(reports, individualSamples, root) {
+#' @param outputDirectory string type. Where should the report be placed.
+.collateReports <- function(reports, individualSamples, outputDirectory) {
     message("Collating report into index.html")
-    # create report directory
-    outputDirectory <- file.path(root, ABSEQ_HTML_DIR)
 
-    # create nested HTML directory for all html files except index.html
-    nestedHTMLdir <- file.path(outputDirectory, ABSEQ_NESTED_HTML_DIR)
-
-    if (!dir.exists(outputDirectory)) {
-        dir.create(outputDirectory)
-    } else {
-        warning(paste(ABSEQ_HTML_DIR, "found, overriding contents."))
-    }
-    if (!dir.exists(nestedHTMLdir)) {
-        dir.create(nestedHTMLdir)
-    } else {
-        warning(paste(nestedHTMLdir, "found, overriding contents."))
-    }
-
-    # move all files from reports/<sample_name>/<sample_name>_reports.html
-    # newLinks is now a relative link to ABSEQ_NESTED_HTML_DIR/<sample>_report.html
-    newLinks <- lapply(reports, function(pth) {
-        newPath <- file.path(normalizePath(nestedHTMLdir), basename(pth))
-        file.rename(from = pth, to = newPath)
-        return(file.path(ABSEQ_NESTED_HTML_DIR, basename(newPath)))
+    # get relative links for HTML report (instead of absolute paths)
+    relLinks <- lapply(reports, function(pth) {
+        return(file.path(ABSEQ_NESTED_HTML_DIR, basename(pth)))
     })
 
     # define a mask to filter reports based on comparative or single report
@@ -180,8 +183,8 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
     renderParams <- list(
         singleSamples = paste(names(reports)[!multiSampleMask], collapse = ","),
         multiSamples = paste(names(reports)[multiSampleMask], collapse = ","),
-        singleSampleLinks = paste(newLinks[!multiSampleMask], collapse = ","),
-        multiSampleLinks = paste(newLinks[multiSampleMask], collapse = ","),
+        singleSampleLinks = paste(relLinks[!multiSampleMask], collapse = ","),
+        multiSampleLinks = paste(relLinks[multiSampleMask], collapse = ","),
         chains = chains,
         rawReads = rawReads,
         annotReads = annotReads,
@@ -190,8 +193,7 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
         filterSplitter = filterSplitter
     )
     if (rmarkdown::pandoc_available()) {
-        rmarkdown::render(templateFile,
-                          output_dir = outputDirectory,
+        rmarkdown::render(templateFile, output_dir = outputDirectory,
                           params = renderParams)
     } else {
         warning("Pandoc not found in system, will not create index.html")
