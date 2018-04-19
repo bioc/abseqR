@@ -32,9 +32,9 @@ params:
     
     # what analysis to display in this report
     hasAnnot: TRUE
-    hasAbun: TRUE
+    hasAbun: FALSE
     hasProd: TRUE
-    hasDiv: TRUE
+    hasDiv: FALSE
     
     # summary counts - comma separated if multiple samples
     rawReads: "3000"
@@ -85,10 +85,6 @@ library(gridExtra)
 }
 ```
 
-<!-- 
-Page 1 is a overview of the sample analysis
--->
-
 
 `r if(!params$hasAnnot) {"\\begin{comment}"}`
 
@@ -99,7 +95,7 @@ Summary {data-orientation=rows}
 
 Row
 -----------------------------------------------------------------------
-<!-- render title with sample name -->
+
 `r paste(knitr::knit(text = knitr::knit_expand(text = paste("### Overview of", params$name))))`
 ```{r ,echo = FALSE, eval = TRUE}
 sampleNames <- unlist(strsplit(params$name, "_vs_"))
@@ -187,9 +183,6 @@ if (!is.na(fname)) {
 `r if(!params$hasAnnot) {"\\end{comment}"}`
 
 
-<!-- Page 2 is abundance analysis -->
-
-
 `r if(!params$hasAbun) {"\\begin{comment}"}`
 
 
@@ -237,8 +230,9 @@ if (!is.na(fname)) {
 
 > Only the top 15 from each sample are shown
 
+`r if(!params$hasAbun) {"\\end{comment}"}`
 
-`r if(!params$inclD) {"\\begin{comment}"}`
+`r if(!params$inclD || !params$hasAbun) {"\\begin{comment}"}`
 
 
 Row
@@ -284,9 +278,10 @@ if (!is.na(fname)) {
 > Only the top 15 from each sample are shown
 
 
-`r if(!params$inclD) {"\\end{comment}"}`
+`r if(!params$inclD || !params$hasAbun) {"\\end{comment}"}`
 
 
+`r if(!params$hasAbun) {"\\begin{comment}"}`
 
 Row
 -----------------------------------------------------------------------
@@ -330,8 +325,9 @@ if (!is.na(fname)) {
 > Only the top 15 from each sample are shown
 
 
+`r if(!params$hasAbun) {"\\end{comment}"}`
 
-`r if(!params$single) {"\\begin{comment}"}`
+`r if(!params$hasAbun || !params$single) {"\\begin{comment}"}`
 
 
 
@@ -376,7 +372,9 @@ alignmentQuality <- lapply(seq_along(alignQual), function(i) {
 `r if (params$single) { paste(knitr::knit(text = paste(alignmentQuality, collapse = "\n"))) }`
 
 
-`r if(!params$single) {"\\end{comment}"}`
+`r if(!params$hasAbun || !params$single) {"\\end{comment}"}`
+
+`r if(!params$hasAbun) {"\\begin{comment}"}`
 
 
 Row
@@ -480,7 +478,7 @@ if (!is.na(fname)) {
 
 Row {.tabset .tabset-fade}
 -----------------------------------------------------------------------
-<!--  Example of how it should look like after knitting
+<!---  Example of how it should look like after knitting
 ### CDR1
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_cdr1_mismatches_dist\\.Rdata")
@@ -533,7 +531,7 @@ if (params$interactive) {
 > Mismatches, gaps, gaps (in out-of-frame sequences) distribution in %s region\n
 -->
 
-<!-- TODO: fix legend && beware of missing samples when doing so -->
+<!--- TODO: fix legend && beware of missing samples when doing so -->
 ```{r echo = FALSE, eval = TRUE}
 titles <- c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3")
 frcdrMisGaps <- lapply(seq_along(titles), function(i) {
@@ -555,7 +553,7 @@ frcdrMisGaps <- lapply(seq_along(titles), function(i) {
 
 `r paste(knitr::knit(text = paste(frcdrMisGaps, collapse = "\n")))`
 
-<!-- Example of this knitr output:
+<!--- Example of this knitr output:
 ### IGV
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_igv_mismatches_dist\\.Rdata")
@@ -594,7 +592,7 @@ if (params$interactive) {
 > Mismatches and gaps distribution in V gene
 -->
 
-<!-- TODO: fix legend && beware of missing samples when doing so -->
+<!--- TODO: fix legend && beware of missing samples when doing so -->
 ```{r echo = FALSE, eval = TRUE}
 if (params$inclD) {
     titles <- c("IGV", "IGD", "IGJ")
@@ -735,7 +733,7 @@ if (is.na(fname)) {
 
 
 
-<!-- TODO: currently, assumes that all 3 rarefaction, duplication, and recapture
+<!--- TODO: currently, assumes that all 3 rarefaction, duplication, and recapture
 are present because of the ggplotly legend hack -->
 
 Diversity {data-orientation=rows}
@@ -905,7 +903,7 @@ if (params$interactive) {
 Row {.tabset .tabset-fade}
 -----------------------------------------------------------------------
 
-<!-- EXAMPLE:
+<!--- EXAMPLE:
 ### CDR1
 ```{r, eval=params$hasDiv, fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "diversity", "spectratypes"), pattern = ".*_cdr1_spectratype\\.Rdata")
@@ -942,12 +940,14 @@ specOut <- lapply(seq_along(regions), function(i) {
 `r if (params$hasDiv) { paste(knitr::knit(text = paste(specOut, collapse = '\n'))) }`
 
 
-`r if(params$single) {"\\begin{comment}"}`
+`r if(!params$hasDiv) {"\\end{comment}"}`
+
+`r if(!params$hasDiv || params$single) {"\\begin{comment}"}`
 
 
 Row {.tabset .tabset-fade}
 -----------------------------------------------------------------------
-<!-- Always use static plot even if it's interactive - good luck rendering it
+<!--- Always use static plot even if it's interactive - good luck rendering it
  otherwise -->
 ```{r, echo=FALSE, eval=(!params$single && params$hasDiv)}
 files <- list.files(path = file.path(params$rootDir, "diversity"),
@@ -1007,16 +1007,16 @@ if (!is.na(fname)) {
 > Counts show number of clonotypes
 
 
-`r if(params$single) {"\\end{comment}"}`
+`r if(!params$hasDiv || params$single) {"\\end{comment}"}`
 
 
 
-`r if(!params$single) {"\\begin{comment}"}`
+`r if(!params$hasDiv || !params$single) {"\\begin{comment}"}`
 
 
 Row {.tabset .tabset-fade}
 -----------------------------------------------------------------------
-<!-- composition logos EXAMPLE:
+<!--- composition logos EXAMPLE:
 
 ### CDR1 (unscaled, scaled)
 {r, eval=(params$hasDiv && params$single), fig.width=params$width*2, fig.height=params$height}
@@ -1087,7 +1087,7 @@ compOut <- lapply(seq_along(regions), function(i) {
 
 Row {.tabset .tabset-fade}
 -----------------------------------------------------------------------
-<!-- Motifs EXAMPLE:
+<!--- Motifs EXAMPLE:
 ### CDR1 Motifs (aligned, unaligned)
 
 ```{r, eval=(params$hasDiv && params$single), fig.width=params$width*2, fig.height=params$height}
@@ -1126,16 +1126,4 @@ motifOut <- lapply(seq_along(regions), function(i) {
 `r if (params$single && params$hasDiv) { paste(knitr::knit(text = paste(motifOut, collapse = '\n'))) }`
 
 
-
-
-`r if(!params$single) {"\\end{comment}"}`
-`r if(!params$hasDiv) {"\\end{comment}"}`
-
-<!--
-=======================================================================
------------------------------------------------------------------------
--->
-
-
-
-
+`r if(!params$hasDiv || !params$single) {"\\end{comment}"}`
