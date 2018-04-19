@@ -3,7 +3,7 @@ title: "AbSeq analysis report"
 output:
     html_document:
         # using the same theme as template.Rmd
-        theme: cosmo
+        # theme: cosmo
         toc: true
         toc_float:
             collapsed: false
