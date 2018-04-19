@@ -195,7 +195,8 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
         annotReads = annotReads,
         prodReads = prodReads,
         filters = filters,
-        filterSplitter = filterSplitter
+        filterSplitter = filterSplitter,
+        analysisParams = file.path(individualSamples[[1]]@outdir, RESULT_DIR, individualSamples[[1]]@name, ANALYSIS_PARAMS)
     )
     if (rmarkdown::pandoc_available()) {
         rmarkdown::render(templateFile, output_dir = outputDirectory,
