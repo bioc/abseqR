@@ -377,15 +377,17 @@ setMethod(f = ".generateReport",
                       productiveReads = paste(productiveReadCounts, collapse = ",")
                   )
 
-                  saveAs <- paste0(paste(sampleNames, collapse = "_vs_"), "_report.html")
-
-                  rmarkdown::render(
-                      system.file("extdata", "template.Rmd", package = "AbSeq"),
-                      output_dir = outputDir,
-                      output_file = saveAs,
-                      params = renderParams
-                  )
-                  return(file.path(outputDir, saveAs))
+                  # https://github.com/rstudio/rmarkdown/issues/861#issuecomment-326637323
+                  # paraphrased: just don't use output_file or output_dir
+                  # instead, copy to output_dir and remove it if you want to
+                  # as a safety measure, rename the template.Rmd file to
+                  # sample name so that the cache will not clash with other
+                  # samples it it wasn't cleared in time
+                  tmpTemplate <- file.path(outputDir, paste0(paste(sampleNames, collapse = "_vs_"), ".Rmd"))
+                  file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"), tmpTemplate, overwrite = T)
+                  rmarkdown::render(tmpTemplate, params = renderParams)
+                  file.remove(tmpTemplate)
+                  return(sub(".Rmd", ".html", tmpTemplate))
               } else {
                   warning("Pandoc cannot be detected on system, skipping HTML report")
                   return(NA)
@@ -416,8 +418,6 @@ setMethod(f = ".generateReport",
                   productiveReadCount <- .readSummary(analysisDirectory,
                                                       ABSEQ_PROD_READ_COUNT_KEY)
 
-                  saveAs <- paste0(object@name, "_report.html")
-
                   renderParams <- list(
                       rootDir = root,
                       single = TRUE,
@@ -438,13 +438,17 @@ setMethod(f = ".generateReport",
                       productiveReads = productiveReadCount
                   )
 
-                  rmarkdown::render(
-                      system.file("extdata", "template.Rmd", package = "AbSeq"),
-                      output_dir = outputDir,
-                      output_file = saveAs,
-                      params = renderParams
-                  )
-                  return(file.path(outputDir, saveAs))
+                  # https://github.com/rstudio/rmarkdown/issues/861#issuecomment-326637323
+                  # paraphrased: just don't use output_file or output_dir
+                  # instead, copy to output_dir and remove it if you want to
+                  # as a safety measure, rename the template.Rmd file to
+                  # sample name so that the cache will not clash with other
+                  # samples it it wasn't cleared in time
+                  tmpTemplate <- file.path(outputDir, paste0(object@name, ".Rmd"))
+                  file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"), tmpTemplate, overwrite = T)
+                  rmarkdown::render(tmpTemplate, params = renderParams)
+                  file.remove(tmpTemplate)
+                  return(sub(".Rmd", ".html", tmpTemplate))
               } else {
                   warning("Pandoc cannot be detected on system, skipping HTML report")
                   return(NA)

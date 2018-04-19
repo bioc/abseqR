@@ -32,9 +32,9 @@ params:
     
     # what analysis to display in this report
     hasAnnot: TRUE
-    hasAbun: FALSE
+    hasAbun: TRUE
     hasProd: TRUE
-    hasDiv: FALSE
+    hasDiv: TRUE
     
     # summary counts - comma separated if multiple samples
     rawReads: "3000"
