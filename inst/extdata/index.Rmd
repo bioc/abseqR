@@ -99,4 +99,16 @@ comparativePoints <- lapply(seq_along(samples), function(i) {
 `r paste(knitr::knit(text = paste(comparativePoints, collapse = '\n')))`
 
 <!-- R, py version - R, py packages -->
-# Additional information
+# Session information
+
+## AbSeqR
+
+```{r echo=TRUE}
+# This report is generated with the following packages(and versions)
+sessionInfo()
+```
+
+## AbSeqPy
+
+AbSeq v1.1.13
+Dummy values here
