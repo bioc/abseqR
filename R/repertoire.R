@@ -108,26 +108,30 @@ Repertoire <- setClass("Repertoire", slots = c(
 
 .loadRepertoireFromParams <- function(analysisParams) {
     con <- file(analysisParams, "r")
-    lines <- tail(readLines(con), n = -2)
+    lines <- readLines(con)
     close(con)
     params <- list(Class = "Repertoire")
     skip <- c("report_interim", "yaml")
+
     for (line in lines) {
-        tokens <- unlist(strsplit(line, "\t"))
-        parameter <- trimws(strsplit(tokens[1], ":")[[1]][2])
-        value <- trimws(strsplit(tokens[2], ":")[[1]][2])
-        if (!(parameter %in% skip)) {
-            if (!is.na(as.logical(value))) {
-                params[[parameter]] <- as.logical(value)
-            } else if (!is.na(suppressWarnings(as.numeric(value)))) {
-                params[[parameter]] <- as.numeric(value)
-            } else if (grepl("[", value, fixed = T)) {
-                # value = [start, end]
-                newValue <- gsub("\\[|\\]", "", value)
-                # to -> c(start, end)
-                params[[parameter]] <- as.numeric(unlist(strsplit(newValue, ",")))
-            } else {
-                params[[parameter]] <- value
+        # read in parameters
+        if (startsWith("Parameter", line)) {
+            tokens <- unlist(strsplit(line, "\t"))
+            parameter <- trimws(strsplit(tokens[1], ":")[[1]][2])
+            value <- trimws(strsplit(tokens[2], ":")[[1]][2])
+            if (!(parameter %in% skip)) {
+                if (!is.na(as.logical(value))) {
+                    params[[parameter]] <- as.logical(value)
+                } else if (!is.na(suppressWarnings(as.numeric(value)))) {
+                    params[[parameter]] <- as.numeric(value)
+                } else if (grepl("[", value, fixed = T)) {
+                    # value = [start, end]
+                    newValue <- gsub("\\[|\\]", "", value)
+                    # to -> c(start, end)
+                    params[[parameter]] <- as.numeric(unlist(strsplit(newValue, ",")))
+                } else {
+                    params[[parameter]] <- value
+                }
             }
         }
     }
