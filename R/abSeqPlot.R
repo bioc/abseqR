@@ -166,6 +166,10 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
         .readSummary(file.path(x@outdir, RESULT_DIR, x@name), ABSEQ_ANNOT_READ_COUNT_KEY)
     }), collapse = ",")
 
+    filtReads <- paste(lapply(individualSamples, function(x) {
+        .readSummary(file.path(x@outdir, RESULT_DIR, x@name), ABSEQ_FILT_READ_COUNT_KEY)
+    }), collapse = ",")
+
     prodReads <- paste(lapply(individualSamples, function(x) {
         .readSummary(file.path(x@outdir, RESULT_DIR, x@name), ABSEQ_PROD_READ_COUNT_KEY)
     }), collapse = ",")
@@ -187,6 +191,7 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
         multiSampleLinks = paste(relLinks[multiSampleMask], collapse = ","),
         chains = chains,
         rawReads = rawReads,
+        filtReads = filtReads,
         annotReads = annotReads,
         prodReads = prodReads,
         filters = filters,
