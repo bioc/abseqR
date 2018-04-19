@@ -115,7 +115,7 @@ Repertoire <- setClass("Repertoire", slots = c(
 
     for (line in lines) {
         # read in parameters
-        if (startsWith("Parameter", line)) {
+        if (startsWith(line, "Parameter")) {
             tokens <- unlist(strsplit(line, "\t"))
             parameter <- trimws(strsplit(tokens[1], ":")[[1]][2])
             value <- trimws(strsplit(tokens[2], ":")[[1]][2])
