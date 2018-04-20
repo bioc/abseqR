@@ -12,8 +12,8 @@ V_WIDTH_L <- 12
 V_HEIGHT_L <- 7.5
 
 # AbSeq's output directory structure(s)
-RESULT_DIR <- "report"
-AUX_DIR <- "auxiliary"
+RESULT_DIR <- "auxiliary"
+AUX_DIR <- "hdf"
 # AbSeq's analysis directory names
 ABSEQ_DIR_ANNOT <- "annot"
 ABSEQ_DIR_PROD <- "productivity"
@@ -22,7 +22,7 @@ ABSEQ_DIR_DIV <- "diversity"
 ABSEQ_DIR_PRIM <- "primer_specificity"
 ABSEQ_DIR_5UTR <- "utr5"
 ABSEQ_DIR_SEC <- "secretion"
-ABSEQ_HTML_DIR <- "html"
+ABSEQ_HTML_DIR <- "report"
 ABSEQ_NESTED_HTML_DIR <- "html_files"
 
 # parameter file from AbSeq's run
