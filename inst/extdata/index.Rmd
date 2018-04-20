@@ -48,7 +48,7 @@ Click on the sample names for more details.
 
 The comparative analysis (if any) will appear [after the table](#comparative-reports).
 
-## Samples
+## Individual sample reports
 
 Number of samples: `r length(unlist(strsplit(params$singleSampleLinks, ",")))`
 
