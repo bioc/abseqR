@@ -353,7 +353,7 @@ if (!is.na(fname)) {
 
 Row {.tabset .tabset-fade}
 -----------------------------------------------------------------------
-```{r, echo = FALSE, eval = params$single}
+```{r, echo = FALSE, eval =(params$single && params$hasAbun)}
 alignQual <- list("Bitscore vs Alignment Length" = "bitscore",
                "Gaps vs Alignment Length" = "gaps",
                "Identity vs Alignment Length" = "identity",
@@ -369,7 +369,7 @@ alignmentQuality <- lapply(seq_along(alignQual), function(i) {
 })
 ```
 
-`r if (params$single) { paste(knitr::knit(text = paste(alignmentQuality, collapse = "\n"))) }`
+`r if (params$hasAbun && params$single) { paste(knitr::knit(text = paste(alignmentQuality, collapse = "\n"))) }`
 
 
 `r if(!params$hasAbun || !params$single) {"\\end{comment}"}`
