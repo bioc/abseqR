@@ -23,7 +23,7 @@ params:
     analysisParams: "/newhome/jiahong/sandbox/immulator_out/out/report/PCR1/analysis.params"
 ---
 
-```{r setup, include=FALSE}
+```{r abseq_setup, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(echo = FALSE)
 

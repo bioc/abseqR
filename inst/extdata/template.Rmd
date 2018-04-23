@@ -55,7 +55,7 @@ params:
 }
 </style>
 
-```{r setup, include=FALSE}
+```{r abseq_setup, include=FALSE}
 # Buidling rmd using loops: https://github.com/rstudio/flexdashboard/issues/80
 
 library(flexdashboard)
@@ -76,6 +76,14 @@ library(gridExtra)
         }
     } else if (!is.null(.callback)) {
         flist <- flist[lapply(flist, .callback) == T]
+        if (length(flist) != 1) {
+            if (.stop) {
+                stop(paste("Expected to find one file, but found", n, "from",
+                           paste(flist, collapse = ", "), "instead"))
+            } else {
+                return(NA)
+            }
+        }
     }
     return(flist[[1]])
 }
