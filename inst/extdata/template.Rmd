@@ -28,7 +28,7 @@ params:
     single: TRUE
     
     # root output directory
-    rootDir: "/newhome/jiahong/sandbox/immulator_out/out/report/PCR2"
+    rootDir: "/newhome/jiahong/sandbox/immulator_out/out/auxiliary/PCR2"
     
     # what analysis to display in this report
     hasAnnot: TRUE
@@ -81,7 +81,7 @@ library(gridExtra)
 }
 
 .compositionNoGene <- function(x) {
-    return(length(grep("-", x, fixed = T)) == 0)
+    return(length(grep("-", basename(x), fixed = T)) == 0)
 }
 ```
 
