@@ -23,7 +23,7 @@ params:
     analysisParams: "/newhome/jiahong/sandbox/immulator_out/out/report/PCR1/analysis.params"
 ---
 
-```{r abseq_setup, include=FALSE}
+```{r abseq_index_landing_setup, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(echo = FALSE)
 
@@ -53,7 +53,7 @@ The comparative analysis (if any) will appear [after the table](#comparative-rep
 Number of samples: `r length(unlist(strsplit(params$singleSampleLinks, ",")))`
 
 
-```{r echo=FALSE}
+```{r abseq_index_table_summary, echo=FALSE}
 samples <- unlist(strsplit(params$singleSamples, ","))
 links <- unlist(strsplit(params$singleSampleLinks, ","))
 chains <- unlist(strsplit(params$chains, ","))
@@ -91,7 +91,7 @@ sample | chain | # reads | annotated reads | filtered(kept) reads | productive r
 
 Number of comparative reports: `r length(unlist(strsplit(params$multiSampleLinks, ",")))`
 
-```{r echo=FALSE}
+```{r abseq_comparative_show, echo=FALSE}
 samples <- unlist(strsplit(params$multiSamples, ","))
 links <- unlist(strsplit(params$multiSampleLinks, ","))
 if (length(samples) != length(links)) {
@@ -110,14 +110,14 @@ comparativePoints <- lapply(seq_along(samples), function(i) {
 
 ## AbSeqR
 
-```{r echo=TRUE}
+```{r abseq_display_session_info, echo=TRUE}
 # This report is generated with the following packages(and versions)
 sessionInfo()
 ```
 
 ## AbSeqPy
 
-```{r echo=FALSE}
+```{r abseq_display_abseqPy_info, echo=FALSE}
 if (file.exists(params$analysisParams)) {
     con <- file(params$analysisParams, "r")
     lines <- readLines(con)
