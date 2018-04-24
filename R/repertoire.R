@@ -362,7 +362,7 @@ setMethod(f = ".generateReport",
                   })
 
                   renderParams <- list(
-                      rootDir = root,
+                      rootDir = normalizePath(root),
                       single = FALSE,
                       interactive = interactivePlot,
                       inclD = includeD,
@@ -423,7 +423,7 @@ setMethod(f = ".generateReport",
                                                       ABSEQ_PROD_READ_COUNT_KEY)
 
                   renderParams <- list(
-                      rootDir = root,
+                      rootDir = normalizePath(root),
                       single = TRUE,
                       interactive = interactivePlot,
                       inclD = (object@chain == "hv"),
