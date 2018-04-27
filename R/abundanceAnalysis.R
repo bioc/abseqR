@@ -6,12 +6,18 @@
 #'
 #' @param files list type. list of files in abundance directory
 #' @param sampleNames vector type. 1-1 correspondance to files
-#' @param outputDir string type
+#' @param outputDir string type.
+#' @param skipDgene logical type. Skip D germline abundance plot if TRUE.
+#' @param .save logical type. Save Rdata ggplot item
 #'
 #' @return None
-.abundancePlot <- function(files, sampleNames, outputDir) {
+.abundancePlot <- function(files, sampleNames, outputDir,
+                           skipDgene = FALSE, .save = TRUE) {
+
+    vdj <- if (skipDgene) c("v", "j") else c("v", "d", "j")
+
     for (expression in c("family", "gene")) {
-        for (gene in c("v", "d", "j")) {
+        for (gene in vdj) {
             # correction, J has no "gene" but rather variant
             if (gene == 'j' && expression == 'gene') {
                 expression <- 'variant'
@@ -39,10 +45,9 @@
                                paste0("IG", toupper(gene),
                                       " abundance in ", mashedName),
                                vert, subs = subtitle)
-                ggsave(file.path(outputDir,
-                              paste0(paste(sampleNames, collapse = "_"), "_ig",
-                              gene, "_dist_", expression, "_level.png")),
-                       plot = p, width = width, height = height)
+                filename <- file.path(outputDir, paste0(paste(sampleNames, collapse = "_"), "_ig", gene, "_dist_", expression, "_level.png"))
+                ggsave(filename, plot = p, width = width, height = height)
+                .saveAs(.save, filename, plot = p)
             }
         }
     }
@@ -66,7 +71,8 @@
         df <- read.csv(filename)
 
         # output file
-        png(gsub(".csv", ".png", filename))
+        png(gsub(".csv", ".png", filename), width = V_WIDTH, height = V_HEIGHT,
+            units = "in", res = 1200, pointsize = 10)
 
         # circos theme setup
         #if (length(unique(df[[1]]))-1 < 8 && length(unique(df[[2]]))-1 < 8)  {
@@ -81,7 +87,7 @@
         chordDiagram(df, annotationTrack = "grid",
                      preAllocateTracks = list(track.height = 0.2),
                      grid.col = c(row,col))
-        title(sampleName, cex = 0.8)
+        title(sampleName, cex = 8)
         circos.trackPlotRegion(track.index = 1, bg.border = NA,
                                panel.fun = function(x, y) {
                                    sector.name =
@@ -114,10 +120,13 @@
 #' @param sampleNames vector type. 1-1 correspondence with abundanceDirectories
 #' @param combinedNames string type. Title "combined" sample names
 #' @param mashedNames string type. File "mashed" names - avoid special chars
+#' @param skipDgene logical type. Skip D gene plots?
+#' @param .save logical type. Save ggplot as Rdata
 #'
 #' @return None
 .abundanceAnalysis <- function(abundanceDirectories, abunOut,
-                               sampleNames, combinedNames, mashedNames) {
+                               sampleNames, combinedNames, mashedNames,
+                               skipDgene = FALSE, .save = TRUE) {
     # where to find the files
     # 3 each from V and D, then 2 from J (no gene) or 5 (exclude the 3 from D)
     searchFiles <-
@@ -132,7 +141,9 @@
             # what are the sample names (in-order)
             sampleNames,
             # output directory
-            abunOut
+            abunOut,
+            # whether or not to ignore D gene plots
+            skipDgene = skipDgene
         )
     } else {
         warning(paste("Could not find V(D)J abundance CSV files in",
@@ -158,9 +169,9 @@
             .checkVert(abunIgvMismatchFiles[[1]]),
             subs = subtitle
         )
-        ggsave(file.path(abunOut, paste0(mashedNames,
-                                         "_igv_mismatches_dist.png")),
-               plot = abunIgvMismatches, width = V_WIDTH, height = V_HEIGHT)
+        saveName <- file.path(abunOut, paste0(mashedNames, "_igv_mismatches_dist.png"))
+        ggsave(saveName, plot = abunIgvMismatches, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, saveName, plot = abunIgvMismatches)
     } else {
         warning("Could not find IGV mismatches distribution CSV files in",
                 paste(abundanceDirectories, collapse = ","))
@@ -183,8 +194,9 @@
             .checkVert(abunIgvGapsFiles[[1]]),
             subs = subtitle
         )
-        ggsave(file.path(abunOut, paste0(mashedNames, "_igv_gaps_dist.png")),
-               plot = abunIgvGaps, width = V_WIDTH, height = V_HEIGHT)
+        saveName <- file.path(abunOut, paste0(mashedNames, "_igv_gaps_dist.png"))
+        ggsave(saveName, plot = abunIgvGaps, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, saveName, plot = abunIgvGaps)
     } else {
         warning("Could not find IGV indels distribution CSV files in",
                 paste(abundanceDirectories, collapse = ","))

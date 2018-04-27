@@ -1,4 +1,4 @@
-# single plot uses blue
+# single plot uses light blue colour
 BLUEHEX <- "#56B4E9"
 
 # plot sizes
@@ -10,6 +10,39 @@ VENN_WIDTH <- 8
 VENN_HEIGHT <- 8
 V_WIDTH_L <- 12
 V_HEIGHT_L <- 7.5
+
+# AbSeq's output directory structure(s)
+RESULT_DIR <- "auxiliary"
+AUX_DIR <- "hdf"
+# AbSeq's analysis directory names
+ABSEQ_DIR_ANNOT <- "annot"
+ABSEQ_DIR_PROD <- "productivity"
+ABSEQ_DIR_ABUN <- "abundance"
+ABSEQ_DIR_DIV <- "diversity"
+ABSEQ_DIR_PRIM <- "primer_specificity"
+ABSEQ_DIR_5UTR <- "utr5"
+ABSEQ_DIR_SEC <- "secretion"
+ABSEQ_HTML_DIR <- "report"
+ABSEQ_NESTED_HTML_DIR <- "html_files"
+
+# parameter file from AbSeq's run
+ANALYSIS_PARAMS <- "analysis.params"
+
+# sample comparison configuration file - only used in AbSeqR (to know what
+# samples must be compared against each other when abSeqPlot() is called)
+ABSEQ_CFG <- "abseq.cfg"
+
+# AbSeq's summary file about the repertoire - raw/annot/prod counts
+ABSEQ_SUMMARY <- "summary.txt"
+
+# These are the "key"s from ABSEQ_SUMMARY file
+# They should be in the format of: (for example)
+# RawReads:<number>
+# AnnotatedReads:<number>
+ABSEQ_RAW_READ_COUNT_KEY <- "RawReads"
+ABSEQ_ANNOT_READ_COUNT_KEY <- "AnnotatedReads"
+ABSEQ_FILT_READ_COUNT_KEY <- "FilteredReads"
+ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
 
 
 .checkVert <- function(filename) {
@@ -57,7 +90,11 @@ V_HEIGHT_L <- 7.5
 }
 
 .inferAnalyzed <- function(sampleDirectory) {
-    return(list.files(sampleDirectory))
+    everything <- list.files(sampleDirectory)
+    fullPath <- lapply(everything, function(x) {
+        file.path(sampleDirectory, x)
+    })
+    return(everything[unlist(lapply(fullPath, dir.exists))])
 }
 
 .capitalize <- function(str) {
@@ -129,4 +166,53 @@ V_HEIGHT_L <- 7.5
 
     factorRegions <- factor(regions, levels = lvls)
     return(lines[order(factorRegions, decreasing = T)])
+}
+
+
+#' Saves ggplot object as a Rdata file.
+#'
+#' @description It's a convinient function that does the check and saves
+#' at the same time, for brevity within other areas of the code (to eliminate
+#' repeated if checks).
+#'
+#' @import tools
+#'
+#' @param .save logical type. Whether or not we should save.
+#' @param filename string.
+#' @param plot ggplot object.
+#'
+#' @return nothing
+.saveAs <- function(.save, filename, plot) {
+    if (.save) {
+        fname <- sub(tools::file_ext(filename), "Rdata", filename)
+        save(file = fname, list = c("plot"))
+    }
+}
+
+
+#' Return value specifed by key from AbSeq's summary file
+#'
+#' @param sampleRoot sample's root directory. For example,
+#' \code{/path/to/<outputdir>/reports/<sample_name>}.
+#' @param key character type. Possible values are (though they might change)
+#' \itemize{
+#'    \item{RawReads}
+#'    \item{AnnotatedReads}
+#'    \item{FilteredReads}
+#'    \item{ProductiveReads}
+#' }
+#' @return value associated with key from summary file. "NA" (in string) if the field
+#' is not available
+#' refer to \code{util.R} for the key values
+.readSummary <- function(sampleRoot, key) {
+    fname <- file.path(sampleRoot, ABSEQ_SUMMARY)
+    con <- file(fname, "r")
+    lines <- readLines(con)
+    close(con)
+    for (line in lines) {
+        if (grepl(key, line, fixed = T)) {
+            return(strsplit(line, ":")[[1]][2])
+        }
+    }
+    return("NA")
 }

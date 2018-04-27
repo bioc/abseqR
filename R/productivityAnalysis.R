@@ -21,7 +21,7 @@
     # label each row with sample name and drop unused columns
     for (i in seq_len(nsamples)) {
         df <- dataframes[[i]]
-        df$round <- rep(sampleNames[i], nrow(df))
+        df$sample<- rep(sampleNames[i], nrow(df))
         dataframes[[i]] <- df[, !(names(df) %in% unusedCols)]
     }
     #   ---- done: clean & pre-processing ----
@@ -30,14 +30,14 @@
     df.union <- do.call("rbind", dataframes)
 
     # plot!
-    g <- ggplot(df.union, aes(round, Percentage,
+    g <- ggplot(df.union, aes(sample, Percentage,
                               label = sprintf("%0.2f%%", Percentage))) +
         geom_bar(stat = "identity", aes(fill = Reason), width=0.5) +
         facet_grid(~ Productivity) +
         labs(title = "Productivity proportions",
              subtitle = "Percentage of unproductive reads due to stop codons and frameshifts",
-             x = "Sample",
-             y = "Percentage (%)") +
+             x = "sample",
+             y = "percentage (%)") +
         scale_y_continuous(limits = c(0,100)) +
         geom_text(position = position_stack(vjust = 0.5)) +
         theme(axis.text.x = element_text(angle = 75, hjust = 1))
@@ -61,12 +61,14 @@
 #' Vector of file names to save in the order of regions
 #' @param regions string type.
 #' Most of the dist plots are regional based. use c("") if no regions are involved
+#' @param .save logical type. Save Rdata
 #'
 #' @return None
 .prodDistPlot <- function(productivityDirectories, sampleNames, title,
                           reg, saveNames,
                           regions = c("cdr1", "cdr2", "cdr3", "fr1",
-                                      "fr2", "fr3", "igv", "igd", "igj")) {
+                                      "fr2", "fr3", "igv", "igd", "igj"),
+                          .save = TRUE) {
     if (length(regions) != length(saveNames)) {
         stop(paste("Expected equal number of regions and filenames , got",
                    length(regions), "regions and",
@@ -86,6 +88,7 @@
             g <- .plotDist(dataframes, sampleNames, plotTitle,
                            .checkVert(fs[[1]]), subs = subtitle)
             ggsave(saveNames[i], plot = g, width = V_WIDTH, height = V_HEIGHT)
+            .saveAs(.save, saveNames[i], g)
         }
         i <- i + 1
     }
@@ -103,22 +106,28 @@
 #' @param sampleNames vector type. 1-1 with productivity directories
 #' @param combinedNames string type. Title friendly "combined" sample names
 #' @param mashedNames string type. File friendly "mashed-up" sample names
+#' @param .save logical type. Save Rdata
 #'
 #' @return None
 .productivityAnalysis <- function(productivityDirectories, prodOut,
-                                  sampleNames, combinedNames, mashedNames) {
+                                  sampleNames, combinedNames, mashedNames,
+                                  .save = TRUE) {
+
+    message("Commencing productivity analysis")
 
     # summary productivity file
     prodFiles <- .listFilesInOrder(path = productivityDirectories,
                                    pattern = ".*_productivity\\.csv(\\.gz)?$")
+
+
     if (length(prodFiles) > 0) {
         g <- .productivityPlot(lapply(prodFiles, read.csv,
                                       stringsAsFactors = FALSE), sampleNames)
-        ggsave(file.path(prodOut, paste0(mashedNames, "_productivity.png")),
-               plot = g, width = V_WIDTH, height = V_HEIGHT)
+        saveName <- file.path(prodOut, paste0(mashedNames, "_productivity.png"))
+        ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, saveName, g)
     }
 
-    message("Commencing productivity analysis")
 
     # sub-productivity files
     regions <- c("cdr1", "cdr2", "cdr3", "fr1", "fr2",
@@ -239,16 +248,17 @@
                 subs = subtitle,
                 sorted = FALSE
             )
+            saveName <- file.path(prodOut,
+                                  paste0(mashedNames, "_stopcodon_region_",
+                                         framestat, ".png"))
             if (vert) {
-                ggsave(file.path(prodOut, paste0(mashedNames,
-                              "_stopcodon_region_", framestat, ".png")),
-                       plot = stopcodonRegion,
+                ggsave(saveName, plot = stopcodonRegion,
                        width = V_WIDTH, height = V_HEIGHT)
             } else {
-                ggsave(file.path(prodOut, paste0(mashedNames,  "_stopcodon_region_",
-                              framestat, ".png")), plot = stopcodonRegion,
+                ggsave(saveName, plot = stopcodonRegion,
                        width = H_WIDTH, height = H_HEIGHT)
             }
+            .saveAs(.save, saveName, stopcodonRegion)
         }
     }
 }
