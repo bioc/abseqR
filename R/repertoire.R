@@ -85,6 +85,7 @@ Repertoire <- setClass("Repertoire", slots = c(
     sstart = "numeric",
     alignlen = "numeric",
     clonelimit = "numeric",
+    detailedComposition = "logical",
     log = "character",
     merger = "character",
     fmt = "character",
