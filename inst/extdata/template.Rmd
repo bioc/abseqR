@@ -202,7 +202,7 @@ Row
 
 ### V family 
 
-```{r abseq_v_familly, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+```{r abseq_v_family, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igv_dist_family_level\\.Rdata")
 if (!is.na(fname)) {
