@@ -48,8 +48,8 @@ title: "`r params$title`"
 output: 
     flexdashboard::flex_dashboard:
         vertical_layout: scroll
-        navbar:
-            - {title: "Back", href: "#", icon: "fa-home", align: right}
+        navbar: 
+            - {title: "Home", href: "#", icon: "fa-home", align: right}
 ---
 
 <style type="text/css">
@@ -196,6 +196,79 @@ if (!is.na(fname)) {
 
 `r if(!params$hasAbun) {"\\begin{comment}"}`
 
+
+Quality {data-orientation=rows data-icon="fa-clipboard-list"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Indels (Gaps)
+```{r abseq_v_indel, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
+                  pattern = ".*_igv_gaps_dist\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
+} else {
+    cat("404!")
+}
+```
+
+> Plot of insertions and deletions found within the __V gene__
+
+### Mismatches
+```{r abseq_v_mismatch, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
+                  pattern = ".*_igv_mismatches_dist\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
+} else {
+    cat("404!")
+}
+```
+
+> Plot of nucleotide base mismatches found within the __V gene__
+
+
+`r if(!params$hasAbun) {"\\end{comment}"}`
+
+`r if(!params$hasAbun || !params$single) {"\\begin{comment}"}`
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+```{r abseq_quality_heatmaps, echo = FALSE, eval =(params$single && params$hasAbun)}
+alignQual <- list("Bitscore vs Alignment Length" = "bitscore",
+               "Gaps vs Alignment Length" = "gaps",
+               "Identity vs Alignment Length" = "identity",
+               "Mismatches vs Alignment Length" = "mismatches",
+               "Subject Start vs Query Start" = "start")
+alignmentQuality <- lapply(seq_along(alignQual), function(i) {
+    line1 <- knitr::knit_expand(text = sprintf("### %s\n", names(alignQual)[i]))
+    line2 <- knitr::knit_expand(text = sprintf("\n```{r abseq_align_qual_chunk_%d, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}", i))
+    line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(path = file.path(params$rootDir, "abundance"), pattern = ".*_igv_align_quality_%s_hm\\\\.png")', alignQual[[i]]))
+    line4 <- knitr::knit_expand(text = '\nif(!is.na(fname)) { img <- readPNG(fname); grid.raster(img) } else { cat("404!") }')
+    line5 <- knitr::knit_expand(text = "\n```\n")
+    paste(line1, line2, line3, line4, line5, collapse = "\n")
+})
+```
+
+`r if (params$hasAbun && params$single) { paste(knitr::knit(text = paste(alignmentQuality, collapse = "\n"))) }`
+
+`r if(!params$hasAbun || !params$single) {"\\end{comment}"}`
+
+
+`r if(!params$hasAbun) {"\\begin{comment}"}`
 
 Abundance {data-orientation=rows data-icon="fa-chart-bar"}
 =======================================================================
@@ -361,77 +434,7 @@ if (!is.na(fname)) {
 
 
 
-
-Row {.tabset .tabset-fade}
------------------------------------------------------------------------
-```{r abseq_quality_heatmaps, echo = FALSE, eval =(params$single && params$hasAbun)}
-alignQual <- list("Bitscore vs Alignment Length" = "bitscore",
-               "Gaps vs Alignment Length" = "gaps",
-               "Identity vs Alignment Length" = "identity",
-               "Mismatches vs Alignment Length" = "mismatches",
-               "Subject Start vs Query Start" = "start")
-alignmentQuality <- lapply(seq_along(alignQual), function(i) {
-    line1 <- knitr::knit_expand(text = sprintf("### %s\n", names(alignQual)[i]))
-    line2 <- knitr::knit_expand(text = sprintf("\n```{r abseq_align_qual_chunk_%d, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}", i))
-    line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(path = file.path(params$rootDir, "abundance"), pattern = ".*_igv_align_quality_%s_hm\\\\.png")', alignQual[[i]]))
-    line4 <- knitr::knit_expand(text = '\nif(!is.na(fname)) { img <- readPNG(fname); grid.raster(img) } else { cat("404!") }')
-    line5 <- knitr::knit_expand(text = "\n```\n")
-    paste(line1, line2, line3, line4, line5, collapse = "\n")
-})
-```
-
-`r if (params$hasAbun && params$single) { paste(knitr::knit(text = paste(alignmentQuality, collapse = "\n"))) }`
-
-
 `r if(!params$hasAbun || !params$single) {"\\end{comment}"}`
-
-`r if(!params$hasAbun) {"\\begin{comment}"}`
-
-
-Row
------------------------------------------------------------------------
-
-### Indels (Gaps)
-```{r abseq_v_indel, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "abundance"),
-                  pattern = ".*_igv_gaps_dist\\.Rdata")
-if (!is.na(fname)) {
-    load(fname)
-    if (params$interactive) {
-        ggplotly(plot)
-    } else {
-        plot
-    }
-} else {
-    cat("404!")
-}
-```
-
-> Plot of insertions and deletions found within the __V gene__
-
-### Mismatches
-```{r abseq_v_mismatch, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "abundance"),
-                  pattern = ".*_igv_mismatches_dist\\.Rdata")
-if (!is.na(fname)) {
-    load(fname)
-    if (params$interactive) {
-        ggplotly(plot)
-    } else {
-        plot
-    }
-} else {
-    cat("404!")
-}
-```
-
-> Plot of nucleotide base mismatches found within the __V gene__
-
-
-`r if(!params$hasAbun) {"\\end{comment}"}`
-
-
-
 
 `r if(!params$hasProd) {"\\begin{comment}"}`
 

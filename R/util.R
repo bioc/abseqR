@@ -216,3 +216,22 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
     }
     return("NA")
 }
+
+
+#' Substitutes the first occurance of `key` with `value` in `filename`
+#'
+#' @param filename character type
+#' @param key character type
+#' @param value character type
+#' @param fixed logical type
+#'
+#' @return None
+.substituteStringInFile <- function(filename, key, value, fixed = F) {
+    con <- file(filename, "r")
+    lines <- readLines(con)
+    close(con)
+    lines <- sub(key, value, lines, fixed = fixed)
+    con <- file(filename, "w")
+    cat(lines, file = con, sep = "\n")
+    close(con)
+}

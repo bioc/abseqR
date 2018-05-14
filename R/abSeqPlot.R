@@ -119,7 +119,8 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
         if (report) {
             pth <- .generateReport(samples, root = outputDir,
                                    outputDir = file.path(root, ABSEQ_HTML_DIR, ABSEQ_NESTED_HTML_DIR),
-                                   interactivePlot = interactivePlot)
+                                   interactivePlot = interactivePlot,
+                                   .indexHTML = file.path("..", "index.html"))
             if (!is.na(pth)) {
                 individualReports[paste(sampleNames, collapse = "_vs_")] <- pth
             }

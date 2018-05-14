@@ -300,16 +300,18 @@ setMethod(f = "plotRepertoires",
 #' @param root string type. Root directory of the sample(s)
 #' @param outputDir string type. The path where the HTML will be generated
 #' @param interactivePlot logical type. Interactive or not
+#' @param .indexHTML character type. The back button will redirect to this link.
+#' This is typically used to redirect users back to index.html page
 #'
 #' @return path (including HTML name) where the report (HTML file) was saved to
 setGeneric(name = ".generateReport",
-           def = function(object, root, outputDir, interactivePlot = TRUE) {
+           def = function(object, root, outputDir, interactivePlot = TRUE, .indexHTML = "#") {
                standardGeneric(".generateReport")
            })
 
 setMethod(f = ".generateReport",
           signature = "CompositeRepertoire",
-          definition = function(object, root, outputDir, interactivePlot = TRUE) {
+          definition = function(object, root, outputDir, interactivePlot = TRUE, .indexHTML = "#") {
               if (rmarkdown::pandoc_available()) {
                   analysisDirectories = unlist(lapply(object@repertoires, function(x) {
                       # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
@@ -390,6 +392,7 @@ setMethod(f = ".generateReport",
                   # samples it it wasn't cleared in time
                   tmpTemplate <- file.path(outputDir, paste0(paste(sampleNames, collapse = "_vs_"), ".Rmd"))
                   file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"), tmpTemplate, overwrite = T)
+                  .substituteStringInFile(tmpTemplate, "href: \"#\"", paste0("href: \"", .indexHTML, "\""), fixed = T)
                   rmarkdown::render(tmpTemplate, params = renderParams)
                   file.remove(tmpTemplate)
                   return(sub(".Rmd", ".html", tmpTemplate))
@@ -403,7 +406,7 @@ setMethod(f = ".generateReport",
 
 setMethod(f = ".generateReport",
           signature = "Repertoire",
-          definition = function(object, root, outputDir, interactivePlot = TRUE) {
+          definition = function(object, root, outputDir, interactivePlot = TRUE, .indexHTML = "#") {
               if (rmarkdown::pandoc_available()) {
                   message(paste("Generating HTML report for", object@name))
                   analysisDirectory = file.path(object@outdir, RESULT_DIR, object@name)
@@ -451,6 +454,7 @@ setMethod(f = ".generateReport",
                   # samples it it wasn't cleared in time
                   tmpTemplate <- file.path(outputDir, paste0(object@name, ".Rmd"))
                   file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"), tmpTemplate, overwrite = T)
+                  .substituteStringInFile(tmpTemplate, "href: \"#\"", paste0("href: \"", .indexHTML, "\""), fixed = T)
                   rmarkdown::render(tmpTemplate, params = renderParams)
                   file.remove(tmpTemplate)
                   return(sub(".Rmd", ".html", tmpTemplate))
