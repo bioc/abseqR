@@ -565,7 +565,8 @@ frcdrMisGaps <- lapply(seq_along(titles), function(i) {
 })
 ```
 
-`r paste(knitr::knit(text = paste(frcdrMisGaps, collapse = "\n")))`
+
+
 
 <!--- Example of this knitr output:
 ### IGV
@@ -607,6 +608,7 @@ if (params$interactive) {
 -->
 
 <!--- TODO: fix legend && beware of missing samples when doing so -->
+
 ```{r abseq_vdj_gap_mismatch, echo = FALSE, eval = TRUE}
 if (params$inclD) {
     titles <- c("IGV", "IGD", "IGJ")
@@ -627,7 +629,9 @@ vdjMisGaps <- lapply(seq_along(titles), function(i) {
 })
 ```
 
+`r paste(knitr::knit(text = paste(frcdrMisGaps, collapse = "\n")))`
 `r paste(knitr::knit(text = paste(vdjMisGaps, collapse = "\n")))`
+
 
 
 Row {.tabset .tabset-fade}
