@@ -67,7 +67,7 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
         # due to the cache/shared user issue (see render() parallel github issue)
         # we delay the report generation until AFTER the multiprocessing part
         # has completed
-        AbSeq::plotRepertoires(samples, outputDir,
+        abseqR::plotRepertoires(samples, outputDir,
                                report = FALSE,
                                interactivePlot = FALSE)
     #})
@@ -186,7 +186,7 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
               sep = ",")
     }), collapse = filterSplitter)
 
-    templateFile <- system.file("extdata", "index.Rmd", package = "AbSeq")
+    templateFile <- system.file("extdata", "index.Rmd", package = "abseqR")
     renderParams <- list(
         singleSamples = paste(names(reports)[!multiSampleMask], collapse = ","),
         multiSamples = paste(names(reports)[multiSampleMask], collapse = ","),

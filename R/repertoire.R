@@ -391,7 +391,7 @@ setMethod(f = ".generateReport",
                   # sample name so that the cache will not clash with other
                   # samples it it wasn't cleared in time
                   tmpTemplate <- file.path(outputDir, paste0(paste(sampleNames, collapse = "_vs_"), ".Rmd"))
-                  file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"), tmpTemplate, overwrite = T)
+                  file.copy(system.file("extdata", "template.Rmd", package = "abseqR"), tmpTemplate, overwrite = T)
                   .substituteStringInFile(tmpTemplate, "href: \"#\"", paste0("href: \"", .indexHTML, "\""), fixed = T)
                   rmarkdown::render(tmpTemplate, params = renderParams)
                   file.remove(tmpTemplate)
@@ -453,7 +453,7 @@ setMethod(f = ".generateReport",
                   # sample name so that the cache will not clash with other
                   # samples it it wasn't cleared in time
                   tmpTemplate <- file.path(outputDir, paste0(object@name, ".Rmd"))
-                  file.copy(system.file("extdata", "template.Rmd", package = "AbSeq"), tmpTemplate, overwrite = T)
+                  file.copy(system.file("extdata", "template.Rmd", package = "abseqR"), tmpTemplate, overwrite = T)
                   .substituteStringInFile(tmpTemplate, "href: \"#\"", paste0("href: \"", .indexHTML, "\""), fixed = T)
                   rmarkdown::render(tmpTemplate, params = renderParams)
                   file.remove(tmpTemplate)
