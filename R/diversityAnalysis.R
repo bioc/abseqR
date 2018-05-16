@@ -872,6 +872,8 @@
 #' @param regions logical type. vector of FR/CDR regions to plot
 #' @param .save logical type. save ggplot object
 #'
+#' @import stringr
+#'
 #' @return none
 .aminoAcidPlot <- function(compositionDirectory, sampleName,
                            regions = c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3", "FR4"),
@@ -889,21 +891,24 @@
         .saveAs(.save, fname1, g1)
         .saveAs(.save, fname2, g2)
 
-        germlineSpecific <- list.files(path = dirName, pattern = paste0(sampleName, "_.+_cumulative_logo\\.csv(\\.gz)?$"), full.names = T)
+        germlineSpecific <-
+            list.files(path = dirName,
+                       pattern = paste0(sampleName,
+                                        "_.+_cumulative_logo\\.csv(\\.gz)?$"),
+                       full.names = T)
+
         lapply(germlineSpecific, function(gLogoFile) {
-            germName <-
-                sub(paste0(dirName, .Platform$file.sep),
-                    "",
-                    gsub(
-                        paste0(sampleName, "_(.*)_cumulative_logo\\.csv$"),
-                        "\\1",
-                        gLogoFile
-                    ))
+            germName <- sub("_cumulative_logo\\.csv(\\.gz)?$", "",
+                            stringr::str_extract(gLogoFile, "IG[HKL][VDJ].*"))
             df <- read.csv(gLogoFile)
             g1 <- .aminoAcidBar(df, scale = F, region, germ = germName)
             g2 <- .aminoAcidBar(df, scale = T, region, germ = germName)
-            fname1 <- file.path(dirName, paste0(sampleName, "_", germName, "_cumulative_logo.png"))
-            fname2 <- file.path(dirName, paste0(sampleName, "_", germName, "_cumulative_logo_scaled.png"))
+            fname1 <- file.path(dirName,
+                                paste0(sampleName, "_",
+                                       germName, "_cumulative_logo.png"))
+            fname2 <- file.path(dirName,
+                                paste0(sampleName, "_",
+                                       germName, "_cumulative_logo_scaled.png"))
             ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
             ggsave(fname2, plot = g2, width = V_WIDTH, height = V_HEIGHT)
             .saveAs(.save, fname1, g1)
