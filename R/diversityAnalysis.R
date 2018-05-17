@@ -846,13 +846,14 @@
     # MINISECTION:
     # ## COMPOSITION LOGOS ###
     if (length(sampleNames) == 1) {
+        compDir <- file.path(diversityDirectories[[1]], "composition_logos")
         compOut <- file.path(diversityOut, "composition_logos")
         if (!file.exists(compOut)) {
             dir.create(compOut)
         }
         message(paste("Plotting composition logos on samples",
                 paste(sampleNames, collapse = ", ")))
-        .aminoAcidPlot(compOut, sampleNames[1])
+        .aminoAcidPlot(compDir, compOut, sampleNames[1])
     }
 
     # we can plot region analysis if there's only one sample
@@ -868,22 +869,30 @@
 #' Composition logo plot
 #'
 #' @param compositionDirectory string type.
+#' @param outdir string type.
 #' @param sampleName string type.
 #' @param regions logical type. vector of FR/CDR regions to plot
 #' @param .save logical type. save ggplot object
 #'
 #' @return none
-.aminoAcidPlot <- function(compositionDirectory, sampleName,
+.aminoAcidPlot <- function(compositionDirectory, outdir, sampleName,
                            regions = c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3", "FR4"),
                            .save = T) {
     for (region in regions) {
+        # todo: change dirname such that compositionDirectory and outdir
+        # is differentiated!
         dirName <- file.path(compositionDirectory, region)
+        outputPath <- file.path(outdir, region)
+        if (!dir.exists(outputPath)) {
+            dir.create(outputPath)
+        }
+
         summaryPlot <- file.path(dirName, paste0(sampleName, "_cumulative_logo.csv"))
         df <- read.csv(summaryPlot)
         g1 <- .aminoAcidBar(df, scale = F, region)
         g2 <- .aminoAcidBar(df, scale = T, region)
-        fname1 <- file.path(dirName, paste0(sampleName, "_cumulative_logo.png"))
-        fname2 <- file.path(dirName, paste0(sampleName, "_cumulative_logo_scaled.png"))
+        fname1 <- file.path(outputPath, paste0(sampleName, "_cumulative_logo.png"))
+        fname2 <- file.path(outputPath, paste0(sampleName, "_cumulative_logo_scaled.png"))
         ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
         ggsave(fname2, plot = g2, width = V_WIDTH, height = V_HEIGHT)
         .saveAs(.save, fname1, g1)
@@ -902,8 +911,8 @@
             df <- read.csv(gLogoFile)
             g1 <- .aminoAcidBar(df, scale = F, region, germ = germName)
             g2 <- .aminoAcidBar(df, scale = T, region, germ = germName)
-            fname1 <- file.path(dirName, paste0(sampleName, "_", germName, "_cumulative_logo.png"))
-            fname2 <- file.path(dirName, paste0(sampleName, "_", germName, "_cumulative_logo_scaled.png"))
+            fname1 <- file.path(outputPath, paste0(sampleName, "_", germName, "_cumulative_logo.png"))
+            fname2 <- file.path(outputPath, paste0(sampleName, "_", germName, "_cumulative_logo_scaled.png"))
             ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
             ggsave(fname2, plot = g2, width = V_WIDTH, height = V_HEIGHT)
             .saveAs(.save, fname1, g1)
