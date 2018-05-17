@@ -106,12 +106,12 @@ values are either \code{imgt} or \code{kabat}.}
 \examples{
 \dontrun{
 # this class is (usually) not directly constructed by users, but as a return
-# value from the \\code{abSeqPlot} method.
-samples <- abSeqPlot("/path/to/output/directory/")
-samples[[1]]@name     # gives the name of the first repertoire object returned by abSeqPlot
+# value from the abseqPlot method.
+samples <- abseqPlot("/path/to/output/directory/")
+samples[[1]]@name     # gives the name of the first repertoire object returned by abseqPlot
 }
 }
 \seealso{
-\code{\link{abSeqPlot}} returns a \code{list} of \code{Repertoire}
+\code{\link{abseqPlot}} returns a \code{list} of \code{Repertoire}
 objects.
 }
