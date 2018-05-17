@@ -106,7 +106,7 @@ values are either \code{imgt} or \code{kabat}.}
 \examples{
 \dontrun{
 # this class is (usually) not directly constructed by users, but as a return
-# value from the \\code{abSeqPlot} method.
+# value from the abSeqPlot method.
 samples <- abSeqPlot("/path/to/output/directory/")
 samples[[1]]@name     # gives the name of the first repertoire object returned by abSeqPlot
 }

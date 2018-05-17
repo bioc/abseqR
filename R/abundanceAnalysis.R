@@ -59,10 +59,11 @@
 #' @import RColorBrewer
 #'
 #' @param sampleName string type
-#' @param path string type
+#' @param path string type. Path to _vjassoc.csv
+#' @param outputdir string type
 #'
 #' @return None
-.plotCirclize <- function(sampleName, path) {
+.plotCirclize <- function(sampleName, path, outputdir) {
     filename <- file.path(path, paste0(sampleName, "_vjassoc.csv"))
 
     message(paste("Plotting V-J association for", sampleName))
@@ -71,7 +72,12 @@
         df <- read.csv(filename)
 
         # output file
-        png(gsub(".csv", ".png", filename), width = V_WIDTH, height = V_HEIGHT,
+        outputFileName <- file.path(outputdir, gsub(".csv",
+                                                    ".png",
+                                                    basename(filename),
+                                                    fixed = T))
+
+        png(outputFileName, width = V_WIDTH, height = V_HEIGHT,
             units = "in", res = 1200, pointsize = 10)
 
         # circos theme setup
@@ -204,6 +210,6 @@
 
     if (length(sampleNames) == 1) {
         # we can plot circlize if there's only one sample
-        .plotCirclize(sampleNames[1], abunOut)
+        .plotCirclize(sampleNames[1], abundanceDirectories[[1]], abunOut)
     }
 }

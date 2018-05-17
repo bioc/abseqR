@@ -21,7 +21,8 @@ Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.
 for more information.}
 }
 \value{
-list type. List of \linkS4class{Repertoire} objects
+named list. List of \linkS4class{Repertoire} objects. The names of
+the list are taken directly from the repertoire object itself.
 }
 \description{
 Plots all samples and comparisons as specified in \code{abseq.cfg}

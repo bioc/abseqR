@@ -29,7 +29,7 @@ ABSEQ_NESTED_HTML_DIR <- "html_files"
 ANALYSIS_PARAMS <- "analysis.params"
 
 # sample comparison configuration file - only used in AbSeqR (to know what
-# samples must be compared against each other when abSeqPlot() is called)
+# samples must be compared against each other when abseqPlot() is called)
 ABSEQ_CFG <- "abseq.cfg"
 
 # AbSeq's summary file about the repertoire - raw/annot/prod counts
