@@ -70,8 +70,8 @@ abseqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
         # we delay the report generation until AFTER the multiprocessing part
         # has completed
         abseqR::plotRepertoires(samples, outputDir,
-                               report = FALSE,
-                               interactivePlot = FALSE)
+                                report = FALSE,
+                                interactivePlot = FALSE)
     #})
     }, BPPARAM = BPPARAM)
 
@@ -106,7 +106,7 @@ abseqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
             if (normalizePath(samples@outdir) != root) {
                 samples@outdir <- root
             }
-            individualSamples[samples@name] <- samples
+            individualSamples[[samples@name]] <- samples
         } else {
             outputDir <- file.path(root, RESULT_DIR, paste(sampleNames, collapse = "_vs_"))
             samples <- Reduce("+",
