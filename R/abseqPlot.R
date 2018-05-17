@@ -13,12 +13,14 @@
 #' Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.html}{BiocParallel}
 #' for more information.
 #'
-#' @return list type. List of \linkS4class{Repertoire} objects
+#' @return named list. List of \linkS4class{Repertoire} objects. The names of
+#' the list are taken directly from the repertoire object itself.
+#'
 #' @seealso \linkS4class{Repertoire}
 #' @export
 #'
 #' @examples todo
-abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
+abseqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
                       BPPARAM = BiocParallel::bpparam()) {
     if (!report && interactivePlot) {
         warning("report is set to FALSE, ignoring interactivePlots argument")
@@ -68,8 +70,8 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
         # we delay the report generation until AFTER the multiprocessing part
         # has completed
         abseqR::plotRepertoires(samples, outputDir,
-                               report = FALSE,
-                               interactivePlot = FALSE)
+                                report = FALSE,
+                                interactivePlot = FALSE)
     #})
     }, BPPARAM = BPPARAM)
 
@@ -104,7 +106,7 @@ abSeqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
             if (normalizePath(samples@outdir) != root) {
                 samples@outdir <- root
             }
-            individualSamples <- c(individualSamples, samples)
+            individualSamples[[samples@name]] <- samples
         } else {
             outputDir <- file.path(root, RESULT_DIR, paste(sampleNames, collapse = "_vs_"))
             samples <- Reduce("+",
