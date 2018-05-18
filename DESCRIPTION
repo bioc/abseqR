@@ -37,5 +37,5 @@ Collate:
     'plotter.R'
     'compositeRepertoire.R'
     'repertoire.R'
-    'abseqPlot.R'
+    'abseqReport.R'
 SystemRequirements: pandoc
