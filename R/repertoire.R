@@ -140,47 +140,103 @@ Repertoire <- setClass("Repertoire", slots = c(
 }
 
 
-#' Title
+#' Combines 2 \linkS4class{Repertoire} objects together for comparison
 #'
 #' @include compositeRepertoire.R
 #'
-#' @param e1 Repertoire.
-#' @param e2 Repertoire.
+#' @param e1 Repertoire object.
+#' @param e2 Repertoire object.
 #'
-#' @return
+#' @return \linkS4class{CompositeRepertoire} object. Calling \code{abseqR}'s
+#' functions on this object will always result in a comparison.
+#'
 #' @export
 #'
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}s
+#'
 #' @examples
+#' \dontrun{
+#' # 'load' Repertoire objects using abseqReport (ignoring plots, report, etc..)
+#' # also assumes there's a result/ directory in current working directory,
+#' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
+#' samples <- abseqReport("results")
+#'
+#' # assuming there are samples named "Sample1" and "Sample3"
+#' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
+#'
+#' # generate plots and report for this new comparison
+#' plotRepertoires(S1S3, "s1_vs_s3")
+#' }
 setMethod("+", signature(e1 = "Repertoire", e2 = "Repertoire"), function(e1, e2) {
     new("CompositeRepertoire", repertoires = list(e1, e2))
 })
 
-#' Title
+#' Combines a \linkS4class{CompositeRepertoire} object with
+#' a \linkS4class{Repertoire} object together for comparison
 #'
 #' @include compositeRepertoire.R
 #'
 #' @param e1 CompositeRepertoire.
 #' @param e2 Repertoire.
 #'
-#' @return
+#' @return \linkS4class{CompositeRepertoire} object. Calling \code{abseqR}'s
+#' functions on this object will always result in a comparison.
+#'
 #' @export
 #'
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}s
+#'
 #' @examples
+#' \dontrun{
+#' # 'load' Repertoire objects using abseqReport (ignoring plots, report, etc..)
+#' # also assumes there's a result/ directory in current working directory,
+#' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
+#' samples <- abseqReport("results")
+#'
+#' # assuming there are samples named "Sample1", "Sample3", and "Sample4"
+#' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
+#' S4 <- samples[["Sample4"]]
+#'
+#' S1S3S4 <- S1S3 + S4
+#'
+#' # generate plots and report for this new comparison
+#' plotRepertoires(S1S3S4, "s1_vs_s3_vs_s4")
+#' }
 setMethod("+", signature(e1 = "CompositeRepertoire", e2 = "Repertoire"), function(e1, e2) {
     new("CompositeRepertoire", repertoires = unique(c(e1@repertoires, e2)))
 })
 
-#' Title
+#' Combines a \linkS4class{Repertoire} object with
+#' a \linkS4class{CompositeRepertoire} object together for comparison
 #'
 #' @include compositeRepertoire.R
 #'
 #' @param e1 Repertoire.
 #' @param e2 CompositeRepertoire.
 #'
-#' @return
+#' @return \linkS4class{CompositeRepertoire} object. Calling \code{abseqR}'s
+#' functions on this object will always result in a comparison.
+#'
 #' @export
 #'
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}s
+#'
 #' @examples
+#' \dontrun{
+#' # 'load' Repertoire objects using abseqReport (ignoring plots, report, etc..)
+#' # also assumes there's a result/ directory in current working directory,
+#' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
+#' samples <- abseqReport("results")
+#'
+#' # assuming there are samples named "Sample1", "Sample3", and "Sample4"
+#' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
+#' S4 <- samples[["Sample4"]]
+#'
+#' S4S1S3 <- S4 + S1S3
+#'
+#' # generate plots and report for this new comparison
+#' plotRepertoires(S4S1S3, "s4_vs_s1_vs_s3")
+#' }
 setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), function(e1, e2) {
     new("CompositeRepertoire", repertoires = unique(c(e1, e2@repertoires)))
 })
