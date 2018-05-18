@@ -135,7 +135,7 @@
         title = ylabel
     )
 
-    s <- subplot(plot_ly(x = as.numeric(colnames(m)),
+    s <- suppressMessages(subplot(plot_ly(x = as.numeric(colnames(m)),
                          y = x,
                          type = "bar",
                          color = I("DarkBlue")),
@@ -150,7 +150,7 @@
                  nrows = 2, heights = c(0.2, 0.8),
                  widths = c(0.8, 0.2), margin = 0, shareX = T,
                  shareY = T, titleX = F, titleY = F
-    )
+    ))
     return(plotly::layout(s, title = title, showlegend = F, xaxis = xax, yaxis = yax))
     # non interactive version:
     # library(ComplexHeatmap)
