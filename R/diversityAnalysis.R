@@ -736,9 +736,9 @@
                                                "_rarefaction\\.csv(\\.gz)?$"))
         if (length(searchFiles) > 0) {
             # plot rarefaction
-            g <- suppressWarnings(.plotRarefaction(searchFiles,
+            g <- .plotRarefaction(searchFiles,
                                  sampleNames,
-                                 includedRegions))
+                                 includedRegions)
             saveName <- file.path(diversityOut, paste0(mashedNames, "_", reg, "_rarefaction.png"))
             ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
             .saveAs(.save, saveName, g)
@@ -752,9 +752,9 @@
                                                "_recapture\\.csv(\\.gz)?$"))
         if (length(searchFiles) > 0) {
             # plot recapture
-            g <- suppressWarnings(.plotRecapture(searchFiles,
+            g <- .plotRecapture(searchFiles,
                                sampleNames,
-                               includedRegions))
+                               includedRegions)
             saveName <- file.path(diversityOut, paste0(mashedNames, "_", reg, "_recapture.png"))
             ggsave(saveName,
                    plot = g,
