@@ -115,6 +115,105 @@
 }
 
 
+#' Plots a plotly heatmap from provided matrix
+#'
+#' @param m matrix type
+#' @param title character type
+#' @param xlabel character type
+#' @param ylabel character type
+#'
+#' @return None
+#' @importFrom plotly subplot plot_ly plotly_empty layout
+.hmFromMatrix <- function(m, title, xlabel = "", ylabel = "") {
+    x <- colSums(m)
+    y <- rowSums(m)
+
+    xax <- list(
+        title = xlabel
+    )
+    yax <- list(
+        title = ylabel
+    )
+
+    s <- suppressMessages(subplot(plot_ly(x = as.numeric(colnames(m)),
+                         y = x,
+                         type = "bar",
+                         color = I("DarkBlue")),
+                 plotly_empty(),
+                 plot_ly(x = as.numeric(colnames(m)),
+                         y = as.numeric(rownames(m)),
+                         z = m,
+                         type = "heatmap"),
+                 plot_ly(y = as.numeric(rownames(m)), x = y,
+                         type = "bar", orientation = "h",
+                         color = I("DarkBlue")),
+                 nrows = 2, heights = c(0.2, 0.8),
+                 widths = c(0.8, 0.2), margin = 0, shareX = T,
+                 shareY = T, titleX = F, titleY = F
+    ))
+    return(plotly::layout(s, title = title, showlegend = F, xaxis = xax, yaxis = yax))
+    # non interactive version:
+    # library(ComplexHeatmap)
+    # library(ggExtra)
+    #
+    # mat <- m
+    #
+    # ha1 <- HeatmapAnnotation(dist1 = anno_barplot(colSums(mat), bar_width = 1,
+    #                          border = FALSE,
+    #                          axis = TRUE))
+    # ha2 <- rowAnnotation(dist2 = anno_barplot(rowSums(mat), bar_width = 1,
+    #                      border = FALSE,
+    #                      axis = TRUE, which = "row"), width = unit(1, "cm"))
+    #
+    # g <- Heatmap(mat, name = "cases", cluster_columns = F,
+    #         show_row_dend = F, show_column_names = T,
+    #         row_names_side = "left", column_title = "Testing title",
+    #         top_annotation = ha1, top_annotation_height = unit(1, "cm")) +
+    #     ha2
+}
+
+
+#' Plots all 5 alignment quality heatmaps
+#'
+#' @description Plots alignment quality vs:
+#' \itemize{
+#'   \item{mismatches}
+#'   \item{gaps}
+#'   \item{bitscore}
+#'   \item{percent identity}
+#'   \item{subject start}
+#' }
+#'
+#' @param abundanceDirectory character type.
+#' fully qualified path to abundance directory
+#' @param sampleName character type. sample name
+#'
+#' @include util.R
+#'
+#' @return list of ggplotly heatmaps
+.alignQualityHeatMaps <- function(abundanceDirectory, sampleName) {
+    qualityMeasure <- c("mismatches", "gaps", "bitscore", "identity", "start")
+    lapply(qualityMeasure, function(qual) {
+        heatmapFile <- file.path(abundanceDirectory, paste0(sampleName, "_igv_align_quality_", qual, "_hm.tsv"))
+        if (length(heatmapFile)) {
+            mat <- as.matrix(read.table(heatmapFile, skip = 1, check.names = F))
+            if (qual == "identity") {
+                qual <- "%Identity"
+            } else if (qual == "start") {
+                qual <- "Subject start"
+            }
+            totalCount <- .getTotal(heatmapFile)
+            p <- .hmFromMatrix(mat,
+                               title = paste("Alignment Quality of", sampleName, "\nTotal is", totalCount),
+                               xlabel = "Alignment Length",
+                               ylabel = qual)
+            .saveAs(T, heatmapFile, plot = p)
+            return(p)
+        }
+    })
+}
+
+
 #' Conducts abundance analysis
 #'
 #' @import ggplot2
@@ -211,5 +310,7 @@
     if (length(sampleNames) == 1) {
         # we can plot circlize if there's only one sample
         .plotCirclize(sampleNames[1], abundanceDirectories[[1]], abunOut)
+        # alignment quality heatmaps
+        .alignQualityHeatMaps(abundanceDirectories, sampleNames[1])
     }
 }

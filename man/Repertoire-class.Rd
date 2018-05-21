@@ -17,7 +17,7 @@ run conducted on it. For further information, refer to AbSeq's python help.
 \describe{
 \item{\code{f1}}{character. Path to FASTA/FASTQ file 1.}
 
-\item{\code{f2}}{character. Path to FASTA/FASTQ file 1.}
+\item{\code{f2}}{character. Path to FASTA/FASTQ file 2.}
 
 \item{\code{chain}}{character. Type of chain, possible values:
 \itemize{
@@ -106,12 +106,12 @@ values are either \code{imgt} or \code{kabat}.}
 \examples{
 \dontrun{
 # this class is (usually) not directly constructed by users, but as a return
-# value from the abseqPlot method.
-samples <- abseqPlot("/path/to/output/directory/")
-samples[[1]]@name     # gives the name of the first repertoire object returned by abseqPlot
+# value from the abseqReport method.
+samples <- abseqReport("/path/to/output/directory/")
+samples[[1]]@name     # gives the name of the first repertoire object returned by abseqReport
 }
 }
 \seealso{
-\code{\link{abseqPlot}} returns a \code{list} of \code{Repertoire}
+\code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}
 objects.
 }

@@ -4,7 +4,7 @@
 #' run conducted on it. For further information, refer to AbSeq's python help.
 #'
 #' @slot f1 character. Path to FASTA/FASTQ file 1.
-#' @slot f2 character. Path to FASTA/FASTQ file 1.
+#' @slot f2 character. Path to FASTA/FASTQ file 2.
 #' @slot chain character. Type of chain, possible values:
 #' \itemize{
 #'   \item{hv}
@@ -62,7 +62,7 @@
 #' @slot domainSystem character. Domain system to use in IgBLAST, possible
 #' values are either \code{imgt} or \code{kabat}.
 #' @slot primer numeric. Dummy value - not implemented yet.
-#' @seealso \code{\link{abseqPlot}} returns a \code{list} of \code{Repertoire}
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}
 #' objects.
 #' @return none
 #' @export
@@ -70,9 +70,9 @@
 #' @examples
 #' \dontrun{
 #' # this class is (usually) not directly constructed by users, but as a return
-#' # value from the abseqPlot method.
-#' samples <- abseqPlot("/path/to/output/directory/")
-#' samples[[1]]@name     # gives the name of the first repertoire object returned by abseqPlot
+#' # value from the abseqReport method.
+#' samples <- abseqReport("/path/to/output/directory/")
+#' samples[[1]]@name     # gives the name of the first repertoire object returned by abseqReport
 #' }
 Repertoire <- setClass("Repertoire", slots = c(
     f1 = "character",
@@ -140,47 +140,103 @@ Repertoire <- setClass("Repertoire", slots = c(
 }
 
 
-#' Title
+#' Combines 2 \linkS4class{Repertoire} objects together for comparison
 #'
 #' @include compositeRepertoire.R
 #'
-#' @param e1 Repertoire.
-#' @param e2 Repertoire.
+#' @param e1 Repertoire object.
+#' @param e2 Repertoire object.
 #'
-#' @return
+#' @return \linkS4class{CompositeRepertoire} object. Calling \code{abseqR}'s
+#' functions on this object will always result in a comparison.
+#'
 #' @export
 #'
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}s
+#'
 #' @examples
+#' \dontrun{
+#' # 'load' Repertoire objects using abseqReport (ignoring plots, report, etc..)
+#' # also assumes there's a result/ directory in current working directory,
+#' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
+#' samples <- abseqReport("results")
+#'
+#' # assuming there are samples named "Sample1" and "Sample3"
+#' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
+#'
+#' # generate plots and report for this new comparison
+#' plotRepertoires(S1S3, "s1_vs_s3")
+#' }
 setMethod("+", signature(e1 = "Repertoire", e2 = "Repertoire"), function(e1, e2) {
     new("CompositeRepertoire", repertoires = list(e1, e2))
 })
 
-#' Title
+#' Combines a \linkS4class{CompositeRepertoire} object with
+#' a \linkS4class{Repertoire} object together for comparison
 #'
 #' @include compositeRepertoire.R
 #'
 #' @param e1 CompositeRepertoire.
 #' @param e2 Repertoire.
 #'
-#' @return
+#' @return \linkS4class{CompositeRepertoire} object. Calling \code{abseqR}'s
+#' functions on this object will always result in a comparison.
+#'
 #' @export
 #'
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}s
+#'
 #' @examples
+#' \dontrun{
+#' # 'load' Repertoire objects using abseqReport (ignoring plots, report, etc..)
+#' # also assumes there's a result/ directory in current working directory,
+#' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
+#' samples <- abseqReport("results")
+#'
+#' # assuming there are samples named "Sample1", "Sample3", and "Sample4"
+#' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
+#' S4 <- samples[["Sample4"]]
+#'
+#' S1S3S4 <- S1S3 + S4
+#'
+#' # generate plots and report for this new comparison
+#' plotRepertoires(S1S3S4, "s1_vs_s3_vs_s4")
+#' }
 setMethod("+", signature(e1 = "CompositeRepertoire", e2 = "Repertoire"), function(e1, e2) {
     new("CompositeRepertoire", repertoires = unique(c(e1@repertoires, e2)))
 })
 
-#' Title
+#' Combines a \linkS4class{Repertoire} object with
+#' a \linkS4class{CompositeRepertoire} object together for comparison
 #'
 #' @include compositeRepertoire.R
 #'
 #' @param e1 Repertoire.
 #' @param e2 CompositeRepertoire.
 #'
-#' @return
+#' @return \linkS4class{CompositeRepertoire} object. Calling \code{abseqR}'s
+#' functions on this object will always result in a comparison.
+#'
 #' @export
 #'
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}s
+#'
 #' @examples
+#' \dontrun{
+#' # 'load' Repertoire objects using abseqReport (ignoring plots, report, etc..)
+#' # also assumes there's a result/ directory in current working directory,
+#' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
+#' samples <- abseqReport("results")
+#'
+#' # assuming there are samples named "Sample1", "Sample3", and "Sample4"
+#' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
+#' S4 <- samples[["Sample4"]]
+#'
+#' S4S1S3 <- S4 + S1S3
+#'
+#' # generate plots and report for this new comparison
+#' plotRepertoires(S4S1S3, "s4_vs_s1_vs_s3")
+#' }
 setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), function(e1, e2) {
     new("CompositeRepertoire", repertoires = unique(c(e1, e2@repertoires)))
 })
@@ -463,60 +519,3 @@ setMethod(f = ".generateReport",
                   return(NA)
               }
          })
-
-#' Produces a named list of \linkS4class{Repertoire} object(s)
-#'
-#' @param directory character type. This should be the same string as the
-#' argument provided to \code{abseqPy}'s \code{-o} or \code{--outdir}.
-#'
-#' @return named list of \linkS4class{Repertoire} objects. The names of the list
-#' is the exact string used to name each repertoire object.
-#'
-#' @include util.R
-#'
-#' @seealso \linkS4class{Repertoire}
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # assuming abseqPy was run with -o results (or --outdir results)
-#' samples <- fromDir("results")
-#' }
-fromDir <- function(directory) {
-    resultDirectories <- list.files(path = file.path(directory, RESULT_DIR),
-                                    full.names = T)
-
-    # by now, all "CompositeRepertoire" directories are ignored because they do
-    # not contain analysis.params, only "Repertoire" objects are left
-    paramFiles <- list.files(path = resultDirectories,
-                             pattern = ANALYSIS_PARAMS,
-                             full.names = T)
-
-    repositories <- lapply(paramFiles, .loadRepertoireFromParams)
-
-    root <- normalizePath(directory)
-
-    # make sure that output director is up to date, and give user a warning
-    # message if we detect that the output directory has changed location.
-    sanitizedRepositories <- lapply(repositories, function(repo) {
-        if (normalizePath(repo@outdir) != root) {
-            # perhaps the user changed the output directory?
-            warning(paste("Output directory of", repo@name, "is listed as",
-                          repo@outdir, "but provided output directory is",
-                          directory,
-                          ". Overriding output directory to provided value."))
-            warning(paste("You should only see this warning message",
-                          "if you've changed the output directory's location."))
-            repo@outdir <- root
-        }
-        return(repo)
-    })
-
-    # name the list by sample name
-    names(sanitizedRepositories) <- unlist(lapply(sanitizedRepositories, function(rep) {
-        return(rep@name)
-    }))
-
-    return(sanitizedRepositories)
-}

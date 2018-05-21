@@ -6,9 +6,16 @@
 #'
 #' @param root string type. Root directory as specified in
 #' \code{-o} or \code{--outdir} in AbSeqPy.
-#' @param report logical type. Generate HTML report(s) for sample(s)?
-#' @param interactivePlot logical type. Use interactive plots (plotly) when generating
-#' HTML report? (This argument is ignored if \code{report} is \code{FALSE})
+#' @param report integer type. The possible values are:
+#' \itemize{
+#'   \item{0 - does nothing (returns named list of \linkS4class{Repertoire} objects)}
+#'   \item{1 - generates plots for csv files}
+#'   \item{2 - generates a report that collates all plots}
+#'   \item{3 - generates interactive plots in report}
+#' }
+#' each value also does what the previous values do. For example, \code{report = 2}
+#' will return a named list of \linkS4class{Repertoire} objects, plot csv files,
+#' and generate a (non-interactive)HTML report that collates all the plots together.
 #' @param BPPARAM BiocParallel backend. Configures the parallel implementation.
 #' Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.html}{BiocParallel}
 #' for more information.
@@ -19,11 +26,26 @@
 #' @seealso \linkS4class{Repertoire}
 #' @export
 #'
-#' @examples todo
-abseqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
-                      BPPARAM = BiocParallel::bpparam()) {
-    if (!report && interactivePlot) {
-        warning("report is set to FALSE, ignoring interactivePlots argument")
+#' @examples
+abseqReport <- function(root, report = 3, BPPARAM = BiocParallel::bpparam()) {
+    # TODO: sanitize report properly using constants/functions
+    stopifnot(report %in% c(0, 1, 2, 3))
+    if (report == 0) {
+        report <- FALSE
+        interactivePlot <- FALSE
+        loop <- FALSE
+    } else if (report == 1) {
+        report <- FALSE
+        interactivePlot <- FALSE
+        loop <- TRUE
+    } else if (report == 2) {
+        report <- TRUE
+        interactivePlot <- FALSE
+        loop <- TRUE
+    } else {
+        report <- TRUE
+        interactivePlot <- TRUE
+        loop <- TRUE
     }
 
     root <- normalizePath(root)
@@ -33,47 +55,46 @@ abseqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
     pairings <- tail(readLines(con), n = -1)
     close(con)
 
-    #lapply(pairings, function(pair) {
-    BiocParallel::bplapply(pairings, function(pair) {
-        sampleNames <- unlist(strsplit(pair, ","))
+    if (loop) {
+        #lapply(pairings, function(pair) {
+        BiocParallel::bplapply(pairings, function(pair) {
+            sampleNames <- unlist(strsplit(pair, ","))
 
-        # depending on the number of samples requested to plot, outputDir
-        # is either a <sample>_vs_<sample> format or just <sample> meanwhile,
-        # samples will either be a CompositeRepertoire or just Repertoire.
-        if (length(sampleNames) > 1) {
-            outputDir <- file.path(root, RESULT_DIR, paste(sampleNames, collapse = "_vs_"))
-            samples <- Reduce("+",
-                              lapply(sampleNames, function(sampleName) {
-                                  sample_ <- .loadRepertoireFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
-                                  # sample@outdir should be the same as root
-                                  if (normalizePath(sample_@outdir) != root) {
-                                      message(
-                                          paste(
-                                              "Sample output directory is different from provided",
-                                              "path, assuming directory was moved"
-                                          )
-                                      )
-                                      sample_@outdir <- root
-                                  }
-                                  return(sample_)
-                              }))
-        } else {
-            outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
-            samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
-            if (normalizePath(samples@outdir) != root) {
-                message(paste("Sample output directory is different from provided",
-                        "path, assuming directory was moved"))
-                samples@outdir <- root
+            # depending on the number of samples requested to plot, outputDir
+            # is either a <sample>_vs_<sample> format or just <sample> meanwhile,
+            # samples will either be a CompositeRepertoire or just Repertoire.
+            if (length(sampleNames) > 1) {
+                outputDir <- file.path(root, RESULT_DIR, paste(sampleNames, collapse = "_vs_"))
+                samples <- Reduce("+", lapply(sampleNames, function(sampleName) {
+                    sample_ <- .loadRepertoireFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
+                    # sample@outdir should be the same as root
+                    if (normalizePath(sample_@outdir) != root) {
+                        warning(paste("Sample output directory", sample_@outdir,
+                                      "is different from provided path", root,
+                                      "assuming directory was moved"))
+                        sample_@outdir <- root
+                    }
+                    return(sample_)
+                }))
+            } else {
+                outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
+                samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
+                if (normalizePath(samples@outdir) != root) {
+                    warning(paste("Sample output directory", samples@outdir,
+                                  "is different from provided path", root,
+                                  "assuming directory was moved"))
+                    samples@outdir <- root
+                }
             }
-        }
-        # due to the cache/shared user issue (see render() parallel github issue)
-        # we delay the report generation until AFTER the multiprocessing part
-        # has completed
-        abseqR::plotRepertoires(samples, outputDir,
-                                report = FALSE,
-                                interactivePlot = FALSE)
-    #})
-    }, BPPARAM = BPPARAM)
+            # due to the cache/shared user issue (see render() parallel github issue)
+            # we delay the report generation until AFTER the multiprocessing part
+            # has completed
+            abseqR::plotRepertoires(samples, outputDir,
+                                    report = FALSE,
+                                    interactivePlot = FALSE)
+        #})
+        }, BPPARAM = BPPARAM)
+    }
 
     # before we start creating reports, create the report directory
     if (report) {
@@ -104,6 +125,9 @@ abseqPlot <- function(root, report = TRUE, interactivePlot = TRUE,
             outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
             samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
             if (normalizePath(samples@outdir) != root) {
+                warning(paste("Sample output directory", samples@outdir,
+                              "is different from provided path", root,
+                              "assuming directory was moved"))
                 samples@outdir <- root
             }
             individualSamples[[samples@name]] <- samples
