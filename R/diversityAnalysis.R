@@ -51,9 +51,6 @@
 .scatterPlotComplex <- function(df1, df2, name1, name2, cloneClass) {
     message(paste("Generating scatter plot for", name1, "and", name2))
 
-    df1 <- head(df1, 30000)
-    df2 <- head(df2, 30000)
-
     df1$prop <- df1$Count / sum(df1$Count)
     df2$prop <- df2$Count / sum(df2$Count)
 
