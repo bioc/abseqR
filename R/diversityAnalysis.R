@@ -47,6 +47,11 @@
 #' What region was used to classify clonotypes - appears in title. For example,
 #' CDR3 or V region
 #'
+#' this plotting techique was
+#' shamelessly plagarised from
+#' https://github.com/mikessh/vdjtools/blob/master/src/main/resources/rscripts/intersect_pair_scatter.r
+#' (VDJTools) with minor modifications
+#'
 #' @return ggplot2 object
 .scatterPlotComplex <- function(df1, df2, name1, name2, cloneClass) {
     message(paste("Generating scatter plot for", name1, "and", name2))
@@ -66,16 +71,14 @@
     df.union <- merge(df1, df2, by = "Clonotype", all.y = TRUE, all.x = TRUE)
 
     intersectingClones <- df.union[complete.cases(df.union), "Clonotype"]
-    # TODO: remove this line!!
-    stopifnot(length(intersectingClones) == length(intersect(df1$Clonotype, df2$Clonotype)))
 
     df.union[is.na(df.union)] <- log10(smallestPercentage * 1e-1)
 
     xmin <- min(df.union$prop.x)
     ymin <- min(df.union$prop.y)
 
-    sample1.margin <- .cloneDist(df1, intersectingClones, xmin, flip = F)
-    sample2.margin <- .cloneDist(df2, intersectingClones, ymin, flip = T)
+    sample1.margin <- .cloneDistMarginal(df1, intersectingClones, xmin, flip = F)
+    sample2.margin <- .cloneDistMarginal(df2, intersectingClones, ymin, flip = T)
 
     g <- ggplot(df.union, aes(x = prop.x, y = prop.y)) +
         theme_bw() +
@@ -87,15 +90,15 @@
         scale_size_continuous(guide = "none", range = c(1, 10)) +
         scale_x_continuous(limit = c(xmin, 0), expand = c(0, 0.1)) +
         scale_y_continuous(limit = c(ymin, 0), expand = c(0, 0.1)) +
-        stat_smooth(data = df.union, aes(prop.x, prop.y,
-                                         weight = 10^((prop.x + prop.y) / 2)),
-                    color = "blue", method = "lm", fullrange = T, se = T) +
+        # geom_smooth(method = "lm", se = T, fullrange = T) +
+        # stat_smooth(data = df.union, aes(prop.x, prop.y,
+        #                                  weight = 10^((prop.x + prop.y) / 2)),
+        #             color = "blue", method = "lm", fullrange = T, se = T) +
         labs(y = name2, x = name1)
     grid.arrange(sample1.margin, .emptyPlot(), g, sample2.margin,
                  ncol = 2, nrow = 2, widths = c(4, 1), heights = c(1, 4),
-                 top = paste("Scatter plot of ", cloneClass,
-                             " clonotype counts\n", paste(name2, " vs ", name1,
-                             " plot based on clonotype frequencies")))
+                 top = paste("Scatter plot of", cloneClass, "clonotype frequencies\n", name2, "vs", name1)
+    )
 }
 
 #' Marginal density graph of clonotypes (blue for shared, grey for total)
@@ -109,7 +112,7 @@
 #' @param flip
 #'
 #' @return ggplot2 object
-.cloneDist <- function(df.original, otherClones, lim.min, flip) {
+.cloneDistMarginal <- function(df.original, otherClones, lim.min, flip) {
     df.filtered <- df.original[df.original$Clonotype %in% otherClones, ]
     g <- ggplot() +
         stat_density(data = df.original, aes(x = prop, y = ..scaled..),
@@ -118,6 +121,39 @@
         stat_density(data = df.filtered, aes(x = prop, y = ..scaled..),
                      fill = BLUEHEX,
                      alpha = 0.4, adjust = 1, size = 0.1) +
+        scale_x_continuous(limit = c(lim.min, 0), expand = c(0, 0.25)) +
+        theme_bw() +
+        theme(legend.position = "none", axis.title.x = element_blank(),
+              axis.text = element_blank(), axis.ticks = element_blank(),
+              axis.title.y = element_blank(), panel.grid = element_blank())
+    if (flip) {
+        g <- g + coord_flip()
+    }
+    return(g)
+}
+
+#' Marginal histogram of clonotypes (blue for shared, grey for total). The y
+#' axis is scaled by sqrt (but it doesn't really matter anyway, since we're
+#' stripping away the y-ticks)
+#'
+#' @import ggplot2
+#' @include util.R
+#'
+#' @param df.original
+#' @param df.filtered
+#' @param lim.min
+#' @param flip
+#'
+#' @return ggplot2 object
+.cloneDistHist <- function(df.original, otherClones, lim.min, flip) {
+    df.filtered <- df.original[df.original$Clonotype %in% otherClones, ]
+    g <- ggplot() +
+        geom_histogram(data = df.original, aes(x = prop,
+                                               y = sqrt(..count../sum(..count..))),
+                       fill = "#808080", alpha = 0.4) +
+        geom_histogram(data = df.filtered, aes(x = prop,
+                                             y = sqrt(..count../sum(..count..))),
+                       fill = BLUEHEX, alpha = 0.4) +
         scale_x_continuous(limit = c(lim.min, 0), expand = c(0, 0.25)) +
         theme_bw() +
         theme(legend.position = "none", axis.title.x = element_blank(),
@@ -1105,3 +1141,4 @@
               legend.text = element_text(size = 5))
     return(g)
 }
+

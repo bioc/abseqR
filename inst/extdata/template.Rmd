@@ -994,14 +994,14 @@ Row {.tabset .tabset-fade}
  otherwise -->
 ```{r abseq_scatter_diversity, echo=FALSE, eval=(!params$single && params$hasDiv)}
 files <- list.files(path = file.path(params$rootDir, "diversity"),
-                    pattern = ".*_clone_scatter\\.Rdata",
+                    pattern = ".*_clone_scatter\\.png",
                     full.names = T)
 scatterOut <- lapply(seq_along(files), function(i) {
     line1 <- knitr::knit_expand(text = sprintf("### sample %d vs sample %d\n", i, i + 1))
     line2 <- knitr::knit_expand(text = sprintf("\n```{r abseq_scatter_out_%d, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}\n", i))
-    line3 <- knitr::knit_expand(text = sprintf('fname <- "%s"; load(fname); if (params$interactive) { plot; } else { plot; }', files[[i]]))
+    line3 <- knitr::knit_expand(text = sprintf('grid.raster(readPNG("%s"))', files[[i]]))
     line4 <- knitr::knit_expand(text = "\n```\n")
-    line5 <- knitr::knit_expand(text = "\n> Clonotype counts from 2 samples\n")
+    line5 <- knitr::knit_expand(text = "\n> Clonotype frequencies from 2 samples. The axis values are scaled to log10 of the clone proportion. The marginal histograms show the density of total(grey) and overlapping(blue) clonotype abundances.\n")
     paste(line1, line2, line3, line4, line5, collapse = "\n")
 })
 
