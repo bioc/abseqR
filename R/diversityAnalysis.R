@@ -72,7 +72,7 @@
 
     intersectingClones <- df.union[complete.cases(df.union), "Clonotype"]
 
-    df.union[is.na(df.union)] <- log10(smallestPercentage * 1e-1)
+    df.union[is.na(df.union)] <- log10(smallestPercentage * 5e-1)
 
     xmin <- min(df.union$prop.x)
     ymin <- min(df.union$prop.y)
