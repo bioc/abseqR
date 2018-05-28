@@ -88,8 +88,8 @@
                        pch = 21,
                        fill = BLUEHEX) +
         scale_size_continuous(guide = "none", range = c(1, 10)) +
-        scale_x_continuous(limit = c(xmin, 0), expand = c(0, 0.1)) +
-        scale_y_continuous(limit = c(ymin, 0), expand = c(0, 0.1)) +
+        scale_x_continuous(limits = c(xmin, 0), expand = c(0, 0.1)) +
+        scale_y_continuous(limits = c(ymin, 0), expand = c(0, 0.1)) +
         # geom_smooth(method = "lm", se = T, fullrange = T) +
         # stat_smooth(data = df.union, aes(prop.x, prop.y,
         #                                  weight = 10^((prop.x + prop.y) / 2)),
@@ -121,13 +121,13 @@
     g <- ggplot() +
         stat_density(data = df.original, aes(x = prop, y = ..scaled..),
                      fill = "#808080", # grey
-                     alpha = 0.4, adjust = 1, size = 0.1) +
+                     alpha = 0.4, adjust = 1, size = 0.1, color = "black") +
         stat_density(data = df.shared, aes(x = prop, y = ..scaled..),
                      fill = BLUEHEX,
-                     alpha = 0.4, adjust = 1, size = 0.1) +
+                     alpha = 0.4, adjust = 1, size = 0.1, color = "black") +
         stat_density(data = df.exclusive, aes(x = prop, y = ..scaled..),
-                     fill = "#b380ff", # purplish blue
-                     alpha = 0.1, adjust = 1, size = 0.1) +
+                     fill = "#e0ccff", # purplish blue
+                     alpha = 0.4, adjust = 1, size = 0.1, color = "black") +
         scale_x_continuous(limits = c(lim.min, 0), expand = c(0, 0.25)) +
         theme_bw() +
         theme(legend.position = "none", axis.title.x = element_blank(),
@@ -161,7 +161,7 @@
         geom_histogram(data = df.filtered, aes(x = prop,
                                              y = sqrt(..count../sum(..count..))),
                        fill = BLUEHEX, alpha = 0.4) +
-        scale_x_continuous(limit = c(lim.min, 0), expand = c(0, 0.25)) +
+        scale_x_continuous(limits = c(lim.min, 0), expand = c(0, 0.25)) +
         theme_bw() +
         theme(legend.position = "none", axis.title.x = element_blank(),
               axis.text = element_blank(), axis.ticks = element_blank(),
@@ -213,7 +213,9 @@
                           sampleNames[i + 1], cloneClass)
         saveName <- file.path(outputPath, paste0(sampleNames[i], "_vs_",
                       sampleNames[i + 1], "_clone_scatter.png"))
-        ggsave(saveName, plot = p, width = V_WIDTH, height = V_HEIGHT)
+        # plot a square plot instead of rectange (axis needs to have same spacing)
+        # since they share the same axis values
+        ggsave(saveName, plot = p, width = V_WIDTH, height = V_WIDTH)
         # scatterPlotComplex is too large to save!
         #.saveAs(.save, saveName, p)
     }
