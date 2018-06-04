@@ -8,7 +8,7 @@ abseqReport(root, report = 3, BPPARAM = BiocParallel::bpparam())
 }
 \arguments{
 \item{root}{string type. Root directory as specified in
-\code{-o} or \code{--outdir} in AbSeqPy. This tells AbSeq where to look for
+\code{-o} or \code{--outdir} in abseqPy. This tells AbSeq where to look for
 abseqPy's output.}
 
 \item{report}{integer type. The possible values are:

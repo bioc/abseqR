@@ -392,7 +392,7 @@ setMethod(f = "report",
                   }))
 
                   # get all analyses conducted by each repertoire by looking
-                  # at the directory structure created by AbSeqPy
+                  # at the directory structure created by abseqPy
                   analysesConducted <- lapply(analysisDirectories, .inferAnalyzed)
 
                   # find the intersection of all analysis, because it makes no
@@ -465,7 +465,7 @@ setMethod(f = ".generateReport",
                   message(paste("Generating HTML report for", paste(sampleNames, collapse = "_vs_")))
 
                   # get all analyses conducted by each repertoire by looking
-                  # at the directory structure created by AbSeqPy
+                  # at the directory structure created by abseqPy
                   analysesConducted <- lapply(analysisDirectories, .inferAnalyzed)
 
                   # find the intersection of all analysis, because it makes no

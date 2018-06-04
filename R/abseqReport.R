@@ -9,7 +9,7 @@
 #' @import BiocParallel
 #'
 #' @param root string type. Root directory as specified in
-#' \code{-o} or \code{--outdir} in AbSeqPy. This tells AbSeq where to look for
+#' \code{-o} or \code{--outdir} in abseqPy. This tells AbSeq where to look for
 #' abseqPy's output.
 #' @param report integer type. The possible values are:
 #' \itemize{
