@@ -1,4 +1,4 @@
-#'
+#' Monolith AbSeq Plot function
 #'
 #' @include abundanceAnalysis.R
 #' @include annotationAnalysis.R
@@ -16,7 +16,7 @@
 #' @param directories vector type. Vector of directories in strings, must be
 #' 1-1 with sampleNames
 #' @param analysis vector / list type. What analysis to plot for. If sampleNames
-#' or directories is > 1 (i.e. compositeRepertoire), then make sure that it's
+#' or directories is > 1 (i.e. AbSeqCRep), then make sure that it's
 #' an intersection of all analysis conducted by the repertoires, otherwise, it
 #' wouldn't make sense
 #' @param outputDir string type. Where to dump the output

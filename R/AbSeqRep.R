@@ -1,6 +1,6 @@
 #' AbSeq analysis object.
 #'
-#' @description The Repertoire object contains all metadata associated with the AbSeq (python backend)
+#' @description The AbSeqRep object contains all metadata associated with the AbSeq (python backend)
 #' run conducted on it. For further information, refer to AbSeq's python help.
 #'
 #' @slot f1 character. Path to FASTA/FASTQ file 1.
@@ -62,9 +62,9 @@
 #' @slot domainSystem character. Domain system to use in IgBLAST, possible
 #' values are either \code{imgt} or \code{kabat}.
 #' @slot primer numeric. Dummy value - not implemented yet.
-#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}
 #' objects.
-#' @return none
+#' @return AbSeqRep
 #' @export
 #'
 #' @examples
@@ -74,7 +74,7 @@
 #' samples <- abseqReport("/path/to/output/directory/")
 #' samples[[1]]@name     # gives the name of the first repertoire object returned by abseqReport
 #' }
-Repertoire <- setClass("Repertoire", slots = c(
+AbSeqRep <- setClass("AbSeqRep", slots = c(
     f1 = "character",
     f2 = "character",
     chain = "character",
@@ -107,11 +107,11 @@ Repertoire <- setClass("Repertoire", slots = c(
 ))
 
 
-.loadRepertoireFromParams <- function(analysisParams) {
+.loadAbSeqRepFromParams <- function(analysisParams) {
     con <- file(analysisParams, "r")
     lines <- readLines(con)
     close(con)
-    params <- list(Class = "Repertoire")
+    params <- list(Class = "AbSeqRep")
     skip <- c("report_interim", "yaml")
 
     for (line in lines) {
@@ -140,23 +140,23 @@ Repertoire <- setClass("Repertoire", slots = c(
 }
 
 
-#' Combines 2 \linkS4class{Repertoire} objects together for comparison
+#' Combines 2 \linkS4class{AbSeqRep} objects together for comparison
 #'
-#' @include compositeRepertoire.R
+#' @include AbSeqCRep.R
 #'
-#' @param e1 Repertoire object.
-#' @param e2 Repertoire object.
+#' @param e1 AbSeqRep object.
+#' @param e2 AbSeqRep object.
 #'
-#' @return \linkS4class{CompositeRepertoire} object. Calling \code{abseqR}'s
+#' @return \linkS4class{AbSeqCRep} object. Calling \code{abseqR}'s
 #' functions on this object will always result in a comparison.
 #'
 #' @export
 #'
-#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}s
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}s
 #'
 #' @examples
 #' \dontrun{
-#' # 'load' Repertoire objects using abseqReport (ignoring plots, report, etc..)
+#' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
 #' # also assumes there's a result/ directory in current working directory,
 #' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
 #' samples <- abseqReport("results")
@@ -165,30 +165,30 @@ Repertoire <- setClass("Repertoire", slots = c(
 #' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
 #'
 #' # generate plots and report for this new comparison
-#' plotRepertoires(S1S3, "s1_vs_s3")
+#' report(S1S3, "s1_vs_s3")
 #' }
-setMethod("+", signature(e1 = "Repertoire", e2 = "Repertoire"), function(e1, e2) {
-    new("CompositeRepertoire", repertoires = list(e1, e2))
+setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqRep"), function(e1, e2) {
+    new("AbSeqCRep", repertoires = list(e1, e2))
 })
 
-#' Combines a \linkS4class{CompositeRepertoire} object with
-#' a \linkS4class{Repertoire} object together for comparison
+#' Combines a \linkS4class{AbSeqCRep} object with
+#' a \linkS4class{AbSeqRep} object together for comparison
 #'
-#' @include compositeRepertoire.R
+#' @include AbSeqCRep.R
 #'
-#' @param e1 CompositeRepertoire.
-#' @param e2 Repertoire.
+#' @param e1 AbSeqCRep.
+#' @param e2 AbSeqRep.
 #'
-#' @return \linkS4class{CompositeRepertoire} object. Calling \code{abseqR}'s
+#' @return \linkS4class{AbSeqCRep} object. Calling \code{abseqR}'s
 #' functions on this object will always result in a comparison.
 #'
 #' @export
 #'
-#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}s
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}s
 #'
 #' @examples
 #' \dontrun{
-#' # 'load' Repertoire objects using abseqReport (ignoring plots, report, etc..)
+#' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
 #' # also assumes there's a result/ directory in current working directory,
 #' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
 #' samples <- abseqReport("results")
@@ -200,30 +200,30 @@ setMethod("+", signature(e1 = "Repertoire", e2 = "Repertoire"), function(e1, e2)
 #' S1S3S4 <- S1S3 + S4
 #'
 #' # generate plots and report for this new comparison
-#' plotRepertoires(S1S3S4, "s1_vs_s3_vs_s4")
+#' report(S1S3S4, "s1_vs_s3_vs_s4")
 #' }
-setMethod("+", signature(e1 = "CompositeRepertoire", e2 = "Repertoire"), function(e1, e2) {
-    new("CompositeRepertoire", repertoires = unique(c(e1@repertoires, e2)))
+setMethod("+", signature(e1 = "AbSeqCRep", e2 = "AbSeqRep"), function(e1, e2) {
+    new("AbSeqCRep", repertoires = unique(c(e1@repertoires, e2)))
 })
 
-#' Combines a \linkS4class{Repertoire} object with
-#' a \linkS4class{CompositeRepertoire} object together for comparison
+#' Combines a \linkS4class{AbSeqRep} object with
+#' a \linkS4class{AbSeqCRep} object together for comparison
 #'
-#' @include compositeRepertoire.R
+#' @include AbSeqCRep.R
 #'
-#' @param e1 Repertoire.
-#' @param e2 CompositeRepertoire.
+#' @param e1 AbSeqRep.
+#' @param e2 AbSeqCRep.
 #'
-#' @return \linkS4class{CompositeRepertoire} object. Calling \code{abseqR}'s
+#' @return \linkS4class{AbSeqCRep} object. Calling \code{abseqR}'s
 #' functions on this object will always result in a comparison.
 #'
 #' @export
 #'
-#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}s
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}s
 #'
 #' @examples
 #' \dontrun{
-#' # 'load' Repertoire objects using abseqReport (ignoring plots, report, etc..)
+#' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
 #' # also assumes there's a result/ directory in current working directory,
 #' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
 #' samples <- abseqReport("results")
@@ -235,115 +235,201 @@ setMethod("+", signature(e1 = "CompositeRepertoire", e2 = "Repertoire"), functio
 #' S4S1S3 <- S4 + S1S3
 #'
 #' # generate plots and report for this new comparison
-#' plotRepertoires(S4S1S3, "s4_vs_s1_vs_s3")
+#' report(S4S1S3, "s4_vs_s1_vs_s3")
 #' }
-setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), function(e1, e2) {
-    new("CompositeRepertoire", repertoires = unique(c(e1, e2@repertoires)))
+setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqCRep"), function(e1, e2) {
+    new("AbSeqCRep", repertoires = unique(c(e1, e2@repertoires)))
 })
 
-#' Plots \linkS4class{Repertoire} or
-#' \linkS4class{CompositeRepertoire} object to the specfied directory
+#' Plots \linkS4class{AbSeqRep} or
+#' \linkS4class{AbSeqCRep} object to the specfied directory
+#'
+#' @description This method is analogous to \code{\link{abseqReport}}.
+#' The only difference is that this method accepts \linkS4class{AbSeqRep} or
+#' \linkS4class{AbSeqCRep} objects as its first parameter, and the
+#' \code{outputDir} specifies where to store the result.
 #'
 #' @import rmarkdown
 #'
 #' @include util.R
 #' @include plotter.R
-#' @include compositeRepertoire.R
+#' @include AbSeqCRep.R
 #'
-#' @param object repertoire or composite repertoire object to plot
+#' @param object AbSeqRep or AbSeqCRep object to plot
 #' @param outputDir string type. where to save the files to
-#' @param report logical type. Should HTML report be generated
-#' @param interactivePlot logical type. Should the HTML report's plots be
-#' interactive (using plotly)? This argument will be ignored if \code{report}
-#' is \code{FALSE}
+#' @param report integer type. The possible values are:
+#' \itemize{
+#'   \item{0 - does nothing (returns named list of \linkS4class{AbSeqRep} object
+#'   , taken from the first parameter). This option isn't useful, but is
+#'   preserved here for the sake of consistency with \code{\link{abseqReport}}}
+#'   \item{1 - generates plots for csv files}
+#'   \item{2 - generates a report that collates all plots}
+#'   \item{3 - generates interactive plots in report}
+#' }
+#' each value also does what the previous values do. For example, \code{report = 2}
+#' will return a named list of \linkS4class{AbSeqRep} objects, plot csv files,
+#' and generate a (non-interactive)HTML report that collates all the plots together.
+#' @return named list. List of \linkS4class{AbSeqRep} objects. The names of
+#' the list are taken directly from the repertoire object itself. This return
+#' value is consistent with the return value of \code{\link{abseqReport}}
 #'
-#' @return nothing
 #' @export
 #'
-#' @examples todo
-setGeneric(name = "plotRepertoires",
-           def = function(object, outputDir, report = TRUE, interactivePlot = TRUE) {
-               standardGeneric("plotRepertoires")
+#' @seealso \code{\link{abseqReport}}. Analogus function, but takes input from
+#' a string that signifies the output directory (similar to the argument supplied to abseqPy).
+#' @seealso \linkS4class{AbSeqRep}
+#' @seealso \linkS4class{AbSeqCRep}
+#'
+#' @examples
+#' \dontrun{
+#' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
+#' # also assumes there's a result/ directory in current working directory,
+#' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
+#' samples <- abseqReport("results")
+#'
+#' # assuming there are samples named "Sample1", "Sample2", "Sample3", and "Sample4"
+#' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
+#' S2S4 <- samples[["Sample2"]] + samples[["Sample4"]]
+#'
+#' all.S <- S1S3 + S2S4
+#'
+#' # generate plots and report for this new comparison
+#' report(all.S, "s1_vs_s2_vs_s3_vs_s4")
+#'
+#' # generate plots only
+#' report(all.S, "s1_vs_s2_vs_s3_vs_s4", report = 1)
+#'
+#' # generate plots, and a non-interactive report
+#' report(all.S, "s1_vs_s2_vs_s3_vs_s4", report = 2)
+#'
+#' # generate plots, and an interactive report
+#' report(all.S, "s1_vs_s2_vs_s3_vs_s4", report = 3)
+#' }
+setGeneric(name = "report",
+           def = function(object, outputDir, report = 3) {
+               standardGeneric("report")
            })
 
 
 
-setMethod(f = "plotRepertoires",
-          signature = "Repertoire",
-          definition = function(object, outputDir, report = TRUE, interactivePlot = TRUE) {
-              if (!report && interactivePlot) {
-                  warning("report is FALSE, ignoring interactivePlot argument")
+setMethod(f = "report",
+          signature = "AbSeqRep",
+          definition = function(object, outputDir, report = 3) {
+              skip <- FALSE
+              stopifnot(report %in% c(0, 1, 2, 3))
+              if (report == 0) {
+                  report <- FALSE
+                  interactivePlot <- FALSE
+                  skip <- TRUE
+              } else if (report == 1) {
+                  report <- FALSE
+                  interactivePlot <- FALSE
+              } else if (report == 2) {
+                  report <- TRUE
+                  interactivePlot <- FALSE
+              } else {
+                  report <- TRUE
+                  interactivePlot <- TRUE
               }
 
-              analysisDirectories = c(file.path(object@outdir,
-                                                RESULT_DIR, object@name))
-              # get analysis that were conducted by looking at the directory
-              # structure - is this the best way?
-              analyses <- unlist(.inferAnalyzed(analysisDirectories[1]))
-              sampleNames <- c(object@name)
-              primer5Files <- list(object@primer5end)
-              primer3Files <- list(object@primer3end)
-              upstreamRanges <- list(object@upstream)
+              if (!skip) {
+                  analysisDirectories = c(file.path(object@outdir,
+                                                    RESULT_DIR, object@name))
+                  # get analysis that were conducted by looking at the directory
+                  # structure - is this the best way?
+                  analyses <- unlist(.inferAnalyzed(analysisDirectories[1]))
+                  sampleNames <- c(object@name)
+                  primer5Files <- list(object@primer5end)
+                  primer3Files <- list(object@primer3end)
+                  upstreamRanges <- list(object@upstream)
 
-              .plotSamples(sampleNames, analysisDirectories, analyses, outputDir,
-                           primer5Files, primer3Files, upstreamRanges,
-                           skipDgene = (object@chain != "hv"))
+                  .plotSamples(sampleNames, analysisDirectories, analyses, outputDir,
+                               primer5Files, primer3Files, upstreamRanges,
+                               skipDgene = (object@chain != "hv"))
 
-              if (report) {
-                  .generateReport(object, root = outputDir,
-                                  outputDir = outputDir,
-                                  interactivePlot = interactivePlot)
+                  if (report) {
+                      .generateReport(object, root = outputDir,
+                                      outputDir = outputDir,
+                                      interactivePlot = interactivePlot)
+                  }
               }
+
+              # this is dumb, but at least it's consistent with the
+              # API behaviour of abseqR::abseqReport()
+              lst <- list()
+              lst[[object@name]] <- object
+              return(lst)
           })
 
-setMethod(f = "plotRepertoires",
-          signature = "CompositeRepertoire",
-          definition = function(object, outputDir, report = TRUE, interactivePlot = TRUE) {
-              if (!report && interactivePlot) {
-                  warning("report is FALSE, ignoring interactivePlot argument")
+setMethod(f = "report",
+          signature = "AbSeqCRep",
+          definition = function(object, outputDir, report = 3) {
+              stopifnot(report %in% c(0, 1, 2, 3))
+              skip <- FALSE
+              if (report == 0) {
+                  report <- FALSE
+                  interactivePlot <- FALSE
+                  skip <- TRUE
+              } else if (report == 1) {
+                  report <- FALSE
+                  interactivePlot <- FALSE
+              } else if (report == 2) {
+                  report <- TRUE
+                  interactivePlot <- FALSE
+              } else {
+                  report <- TRUE
+                  interactivePlot <- TRUE
               }
-              analysisDirectories = unlist(lapply(object@repertoires, function(x) {
-                  # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
-                  file.path(x@outdir, RESULT_DIR, x@name)
-              }))
-
-              # get all analyses conducted by each repertoire by looking
-              # at the directory structure created by AbSeqPy
-              analysesConducted <- lapply(analysisDirectories, .inferAnalyzed)
-
-              # find the intersection of all analysis, because it makes no
-              # sense to compare samples if they don't have the same analysis
-              similarAnalyses <- unlist(Reduce(intersect, analysesConducted))
 
               sampleNames <- unlist(lapply(object@repertoires, function(x) {
                   x@name
               }))
 
-              primer5Files <- unlist(lapply(object@repertoires, function(x) {
-                  x@primer5end
-              }))
-              primer3Files <- unlist(lapply(object@repertoires, function(x) {
-                  x@primer3end
-              }))
+              if (!skip) {
+                  analysisDirectories = unlist(lapply(object@repertoires, function(x) {
+                      # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
+                      file.path(x@outdir, RESULT_DIR, x@name)
+                  }))
 
-              upstreamRanges <- lapply(object@repertoires,
-                                       function(x) {
-                                           x@upstream
-                                       })
+                  # get all analyses conducted by each repertoire by looking
+                  # at the directory structure created by abseqPy
+                  analysesConducted <- lapply(analysisDirectories, .inferAnalyzed)
 
-              allChains <- lapply(object@repertoires, function(x) { x@chain })
-              # only include D gene plots if all chains only contain "hv"
-              skipD <- (("kv" %in% allChains) || ("lv" %in% allChains))
+                  # find the intersection of all analysis, because it makes no
+                  # sense to compare samples if they don't have the same analysis
+                  similarAnalyses <- unlist(Reduce(intersect, analysesConducted))
 
-              .plotSamples(sampleNames, analysisDirectories, similarAnalyses,
-                           outputDir, primer5Files, primer3Files, upstreamRanges,
-                           skipDgene = skipD)
 
-              if (report) {
-                  .generateReport(object, root = outputDir,
-                                  outputDir = outputDir,
-                                  interactivePlot = interactivePlot)
+                  primer5Files <- unlist(lapply(object@repertoires, function(x) {
+                      x@primer5end
+                  }))
+                  primer3Files <- unlist(lapply(object@repertoires, function(x) {
+                      x@primer3end
+                  }))
+
+                  upstreamRanges <- lapply(object@repertoires,
+                                           function(x) {
+                                               x@upstream
+                                           })
+
+                  allChains <- lapply(object@repertoires, function(x) { x@chain })
+                  # only include D gene plots if all chains only contain "hv"
+                  skipD <- (("kv" %in% allChains) || ("lv" %in% allChains))
+
+                  .plotSamples(sampleNames, analysisDirectories, similarAnalyses,
+                               outputDir, primer5Files, primer3Files, upstreamRanges,
+                               skipDgene = skipD)
+
+                  if (report) {
+                      .generateReport(object, root = outputDir,
+                                      outputDir = outputDir,
+                                      interactivePlot = interactivePlot)
+                  }
               }
+
+              lst <- object@repertoires
+              names(lst) <- sampleNames
+              return(lst)
           })
 
 
@@ -352,7 +438,7 @@ setMethod(f = "plotRepertoires",
 #' @import rmarkdown
 #' @include util.R
 #'
-#' @param object CompositeRepertoire type.
+#' @param object AbSeqCRep type.
 #' @param root string type. Root directory of the sample(s)
 #' @param outputDir string type. The path where the HTML will be generated
 #' @param interactivePlot logical type. Interactive or not
@@ -366,7 +452,7 @@ setGeneric(name = ".generateReport",
            })
 
 setMethod(f = ".generateReport",
-          signature = "CompositeRepertoire",
+          signature = "AbSeqCRep",
           definition = function(object, root, outputDir, interactivePlot = TRUE, .indexHTML = "#") {
               if (rmarkdown::pandoc_available()) {
                   analysisDirectories = unlist(lapply(object@repertoires, function(x) {
@@ -379,7 +465,7 @@ setMethod(f = ".generateReport",
                   message(paste("Generating HTML report for", paste(sampleNames, collapse = "_vs_")))
 
                   # get all analyses conducted by each repertoire by looking
-                  # at the directory structure created by AbSeqPy
+                  # at the directory structure created by abseqPy
                   analysesConducted <- lapply(analysisDirectories, .inferAnalyzed)
 
                   # find the intersection of all analysis, because it makes no
@@ -461,7 +547,7 @@ setMethod(f = ".generateReport",
 
 
 setMethod(f = ".generateReport",
-          signature = "Repertoire",
+          signature = "AbSeqRep",
           definition = function(object, root, outputDir, interactivePlot = TRUE, .indexHTML = "#") {
               if (rmarkdown::pandoc_available()) {
                   message(paste("Generating HTML report for", object@name))
