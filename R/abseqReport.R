@@ -89,7 +89,7 @@ abseqReport <- function(root, report = 3, BPPARAM = BiocParallel::bpparam()) {
             # due to the cache/shared user issue (see render() parallel github issue)
             # we delay the report generation until AFTER the multiprocessing part
             # has completed
-            abseqR::plotRepertoires(samples, outputDir,
+            abseqR::report(samples, outputDir,
                                     report = FALSE,
                                     interactivePlot = FALSE)
         #})

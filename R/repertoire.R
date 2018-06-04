@@ -165,7 +165,7 @@ Repertoire <- setClass("Repertoire", slots = c(
 #' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
 #'
 #' # generate plots and report for this new comparison
-#' plotRepertoires(S1S3, "s1_vs_s3")
+#' report(S1S3, "s1_vs_s3")
 #' }
 setMethod("+", signature(e1 = "Repertoire", e2 = "Repertoire"), function(e1, e2) {
     new("CompositeRepertoire", repertoires = list(e1, e2))
@@ -200,7 +200,7 @@ setMethod("+", signature(e1 = "Repertoire", e2 = "Repertoire"), function(e1, e2)
 #' S1S3S4 <- S1S3 + S4
 #'
 #' # generate plots and report for this new comparison
-#' plotRepertoires(S1S3S4, "s1_vs_s3_vs_s4")
+#' report(S1S3S4, "s1_vs_s3_vs_s4")
 #' }
 setMethod("+", signature(e1 = "CompositeRepertoire", e2 = "Repertoire"), function(e1, e2) {
     new("CompositeRepertoire", repertoires = unique(c(e1@repertoires, e2)))
@@ -235,7 +235,7 @@ setMethod("+", signature(e1 = "CompositeRepertoire", e2 = "Repertoire"), functio
 #' S4S1S3 <- S4 + S1S3
 #'
 #' # generate plots and report for this new comparison
-#' plotRepertoires(S4S1S3, "s4_vs_s1_vs_s3")
+#' report(S4S1S3, "s4_vs_s1_vs_s3")
 #' }
 setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), function(e1, e2) {
     new("CompositeRepertoire", repertoires = unique(c(e1, e2@repertoires)))
@@ -261,14 +261,14 @@ setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), functio
 #' @export
 #'
 #' @examples todo
-setGeneric(name = "plotRepertoires",
+setGeneric(name = "report",
            def = function(object, outputDir, report = TRUE, interactivePlot = TRUE) {
-               standardGeneric("plotRepertoires")
+               standardGeneric("report")
            })
 
 
 
-setMethod(f = "plotRepertoires",
+setMethod(f = "report",
           signature = "Repertoire",
           definition = function(object, outputDir, report = TRUE, interactivePlot = TRUE) {
               if (!report && interactivePlot) {
@@ -296,7 +296,7 @@ setMethod(f = "plotRepertoires",
               }
           })
 
-setMethod(f = "plotRepertoires",
+setMethod(f = "report",
           signature = "CompositeRepertoire",
           definition = function(object, outputDir, report = TRUE, interactivePlot = TRUE) {
               if (!report && interactivePlot) {

@@ -36,7 +36,7 @@ CompositeRepertoire <-
 #' all.S <- S1S3 + S2S4
 #'
 #' # generate plots and report for this new comparison
-#' plotRepertoires(all.S, "s1_vs_s2_vs_s3_vs_s4")
+#' report(all.S, "s1_vs_s2_vs_s3_vs_s4")
 #' }
 setMethod("+",
           signature(e1 = "CompositeRepertoire",

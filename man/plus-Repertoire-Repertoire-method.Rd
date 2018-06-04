@@ -30,7 +30,7 @@ samples <- abseqReport("results")
 S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
 
 # generate plots and report for this new comparison
-plotRepertoires(S1S3, "s1_vs_s3")
+report(S1S3, "s1_vs_s3")
 }
 }
 \seealso{

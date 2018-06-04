@@ -35,7 +35,7 @@ S4 <- samples[["Sample4"]]
 S4S1S3 <- S4 + S1S3
 
 # generate plots and report for this new comparison
-plotRepertoires(S4S1S3, "s4_vs_s1_vs_s3")
+report(S4S1S3, "s4_vs_s1_vs_s3")
 }
 }
 \seealso{
