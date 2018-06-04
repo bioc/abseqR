@@ -1,4 +1,4 @@
-#'
+#' Monolith AbSeq Plot function
 #'
 #' @include abundanceAnalysis.R
 #' @include annotationAnalysis.R

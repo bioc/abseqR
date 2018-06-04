@@ -2,13 +2,14 @@
 % Please edit documentation in R/abseqReport.R
 \name{abseqReport}
 \alias{abseqReport}
-\title{Plots all samples and comparisons as specified in \code{abseq.cfg}}
+\title{Visualize all analysis conducted by AbSePy}
 \usage{
 abseqReport(root, report = 3, BPPARAM = BiocParallel::bpparam())
 }
 \arguments{
 \item{root}{string type. Root directory as specified in
-\code{-o} or \code{--outdir} in AbSeqPy.}
+\code{-o} or \code{--outdir} in AbSeqPy. This tells AbSeq where to look for
+abseqPy's output.}
 
 \item{report}{integer type. The possible values are:
 \itemize{
@@ -17,7 +18,7 @@ abseqReport(root, report = 3, BPPARAM = BiocParallel::bpparam())
   \item{2 - generates a report that collates all plots}
   \item{3 - generates interactive plots in report}
 }
-each value also does what the previous values do. For example, \code{report = 2}
+each higher value also does what the previous values do. For example, \code{report = 2}
 will return a named list of \linkS4class{AbSeqRep} objects, plot csv files,
 and generate a (non-interactive)HTML report that collates all the plots together.}
 
@@ -27,13 +28,66 @@ for more information.}
 }
 \value{
 named list. List of \linkS4class{AbSeqRep} objects. The names of
-the list are taken directly from the repertoire object itself.
+the list are taken directly from the repertoire object itself. This return
+value is consistent with the return value of \code{\link{report}}
 }
 \description{
-Plots all samples and comparisons as specified in \code{abseq.cfg}
+Plots all samples and comparisons as specified in \code{abseq.cfg}.
+ This file can be found in the same output directory supplied to abseqPy's
+\code{--outdir} or \code{-o} argument.
+}
+\examples{
+\dontrun{
+# Assuming abseqPy has dumped its output in /path/to/output/directory/
+# (i.e. the argument to --outdir / -o in abseqPy)
+
+### report parameter usage example:
+
+# report = 0; don't plot, don't collate a HTML report, don't show anything interactive
+samples <- abseqReport("/path/to/output/directory/", report = 0)
+# samples is now a named list of AbSeqRep objects
+
+# report = 1; just plot pngs; don't collate a HTML report; nothing interactive
+samples <- abseqReport("/path/to/output/directory/", report = 1)
+# samples is now a named list of AbSeqRep objects
+
+# report = 2; plot pngs; collate a HTML report; HTML report will NOT be interactive
+samples <- abseqReport("/path/to/output/directory/", report = 2)
+# samples is now a named list of AbSeqRep objects
+
+# report = 3 (default); plot pngs; collate a HTML report; HTML report will be interactive
+samples <- abseqReport("/path/to/output/directory/", report = 3)
+# samples is now a named list of AbSeqRep objects
+
+#### Bonus Section (what to do with the list "samples"?):
+# assume:
+# > names(samples)
+# [1] "Sample1" "Sampel2" "Sample3" "Sample4"
+
+# we want to explicitly compare Sample1 with Sample3:
+new.combination <- samples[["Sample1"]] + samples[["Sample3"]]
+# see abseqR::report for more information.
+abseqR::report(new.combination)
+
+### BPPARAM usage:
+
+# 4 core machine, use all cores -  use whatever value that suits you
+nproc <- 4
+samples <- abseqReport("/path/to/output/directory/",
+                       BPPARAM = BiocParallel::MulticoreParam(nproc))
+
+
+# run sequentially - no multiprocessing
+samples <- abseqReport("/path/to/output/directory/",
+                       BPPARAM = SerialParam())
+
+# see https://www.bioconductor.org/packages/devel/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.pdf
+# for more information about how to use BPPARAM and BiocParallel in general.
+}
 }
 \seealso{
 \linkS4class{AbSeqRep}
 
-\linkS4class{AbSeqCRep}
+\code{\link{report}}. Analogous function, but takes input from
+an \linkS4class{AbSeqRep} or \linkS4class{AbSeqCRep} object instead.
 }

@@ -4,10 +4,10 @@
 #'
 #' @slot repertoires list.
 #'
-#' @return
+#' @return AbSeqCRep
 #' @export
 #'
-#' @seealso \linkS4class(AbSeqRep)
+#' @seealso \linkS4class{AbSeqRep}
 #'
 #' @examples
 #' \dontrun{

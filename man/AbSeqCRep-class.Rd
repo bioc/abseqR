@@ -5,8 +5,11 @@
 \alias{AbSeqCRep-class}
 \alias{AbSeqCRep}
 \title{AbSeqCompositeRepertoire}
+\value{
+AbSeqCRep
+}
 \description{
-AbSeqCompositeRepertoire
+AbSeqCRep is a collection of \linkS4class{AbSeqRep} S4 objects
 }
 \section{Slots}{
 
@@ -32,4 +35,7 @@ S2S4 <- samples[["Sample2"]] + samples[["Sample4"]]
 # all.S is an instance of AbSeqCRep
 all.S <- S1S3 + S2S4
 }
+}
+\seealso{
+\linkS4class{AbSeqRep}
 }

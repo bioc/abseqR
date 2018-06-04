@@ -6,7 +6,7 @@
 \alias{AbSeqRep}
 \title{AbSeq analysis object.}
 \value{
-none
+AbSeqRep
 }
 \description{
 The AbSeqRep object contains all metadata associated with the AbSeq (python backend)
