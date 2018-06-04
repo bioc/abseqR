@@ -235,3 +235,30 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
     cat(lines, file = con, sep = "\n")
     close(con)
 }
+
+
+#' Creates and returns an empty plot
+#'
+#' @import ggplot2
+#'
+#' @return empty ggplot2 object
+.emptyPlot <- function() {
+    # placeholder plot - prints nothing at all
+    # https://www.r-bloggers.com/ggplot2-cheatsheet-for-visualizing-distributions/
+    # https://github.com/mikessh/vdjtools/blob/master/src/main/resources/rscripts/intersect_pair_scatter.r
+    g <- ggplot() + geom_point(aes(1, 1), colour = "white") +
+        theme(
+            plot.background = element_blank(),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(),
+            panel.border = element_blank(),
+            panel.background = element_blank(),
+            axis.title.x = element_blank(),
+            axis.title.y = element_blank(),
+            axis.text.x = element_blank(),
+            axis.text.y = element_blank(),
+            axis.ticks = element_blank(),
+            plot.margin = unit(c(3, -5.5, 4, 3), "mm")
+        )
+    return(g)
+}
