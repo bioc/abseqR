@@ -2,8 +2,8 @@
 
 export(abseqReport)
 export(report)
-exportClasses(CompositeRepertoire)
-exportClasses(Repertoire)
+exportClasses(AbSeqCRep)
+exportClasses(AbSeqRep)
 exportMethods("+")
 import(BiocParallel)
 import(RColorBrewer)

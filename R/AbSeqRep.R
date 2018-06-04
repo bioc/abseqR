@@ -1,6 +1,6 @@
 #' AbSeq analysis object.
 #'
-#' @description The Repertoire object contains all metadata associated with the AbSeq (python backend)
+#' @description The AbSeqRep object contains all metadata associated with the AbSeq (python backend)
 #' run conducted on it. For further information, refer to AbSeq's python help.
 #'
 #' @slot f1 character. Path to FASTA/FASTQ file 1.
@@ -62,7 +62,7 @@
 #' @slot domainSystem character. Domain system to use in IgBLAST, possible
 #' values are either \code{imgt} or \code{kabat}.
 #' @slot primer numeric. Dummy value - not implemented yet.
-#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}
 #' objects.
 #' @return none
 #' @export
@@ -74,7 +74,7 @@
 #' samples <- abseqReport("/path/to/output/directory/")
 #' samples[[1]]@name     # gives the name of the first repertoire object returned by abseqReport
 #' }
-Repertoire <- setClass("Repertoire", slots = c(
+AbSeqRep <- setClass("AbSeqRep", slots = c(
     f1 = "character",
     f2 = "character",
     chain = "character",
@@ -107,11 +107,11 @@ Repertoire <- setClass("Repertoire", slots = c(
 ))
 
 
-.loadRepertoireFromParams <- function(analysisParams) {
+.loadAbSeqRepFromParams <- function(analysisParams) {
     con <- file(analysisParams, "r")
     lines <- readLines(con)
     close(con)
-    params <- list(Class = "Repertoire")
+    params <- list(Class = "AbSeqRep")
     skip <- c("report_interim", "yaml")
 
     for (line in lines) {
@@ -140,23 +140,23 @@ Repertoire <- setClass("Repertoire", slots = c(
 }
 
 
-#' Combines 2 \linkS4class{Repertoire} objects together for comparison
+#' Combines 2 \linkS4class{AbSeqRep} objects together for comparison
 #'
-#' @include compositeRepertoire.R
+#' @include AbSeqCRep.R
 #'
-#' @param e1 Repertoire object.
-#' @param e2 Repertoire object.
+#' @param e1 AbSeqRep object.
+#' @param e2 AbSeqRep object.
 #'
-#' @return \linkS4class{CompositeRepertoire} object. Calling \code{abseqR}'s
+#' @return \linkS4class{AbSeqCRep} object. Calling \code{abseqR}'s
 #' functions on this object will always result in a comparison.
 #'
 #' @export
 #'
-#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}s
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}s
 #'
 #' @examples
 #' \dontrun{
-#' # 'load' Repertoire objects using abseqReport (ignoring plots, report, etc..)
+#' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
 #' # also assumes there's a result/ directory in current working directory,
 #' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
 #' samples <- abseqReport("results")
@@ -167,28 +167,28 @@ Repertoire <- setClass("Repertoire", slots = c(
 #' # generate plots and report for this new comparison
 #' report(S1S3, "s1_vs_s3")
 #' }
-setMethod("+", signature(e1 = "Repertoire", e2 = "Repertoire"), function(e1, e2) {
-    new("CompositeRepertoire", repertoires = list(e1, e2))
+setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqRep"), function(e1, e2) {
+    new("AbSeqCRep", repertoires = list(e1, e2))
 })
 
-#' Combines a \linkS4class{CompositeRepertoire} object with
-#' a \linkS4class{Repertoire} object together for comparison
+#' Combines a \linkS4class{AbSeqCRep} object with
+#' a \linkS4class{AbSeqRep} object together for comparison
 #'
-#' @include compositeRepertoire.R
+#' @include AbSeqCRep.R
 #'
-#' @param e1 CompositeRepertoire.
-#' @param e2 Repertoire.
+#' @param e1 AbSeqCRep.
+#' @param e2 AbSeqRep.
 #'
-#' @return \linkS4class{CompositeRepertoire} object. Calling \code{abseqR}'s
+#' @return \linkS4class{AbSeqCRep} object. Calling \code{abseqR}'s
 #' functions on this object will always result in a comparison.
 #'
 #' @export
 #'
-#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}s
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}s
 #'
 #' @examples
 #' \dontrun{
-#' # 'load' Repertoire objects using abseqReport (ignoring plots, report, etc..)
+#' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
 #' # also assumes there's a result/ directory in current working directory,
 #' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
 #' samples <- abseqReport("results")
@@ -202,28 +202,28 @@ setMethod("+", signature(e1 = "Repertoire", e2 = "Repertoire"), function(e1, e2)
 #' # generate plots and report for this new comparison
 #' report(S1S3S4, "s1_vs_s3_vs_s4")
 #' }
-setMethod("+", signature(e1 = "CompositeRepertoire", e2 = "Repertoire"), function(e1, e2) {
-    new("CompositeRepertoire", repertoires = unique(c(e1@repertoires, e2)))
+setMethod("+", signature(e1 = "AbSeqCRep", e2 = "AbSeqRep"), function(e1, e2) {
+    new("AbSeqCRep", repertoires = unique(c(e1@repertoires, e2)))
 })
 
-#' Combines a \linkS4class{Repertoire} object with
-#' a \linkS4class{CompositeRepertoire} object together for comparison
+#' Combines a \linkS4class{AbSeqRep} object with
+#' a \linkS4class{AbSeqCRep} object together for comparison
 #'
-#' @include compositeRepertoire.R
+#' @include AbSeqCRep.R
 #'
-#' @param e1 Repertoire.
-#' @param e2 CompositeRepertoire.
+#' @param e1 AbSeqRep.
+#' @param e2 AbSeqCRep.
 #'
-#' @return \linkS4class{CompositeRepertoire} object. Calling \code{abseqR}'s
+#' @return \linkS4class{AbSeqCRep} object. Calling \code{abseqR}'s
 #' functions on this object will always result in a comparison.
 #'
 #' @export
 #'
-#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{Repertoire}s
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}s
 #'
 #' @examples
 #' \dontrun{
-#' # 'load' Repertoire objects using abseqReport (ignoring plots, report, etc..)
+#' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
 #' # also assumes there's a result/ directory in current working directory,
 #' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
 #' samples <- abseqReport("results")
@@ -237,20 +237,20 @@ setMethod("+", signature(e1 = "CompositeRepertoire", e2 = "Repertoire"), functio
 #' # generate plots and report for this new comparison
 #' report(S4S1S3, "s4_vs_s1_vs_s3")
 #' }
-setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), function(e1, e2) {
-    new("CompositeRepertoire", repertoires = unique(c(e1, e2@repertoires)))
+setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqCRep"), function(e1, e2) {
+    new("AbSeqCRep", repertoires = unique(c(e1, e2@repertoires)))
 })
 
-#' Plots \linkS4class{Repertoire} or
-#' \linkS4class{CompositeRepertoire} object to the specfied directory
+#' Plots \linkS4class{AbSeqRep} or
+#' \linkS4class{AbSeqCRep} object to the specfied directory
 #'
 #' @import rmarkdown
 #'
 #' @include util.R
 #' @include plotter.R
-#' @include compositeRepertoire.R
+#' @include AbSeqCRep.R
 #'
-#' @param object repertoire or composite repertoire object to plot
+#' @param object AbSeqRep or AbSeqCRep object to plot
 #' @param outputDir string type. where to save the files to
 #' @param report logical type. Should HTML report be generated
 #' @param interactivePlot logical type. Should the HTML report's plots be
@@ -259,6 +259,10 @@ setMethod("+", signature(e1 = "Repertoire", e2 = "CompositeRepertoire"), functio
 #'
 #' @return nothing
 #' @export
+#'
+#' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}s
+#' @seealso \linkS4class{AbSeqRep}
+#' @seealso \linkS4class{AbSeqCRep}
 #'
 #' @examples todo
 setGeneric(name = "report",
@@ -269,7 +273,7 @@ setGeneric(name = "report",
 
 
 setMethod(f = "report",
-          signature = "Repertoire",
+          signature = "AbSeqRep",
           definition = function(object, outputDir, report = TRUE, interactivePlot = TRUE) {
               if (!report && interactivePlot) {
                   warning("report is FALSE, ignoring interactivePlot argument")
@@ -297,7 +301,7 @@ setMethod(f = "report",
           })
 
 setMethod(f = "report",
-          signature = "CompositeRepertoire",
+          signature = "AbSeqCRep",
           definition = function(object, outputDir, report = TRUE, interactivePlot = TRUE) {
               if (!report && interactivePlot) {
                   warning("report is FALSE, ignoring interactivePlot argument")
@@ -352,7 +356,7 @@ setMethod(f = "report",
 #' @import rmarkdown
 #' @include util.R
 #'
-#' @param object CompositeRepertoire type.
+#' @param object AbSeqCRep type.
 #' @param root string type. Root directory of the sample(s)
 #' @param outputDir string type. The path where the HTML will be generated
 #' @param interactivePlot logical type. Interactive or not
@@ -366,7 +370,7 @@ setGeneric(name = ".generateReport",
            })
 
 setMethod(f = ".generateReport",
-          signature = "CompositeRepertoire",
+          signature = "AbSeqCRep",
           definition = function(object, root, outputDir, interactivePlot = TRUE, .indexHTML = "#") {
               if (rmarkdown::pandoc_available()) {
                   analysisDirectories = unlist(lapply(object@repertoires, function(x) {
@@ -461,7 +465,7 @@ setMethod(f = ".generateReport",
 
 
 setMethod(f = ".generateReport",
-          signature = "Repertoire",
+          signature = "AbSeqRep",
           definition = function(object, root, outputDir, interactivePlot = TRUE, .indexHTML = "#") {
               if (rmarkdown::pandoc_available()) {
                   message(paste("Generating HTML report for", object@name))

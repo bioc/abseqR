@@ -1,29 +1,30 @@
 #' Plots all samples and comparisons as specified in \code{abseq.cfg}
 #'
 #' @include util.R
-#' @include repertoire.R
+#' @include AbSeqRep.R
 #' @import BiocParallel
 #'
 #' @param root string type. Root directory as specified in
 #' \code{-o} or \code{--outdir} in AbSeqPy.
 #' @param report integer type. The possible values are:
 #' \itemize{
-#'   \item{0 - does nothing (returns named list of \linkS4class{Repertoire} objects)}
+#'   \item{0 - does nothing (returns named list of \linkS4class{AbSeqRep} objects)}
 #'   \item{1 - generates plots for csv files}
 #'   \item{2 - generates a report that collates all plots}
 #'   \item{3 - generates interactive plots in report}
 #' }
 #' each value also does what the previous values do. For example, \code{report = 2}
-#' will return a named list of \linkS4class{Repertoire} objects, plot csv files,
+#' will return a named list of \linkS4class{AbSeqRep} objects, plot csv files,
 #' and generate a (non-interactive)HTML report that collates all the plots together.
 #' @param BPPARAM BiocParallel backend. Configures the parallel implementation.
 #' Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.html}{BiocParallel}
 #' for more information.
 #'
-#' @return named list. List of \linkS4class{Repertoire} objects. The names of
+#' @return named list. List of \linkS4class{AbSeqRep} objects. The names of
 #' the list are taken directly from the repertoire object itself.
 #'
-#' @seealso \linkS4class{Repertoire}
+#' @seealso \linkS4class{AbSeqRep}
+#'
 #' @export
 #'
 #' @examples
@@ -62,11 +63,11 @@ abseqReport <- function(root, report = 3, BPPARAM = BiocParallel::bpparam()) {
 
             # depending on the number of samples requested to plot, outputDir
             # is either a <sample>_vs_<sample> format or just <sample> meanwhile,
-            # samples will either be a CompositeRepertoire or just Repertoire.
+            # samples will either be a AbSeqCRep or just AbSeqRep.
             if (length(sampleNames) > 1) {
                 outputDir <- file.path(root, RESULT_DIR, paste(sampleNames, collapse = "_vs_"))
                 samples <- Reduce("+", lapply(sampleNames, function(sampleName) {
-                    sample_ <- .loadRepertoireFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
+                    sample_ <- .loadAbSeqRepFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
                     # sample@outdir should be the same as root
                     if (normalizePath(sample_@outdir) != root) {
                         warning(paste("Sample output directory", sample_@outdir,
@@ -78,7 +79,7 @@ abseqReport <- function(root, report = 3, BPPARAM = BiocParallel::bpparam()) {
                 }))
             } else {
                 outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
-                samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
+                samples <- .loadAbSeqRepFromParams(file.path(outputDir, ANALYSIS_PARAMS))
                 if (normalizePath(samples@outdir) != root) {
                     warning(paste("Sample output directory", samples@outdir,
                                   "is different from provided path", root,
@@ -123,7 +124,7 @@ abseqReport <- function(root, report = 3, BPPARAM = BiocParallel::bpparam()) {
         sampleNames <- unlist(strsplit(pair, ","))
         if (length(sampleNames) == 1) {
             outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
-            samples <- .loadRepertoireFromParams(file.path(outputDir, ANALYSIS_PARAMS))
+            samples <- .loadAbSeqRepFromParams(file.path(outputDir, ANALYSIS_PARAMS))
             if (normalizePath(samples@outdir) != root) {
                 warning(paste("Sample output directory", samples@outdir,
                               "is different from provided path", root,
@@ -135,7 +136,7 @@ abseqReport <- function(root, report = 3, BPPARAM = BiocParallel::bpparam()) {
             outputDir <- file.path(root, RESULT_DIR, paste(sampleNames, collapse = "_vs_"))
             samples <- Reduce("+",
                               lapply(sampleNames, function(sampleName) {
-                                  tmpsample <- .loadRepertoireFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
+                                  tmpsample <- .loadAbSeqRepFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
                                   if (normalizePath(tmpsample@outdir) != root) {
                                       tmpsample@outdir <- root
                                   }
@@ -168,7 +169,7 @@ abseqReport <- function(root, report = 3, BPPARAM = BiocParallel::bpparam()) {
 #'
 #' @param reports list/vector type. Collection of strings that are path(s)
 #' to <sample>_report.html
-#' @param individualSamples list type. list of Repertoire objects. Used to
+#' @param individualSamples list type. list of AbSeqRep objects. Used to
 #' extract filtering information and % read counts.
 #' @param outputDirectory string type. Where should the report be placed.
 .collateReports <- function(reports, individualSamples, outputDirectory) {

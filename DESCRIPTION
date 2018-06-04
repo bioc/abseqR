@@ -26,6 +26,7 @@ Imports:
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 
+    'AbSeqCRep.R'
     'util.R'
     'distributions.R'
     'upstreamAnalysis.R'
@@ -35,7 +36,6 @@ Collate:
     'annotationAnalysis.R'
     'abundanceAnalysis.R'
     'plotter.R'
-    'compositeRepertoire.R'
-    'repertoire.R'
+    'AbSeqRep.R'
     'abseqReport.R'
 SystemRequirements: pandoc

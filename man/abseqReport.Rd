@@ -12,13 +12,13 @@ abseqReport(root, report = 3, BPPARAM = BiocParallel::bpparam())
 
 \item{report}{integer type. The possible values are:
 \itemize{
-  \item{0 - does nothing (returns named list of \linkS4class{Repertoire} objects)}
+  \item{0 - does nothing (returns named list of \linkS4class{AbSeqRep} objects)}
   \item{1 - generates plots for csv files}
   \item{2 - generates a report that collates all plots}
   \item{3 - generates interactive plots in report}
 }
 each value also does what the previous values do. For example, \code{report = 2}
-will return a named list of \linkS4class{Repertoire} objects, plot csv files,
+will return a named list of \linkS4class{AbSeqRep} objects, plot csv files,
 and generate a (non-interactive)HTML report that collates all the plots together.}
 
 \item{BPPARAM}{BiocParallel backend. Configures the parallel implementation.
@@ -26,12 +26,14 @@ Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.
 for more information.}
 }
 \value{
-named list. List of \linkS4class{Repertoire} objects. The names of
+named list. List of \linkS4class{AbSeqRep} objects. The names of
 the list are taken directly from the repertoire object itself.
 }
 \description{
 Plots all samples and comparisons as specified in \code{abseq.cfg}
 }
 \seealso{
-\linkS4class{Repertoire}
+\linkS4class{AbSeqRep}
+
+\linkS4class{AbSeqCRep}
 }
