@@ -897,3 +897,48 @@
     return(g)
 }
 
+##  dataframe is something like:
+##  +--------------------------+
+##  | Clonotype | Count | prop |
+##  +--------------------------+
+##  |           |       |      |
+##  |           |       |      |
+##  |           |       |      |
+##  |  .......  |  ...  | .... |
+##  +--------------------------+
+.reportIndices <- function(df, output) {
+    ## calculate number of singletons, number of doubletons,
+    ## higher order .. until i = 10
+    S.rare = unlist(lapply(1:10, function(i) {
+        sum(df$Count == i)
+    }))
+
+    speciesRichness <- nrow(df)
+
+    # se is sqrt(chao.1$var.chao1)
+    chao.1 <- .chao.1(speciesRichness, S.rare[1], S.rare[2])
+
+}
+
+
+#' Calculates Chao1 abundance model using formulae from Vegan package
+#' ref: https://cran.r-project.org/web/packages/vegan/vignettes/diversity-vegan.pdf
+#'
+#' @param s.obs observed species (typically number of rows in dataframe)
+#' @param a1 number of singletons
+#' @param a2 number of doubletons
+#'
+#' @return s.chao1 and var.chao1 as chao1 estimate and variance of chao1 respectively
+.chao.1 <- function(s.obs, a1, a2) {
+    # bias corrected chao.1, works when there's no a2 (f2 = 0)
+    s.chao1 <- s.obs + (a1 * (a1 - 1)) / (2 * (a2 + 1))
+    var.chao1 <- (1/(4 * ((a2 + 1)^4) * s.chao1)) * a1 * (
+        s.chao1 * a1^3 * a2 + 4 * s.chao1 * a1^2 * a2^2 +
+            2 * s.chao1 * a1 * a2^3 + 6 * s.chao1 * a1^2 * a2 +
+            2 * s.chao1 * a1 * a2^2 - 2 * s.chao1 * a2^3 +
+            4 * s.chao1 * a1^2 + s.chao1 * a1 * a2 - 5 * s.chao1 * a2^2 -
+            a1^3 - 2 * a1^2 * a2 - a1 * a2^2 -
+            2 * s.chao1 * a1 - 4 * s.chao1 * a2 - s.chao1
+    )
+    list(s.chao1 = s.chao1, var.chao1 = var.chao1)
+}
