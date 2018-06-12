@@ -993,11 +993,14 @@ Row {.tabset .tabset-fade}
 <!--- Always use static plot even if it's interactive - good luck rendering it
  otherwise -->
 ```{r abseq_scatter_diversity, echo=FALSE, eval=(!params$single && params$hasDiv)}
-files <- list.files(path = file.path(params$rootDir, "diversity"),
+files <- list.files(path = file.path(params$rootDir, "clonotype_analysis"),
                     pattern = ".*_clone_scatter\\.png",
                     full.names = T)
 scatterOut <- lapply(seq_along(files), function(i) {
-    line1 <- knitr::knit_expand(text = sprintf("### sample %d vs sample %d\n", i, i + 1))
+    line1 <- knitr::knit_expand(text = sprintf("### %s\n",
+                                               gsub("_", " ",
+                                                    stringr::str_extract(basename(files[[i]]),
+                                                                         "^.*(?=(_clone_scatter))"))))
     line2 <- knitr::knit_expand(text = sprintf("\n```{r abseq_scatter_out_%d, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}\n", i))
     line3 <- knitr::knit_expand(text = sprintf('grid.raster(readPNG("%s"))', files[[i]]))
     line4 <- knitr::knit_expand(text = "\n```\n")
@@ -1016,7 +1019,7 @@ Row
 ### Distribution of top 10 (colour coded) clonotypes from each sample
 
 ```{r abseq_top_10, eval=(params$hasDiv && !params$single), fig.width=params$widthL, fig.height=params$heightL}
-fname <- .getFile(path = file.path(params$rootDir, "diversity"), pattern = ".*_top10Clonotypes\\.Rdata")
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = ".*_top10Clonotypes\\.Rdata")
 if (!is.na(fname)) {
     load(fname)
     if (params$interactive) {
@@ -1035,7 +1038,7 @@ if (!is.na(fname)) {
 ### Number of shared (and exclusive) clonotypes among samples
 
 ```{r abseq_clone_venn, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "diversity"), pattern = ".*_cdr3_clonotypeIntersection\\.png")
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = ".*_cdr3_clonotypeIntersection\\.png")
 if (!is.na(fname)) {
     img <- readPNG(fname)
     grid.raster(img)

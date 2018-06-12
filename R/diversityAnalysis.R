@@ -1,227 +1,3 @@
-#' Title Creates a scatter plot
-#'
-#' @import ggplot2
-#' @include util.R
-#'
-#' @param df1 dataframe for sample 1
-#' @param df2 dataframe for sample 2
-#' @param name1 string type, Sample 1 name
-#' @param name2 string type. Sample 2 name
-#' @param cloneClass string type.
-#' What region was used to classify clonotypes - appears in title. For example,
-#' CDR3 or V region
-#'
-#' @return ggplot2 object
-.scatterPlot <- function(df1, df2, name1, name2, cloneClass) {
-
-    message(paste("Generating scatter plot for", name1, "and", name2))
-
-    df.union <- merge(df1, df2, by = "Clonotype", all.y = TRUE, all.x = TRUE)
-
-    # replace NaN with 0
-    df.union[is.na(df.union)] <- 0
-
-    # plot!
-    gg <- ggplot(df.union, aes(x = Count.x, y = Count.y)) +
-        geom_point() +
-        theme_bw() +
-        labs(subtitle = paste(name2, " vs ", name1,
-                            " plot based on clonotype counts"),
-             y = name2,
-             x = name1,
-             title = paste("Scatter plot of ", cloneClass, " clonotype counts"))
-    return(gg)
-}
-
-#' Creates a complex scatter plot
-#'
-#' @import ggplot2
-#' @import gridExtra grid
-#' @include util.R
-#'
-#' @param df1 dataframe for sample 1
-#' @param df2 dataframe for sample 2
-#' @param name1 string type, Sample 1 name
-#' @param name2 string type. Sample 2 name
-#' @param cloneClass string type.
-#' What region was used to classify clonotypes - appears in title. For example,
-#' CDR3 or V region
-#'
-#' this plotting techique was
-#' shamelessly plagarised from
-#' https://github.com/mikessh/vdjtools/blob/master/src/main/resources/rscripts/intersect_pair_scatter.r
-#' (VDJTools) with minor modifications
-#'
-#' @return ggplot2 object
-.scatterPlotComplex <- function(df1, df2, name1, name2, cloneClass) {
-    message(paste("Generating scatter plot for", name1, "and", name2))
-
-    df1$prop <- df1$Count / sum(df1$Count)
-    df2$prop <- df2$Count / sum(df2$Count)
-
-    # find what the smallest percentage is so we know what to use as the
-    # minimum (since log10(0) wont cut it)
-    smallestPercentage <- min(df1$prop, df2$prop)
-
-    # log10 scaled
-    df1$prop <- log10(df1$prop)
-    df2$prop <- log10(df2$prop)
-
-
-    df.union <- merge(df1, df2, by = "Clonotype", all.y = TRUE, all.x = TRUE)
-
-    intersectingClones <- df.union[complete.cases(df.union), "Clonotype"]
-
-    df.union[is.na(df.union)] <- log10(smallestPercentage * 5e-1)
-
-    xmin <- min(df.union$prop.x)
-    ymin <- min(df.union$prop.y)
-
-    sample1.margin <- .cloneDistMarginal(df1, intersectingClones, xmin, flip = F)
-    sample2.margin <- .cloneDistMarginal(df2, intersectingClones, ymin, flip = T)
-
-    g <- ggplot(df.union, aes(x = prop.x, y = prop.y)) +
-        theme_bw() +
-        geom_point(aes(size = (prop.x + prop.y / 2)),
-                       color = "black",
-                       alpha = 0.4,
-                       pch = 21,
-                       fill = BLUEHEX) +
-        scale_size_continuous(guide = "none", range = c(1, 10)) +
-        scale_x_continuous(limits = c(xmin, 0), expand = c(0, 0.1)) +
-        scale_y_continuous(limits = c(ymin, 0), expand = c(0, 0.1)) +
-        # geom_smooth(method = "lm", se = T, fullrange = T) +
-        # stat_smooth(data = df.union, aes(prop.x, prop.y,
-        #                                  weight = 10^((prop.x + prop.y) / 2)),
-        #             color = "blue", method = "lm", fullrange = T, se = T) +
-        labs(y = name2, x = name1)
-    grid.arrange(sample1.margin, .emptyPlot(), g, sample2.margin,
-                 ncol = 2, nrow = 2, widths = c(4, 1), heights = c(1, 4),
-                 top = paste("Scatter plot of", cloneClass, "clonotype frequencies\n", name2, "vs", name1)
-    )
-}
-
-#' Marginal density graph of clonotypes (blue for shared, grey for total)
-#'
-#' @import ggplot2
-#' @include util.R
-#'
-#' @param df.original
-#' @param otherClones
-#' @param lim.min
-#' @param flip
-#'
-#' @return ggplot2 object
-.cloneDistMarginal <- function(df.original, otherClones, lim.min, flip) {
-    mask <- df.original$Clonotype %in% otherClones
-    # clones that are shared between df.original and the other sample
-    df.shared <- df.original[mask, ]
-    # clones that are not shared with the other sample
-    df.exclusive <- df.original[!mask, ]
-    g <- ggplot() +
-        stat_density(data = df.original, aes(x = prop, y = ..scaled..),
-                     fill = "#808080", # grey
-                     alpha = 0.4, adjust = 1, size = 0.1, color = "black") +
-        stat_density(data = df.shared, aes(x = prop, y = ..scaled..),
-                     fill = BLUEHEX,
-                     alpha = 0.4, adjust = 1, size = 0.1, color = "black") +
-        stat_density(data = df.exclusive, aes(x = prop, y = ..scaled..),
-                     fill = "#e0ccff", # purplish blue
-                     alpha = 0.4, adjust = 1, size = 0.1, color = "black") +
-        scale_x_continuous(limits = c(lim.min, 0), expand = c(0, 0.25)) +
-        theme_bw() +
-        theme(legend.position = "none", axis.title.x = element_blank(),
-              axis.text = element_blank(), axis.ticks = element_blank(),
-              axis.title.y = element_blank(), panel.grid = element_blank())
-    if (flip) {
-        g <- g + coord_flip()
-    }
-    return(g)
-}
-
-#' Marginal histogram of clonotypes (blue for shared, grey for total). The y
-#' axis is scaled by sqrt (but it doesn't really matter anyway, since we're
-#' stripping away the y-ticks)
-#'
-#' @import ggplot2
-#' @include util.R
-#'
-#' @param df.original
-#' @param df.filtered
-#' @param lim.min
-#' @param flip
-#'
-#' @return ggplot2 object
-.cloneDistHist <- function(df.original, otherClones, lim.min, flip) {
-    df.filtered <- df.original[df.original$Clonotype %in% otherClones, ]
-    g <- ggplot() +
-        geom_histogram(data = df.original, aes(x = prop,
-                                               y = sqrt(..count../sum(..count..))),
-                       fill = "#808080", alpha = 0.4) +
-        geom_histogram(data = df.filtered, aes(x = prop,
-                                             y = sqrt(..count../sum(..count..))),
-                       fill = BLUEHEX, alpha = 0.4) +
-        scale_x_continuous(limits = c(lim.min, 0), expand = c(0, 0.25)) +
-        theme_bw() +
-        theme(legend.position = "none", axis.title.x = element_blank(),
-              axis.text = element_blank(), axis.ticks = element_blank(),
-              axis.title.y = element_blank(), panel.grid = element_blank())
-    if (flip) {
-        g <- g + coord_flip()
-    }
-    return(g)
-}
-
-
-#' Title Creates pairing scatter plots
-#'
-#' Plots a scatterplot of (i, i+1) samples. EG: given samples 1-3, plots
-#' a scatterplot of pairs: (1,2) and (2,3).
-#'
-#' @include util.R
-#' @import ggplot2
-#'
-#' @param dataframes list type. List of dataframes
-#' @param sampleNames vector type. 1-1 with dataframes
-#' @param outputPath string type. Output directory
-#' @param cloneClass string type.
-#' What region was used to classify clonotypes - appears in title. For example,
-#' CDR3 or V region
-#' @param .save logical type. Save ggplot object?
-#'
-#' @return None
-.scatterClones <- function(dataframes, sampleNames, outputPath, cloneClass,
-                           .save = T) {
-    nsamples <- length(dataframes)
-    message(paste("Plotting pairwise scatter plot for",
-                  paste(sampleNames, collapse = ", ")))
-    # this scatter plot doesn't make sense for 1 sample only
-    if (nsamples <= 1) {
-        stop("Expected > 1 samples for scatter plot")
-    }
-    if (nsamples != length(sampleNames)) {
-        stop(paste("Expected equal number of sample names and dataframes, got",
-                   length(sampleNames), "samples and", nsamples, "dataframes."))
-    }
-
-    # only need these 2 columns from dataframe
-    colnames <- c("Clonotype", "Count")
-    for (i in seq_len(nsamples - 1)) {
-        p <- .scatterPlotComplex(dataframes[[i]][colnames],
-                          dataframes[[i + 1]][colnames],
-                          sampleNames[i],
-                          sampleNames[i + 1], cloneClass)
-        saveName <- file.path(outputPath, paste0(sampleNames[i], "_vs_",
-                      sampleNames[i + 1], "_clone_scatter.png"))
-        # plot a square plot instead of rectange (axis needs to have same spacing)
-        # since they share the same axis values
-        ggsave(saveName, plot = p, width = V_WIDTH, height = V_WIDTH)
-        # scatterPlotComplex is too large to save!
-        #.saveAs(.save, saveName, p)
-    }
-}
-
-
 #' Title Creates Venndiagram for clonotype intersection
 #'
 #' @import VennDiagram
@@ -750,9 +526,9 @@
         # only need top N, also take the columns we're interested in only
         df <- head(df[colNames], top)
         # append sample name to distinguish data when merged later on
-        df$sample<- rep(sampleNames[i], nrow(df))
+        df$sample <- rep(sampleNames[i], nrow(df))
         # normalize percentage to top N
-        df$Count <- df$Count / sum(df$Count)
+        df$normPerc <- df$Count / sum(df$Count)
         dataframes[[i]] <- df
     }
 
@@ -783,7 +559,7 @@
         getPalatte <- colorRampPalette(brewer.pal(8, 'Accent'))
         palette <- getPalatte(length(unique(df.union$Clonotype)))
     }
-    g <- ggplot(df.union, aes(x = sample, y = Count)) +
+    g <- ggplot(df.union, aes(x = sample, y = normPerc)) +
         geom_bar(stat ='identity', aes(fill = Clonotype)) +
         theme(legend.position = "bottom", legend.box = "horizontal",
               legend.title = element_blank(),
@@ -814,36 +590,6 @@
                               sampleNames, mashedNames, .save = T) {
     message(paste("Starting diversity analysis on samples",
             paste(sampleNames, collapse = ", ")))
-    # clonotype plots
-    cdr3ClonesFile <-
-        .listFilesInOrder(path = diversityDirectories,
-                          pattern = ".*_cdr3_clonotypes_.*_over\\.csv(\\.gz)?$")
-
-    # these plots can only be done if there are > 1 samples
-    if (length(cdr3ClonesFile) > 0 && length(sampleNames) > 1) {
-        # plot scatter plot (CDR3 clonotypes)
-        .scatterClones(
-            lapply(cdr3ClonesFile, read.csv, stringsAsFactors = FALSE),
-            sampleNames, diversityOut, "CDR3")
-
-        # plot venn diagram (clonotypes)
-        .vennIntersection(
-            lapply(cdr3ClonesFile, read.csv, stringsAsFactors = FALSE),
-            sampleNames,
-            file.path(diversityOut, paste0(mashedNames,
-                                           "_cdr3_clonotypeIntersection.png"))
-            )
-
-        # plot top N distribution (clonotypes)
-        g <- .topNDist(
-            lapply(cdr3ClonesFile, read.csv, stringsAsFactors = FALSE),
-            sampleNames
-            )
-        saveName <- file.path(diversityOut, paste0(mashedNames,
-                                              "_top10Clonotypes.png"))
-        ggsave(saveName, plot = g, width = V_WIDTH_L, height = V_HEIGHT_L)
-        .saveAs(.save, saveName, g)
-    }
 
     # fr/cdr plots
     # plot duplication, rarefaction, recapture

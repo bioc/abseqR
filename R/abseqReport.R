@@ -114,7 +114,7 @@ abseqReport <- function(root, report = 3, BPPARAM = BiocParallel::bpparam()) {
 
     if (loop) {
         #lapply(pairings, function(pair) {
-        BiocParallel::bplapply(pairings, function(pair) {
+        bplapply(pairings, function(pair) {
             sampleNames <- unlist(strsplit(pair, ","))
 
             # depending on the number of samples requested to plot, outputDir

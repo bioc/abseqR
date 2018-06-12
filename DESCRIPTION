@@ -38,4 +38,5 @@ Collate:
     'plotter.R'
     'AbSeqRep.R'
     'abseqReport.R'
+    'pairwise.R'
 SystemRequirements: pandoc

@@ -120,6 +120,24 @@
 
         ##################################################
         #                                                #
+        #               CLONOTYPE PLOTS                  #
+        #                                                #
+        ##################################################
+        # pairwise clonotype comparison analyses only occurs when there's
+        # > 1 sample
+        if (length(sampleNames) > 1 && ABSEQ_DIR_DIV %in% analysis) {
+            pairwiseOut <- file.path(outputDir, ABSEQ_DIR_PAIR)
+            if (!file.exists(pairwiseOut)) {
+                dir.create(pairwiseOut)
+            }
+            diversityDirectories <- sapply(directories, file.path,
+                                           ABSEQ_DIR_DIV, USE.NAMES = F)
+            .clonotypeAnalysis(diversityDirectories, pairwiseOut, sampleNames,
+                               mashedNames)
+        }
+
+        ##################################################
+        #                                                #
         #               PRIMER.S  PLOTS                  #
         #                                                #
         ##################################################
