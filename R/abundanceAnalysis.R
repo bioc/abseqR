@@ -195,7 +195,7 @@
     qualityMeasure <- c("mismatches", "gaps", "bitscore", "identity", "start")
     lapply(qualityMeasure, function(qual) {
         heatmapFile <- file.path(abundanceDirectory, paste0(sampleName, "_igv_align_quality_", qual, "_hm.tsv"))
-        if (length(heatmapFile)) {
+        if (file.exists(heatmapFile)) {
             mat <- as.matrix(read.table(heatmapFile, skip = 1, check.names = F))
             if (qual == "identity") {
                 qual <- "%Identity"
@@ -209,6 +209,8 @@
                                ylabel = qual)
             .saveAs(T, heatmapFile, plot = p)
             return(p)
+        } else {
+            warning(paste("Could not find", heatmapFile, "for sample", sampleName))
         }
     })
 }
