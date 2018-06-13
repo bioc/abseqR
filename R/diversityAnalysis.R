@@ -553,11 +553,16 @@
     renyi.scales = c(0, 1, 2, Inf)
     renyi <- renyi(df, scales = renyi.scales)
     hill <- exp(renyi)
+    shannon <- vegan::diversity(df, index = "shannon")
+    simpson <- vegan::diversity(df, index = "simpson")
+    n.species <- ncol(df)
+
     as.data.frame(cbind(
-          shannon = diversity(df, index = "shannon"),
-          simpson.gini = diversity(df, index = "simpson"),
-          simpson.inv = diversity(df, index = "invsimpson"),
-          simpson.con = 1 - diversity(df, index = "simpson"),
+          shannon = shannon,
+          shannon.norm = shannon / log(n.species),
+          simpson.gini = simpson,
+          simpson.inv = vegan::diversity(df, index = "invsimpson"),
+          simpson.con = 1 - simpson,
           renyi.0 = renyi['0'],
           renyi.1 = renyi['1'],
           renyi.2 = renyi['2'],
