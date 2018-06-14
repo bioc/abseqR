@@ -22,7 +22,8 @@ Imports:
     grid,
     gridExtra,
     rmarkdown,
-    knitr
+    knitr,
+    vegan
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 
