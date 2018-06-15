@@ -769,7 +769,7 @@
         dataframes <- lapply(cdr3ClonesFile, function(fname) {
             df <- read.csv(fname, stringsAsFactors = F)
             d.trans <- as.data.frame(t(df[, "Count"]))
-            names(d.trans) <- df$Clonotype
+            #names(d.trans) <- df$Clonotype
             return(d.trans)
         })
         lbeOut <- file.path(diversityOut, lb.fname)
