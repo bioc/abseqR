@@ -1,33 +1,3 @@
-#' Returns a list of nC2 pairwings
-#'
-#' @import BiocParallel
-#'
-#' @param dataframes
-#'
-#' @return
-.pairwiseDataFrames <- function(dataframes) {
-    # TODO: make this parallel
-    # nC2 operation
-    sampleNames <- names(dataframes)
-    dfs <-  lapply(head(seq_along(dataframes), n = -1), function(i) {
-        pairs <- lapply((i + 1):length(dataframes), function(j) {
-            df1 <- dataframes[[i]]
-            df2 <- dataframes[[j]]
-
-            df.union <- merge(df1, df2, by = "Clonotype", all.y = T, all.x = T)
-        })
-        names(pairs) <- unlist(lapply((i + 1):length(dataframes), function(j) {
-            paste0(sampleNames[i], "_vs_", sampleNames[j])
-        }))
-        return(pairs)
-    })
-    # to get intersecting clones, it's as easy as finding rows with
-    # no NAs:
-    # intersect.clones <- df.union[complete.cases(df.union), "Clonotype"]
-    return(unlist(dfs, recursive = F))
-}
-
-
 #' Title Clonotype table
 #'
 #' @import ggplot2
@@ -446,45 +416,103 @@
 #' Conduct all pairwise comparison analyses
 #'
 #' @include util.R
+#' @include statistics.R
 #'
 #' @import ggplot2
 #' @import BiocParallel
+#' @import ggcorrplot
+#' @import reshape2
 #'
 #' @param dataframes
 #' @param sampleNames
 #' @param outputPath
-#' @param save
+#' @param .save
 #'
-#' @return
-.pairwiseComparison <- function(dataframes, sampleNames, outputPath, .save = T) {
+#' @return nothing
+.pairwiseComparison <- function(dataframes, sampleNames, outputPath, .save = TRUE) {
+
     stopifnot(length(dataframes) == length(sampleNames))
-    names(dataframes) <- sampleNames
-    pairs <- .pairwiseDataFrames(dataframes)
-    lapply(seq_along(pairs), function(i) {
-        comparisonName <- unlist(strsplit(names(pairs)[i], split = "_vs_", fixed = T))
+    # TODO: depending on memory consumption and CPU usage, can parallelize this.
+    df <- do.call("rbind", lapply(head(seq_along(dataframes), n = -1), function(i) {
+        do.call("rbind", lapply((i + 1):length(dataframes), function(j) {
 
-        # -----------------------  scatter plot ---------------------------
-        p <- .scatterPlotComplex(pairs[[i]],
-                                 dataframes[[comparisonName[1]]],
-                                 dataframes[[comparisonName[2]]],
-                                 comparisonName[1],
-                                 comparisonName[2],
-                                 "CDR3")
-        saveName <- file.path(outputPath, paste0(names(pairs)[i], "_clone_scatter.png"))
-        # square plot to get a evenly scaled scatter plot on both the x and y axis
-        ggsave(saveName, plot = p, width = V_WIDTH, height = V_WIDTH)
-        # too large to save, skip this!
-        # .saveAs(.save, saveName, p)
+            df.union <- merge(dataframes[[i]],
+                              dataframes[[j]],
+                              by = "Clonotype",
+                              all.y = T,
+                              all.x = T)
 
-        # -----------------------  something else ---------------------------
-        message("Going to add more analyses here")
+            # --- scatter plot ---
+            p <- .scatterPlotComplex(df.union,
+                                     dataframes[[i]],
+                                     dataframes[[j]],
+                                     sampleNames[i],
+                                     sampleNames[j],
+                                     "CDR3")
+            saveName <- file.path(outputPath,
+                                  paste0(sampleNames[i], "_vs_",
+                                         sampleNames[j], "_clone_scatter.png"))
+            # square plot to get a evenly scaled scatter plot on both the x and y axis
+            ggsave(saveName, plot = p, width = V_WIDTH, height = V_WIDTH)
+            # too large to save, skip this!
+            # .saveAs(.save, saveName, p)
+            # -- end scatter plot --
+
+            # make all NAs 0 before conducting distance / similarity analyses
+            df.union <- replace(df.union, is.na(df.union), 0)
+            # --- pearson correlation of clonotype frequencies ---
+            correlations <- suppressWarnings(.correlationTest(df.union))
+            # -- end pearson correaltion --
+
+            # --- Morisita Horn similarity index ---
+            distance <- .distanceMeasure(df.union)
+            # -- end Morisita Horn similarity index --
+
+
+            data.frame(from = sampleNames[i],
+                       to = sampleNames[j],
+                       morisita.horn = distance$morisita.horn,
+                       jaccard = distance$jaccard,
+                       bray.curtis = distance$bray.curtis,
+                       pearson = correlations$pearson,
+                       pearson.p = correlations$pearson.p,
+                       spearman = correlations$spearman,
+                       spearman.p = correlations$spearman.p
+                       )
+        }))
+    }))
+    # what df should loop like now: length(sampleNames) Choose 2 rows
+    # +------------------------------------------------------------------------------------------------+
+    # |from | to | morisita.horn | jaccard | bray.curtis | pearson | pearson.p | spearman | spearman.p |
+    # +------------------------------------------------------------------------------------------------+
+    # | ...                                                                                            |
+    # +------------------------------------------------------------------------------------------------+
+    #acast(df, from ~ to, value.var = "a", fill = 0, fun.aggregate = sum)
+    # step 1. save the dataframe as a TSV file
+    write.table(file = file.path(outputPath, "indices.tsv"), df,
+                quote = FALSE, row.names = FALSE, sep = "\t")
+
+    # step 2. plot and save the correlograms
+    lapply(c("pearson", "spearman"), function(method) {
+        mat <- acast(df, from ~ to, value.var = method)
+        p <- ggcorrplot(mat,
+                        lab = TRUE,
+                        ggtheme = theme_bw,
+                        method = "circle",
+                        title = paste(.capitalize(method), "correlation"))
+        saveName <- file.path(outputPath, paste0(method, ".png"))
+        ggsave(saveName, plot = p, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, saveName, p)
     })
+
 }
 
 
 #' Comprehensive clonotype analyses
 #'
 #' @include util.R
+#'
+#' @import ggplot2
 #'
 #' @param diversityDirectories list type. List of directories to diversity dir
 #' @param clonotypeOut string type. Output directory
@@ -506,6 +534,7 @@
             df$prop <- df$Count / sum(df$Count)
             return(df[, c("Count", "Clonotype", "prop")])
         })
+
         # all vs all comparisons (scatter plot, similarity, etc ...)
         .pairwiseComparison(dataframes, sampleNames, clonotypeOut, .save = .save)
 
@@ -521,3 +550,4 @@
         .saveAs(.save, saveName, g)
     }
 }
+

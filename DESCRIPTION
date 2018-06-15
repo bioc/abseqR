@@ -23,7 +23,8 @@ Imports:
     gridExtra,
     rmarkdown,
     knitr,
-    vegan
+    vegan,
+    ggcorrplot
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 
@@ -39,5 +40,6 @@ Collate:
     'plotter.R'
     'AbSeqRep.R'
     'abseqReport.R'
+    'statistics.R'
     'pairwise.R'
 SystemRequirements: pandoc
