@@ -489,7 +489,7 @@
     # +------------------------------------------------------------------------------------------------+
     #acast(df, from ~ to, value.var = "a", fill = 0, fun.aggregate = sum)
     # step 1. save the dataframe as a TSV file
-    write.table(file = file.path(outputPath, "indices.tsv"), df,
+    write.table(file = file.path(outputPath, "distance_indices.tsv"), df,
                 quote = FALSE, row.names = FALSE, sep = "\t")
 
     # step 2. plot and save the correlograms
