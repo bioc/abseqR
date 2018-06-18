@@ -518,8 +518,7 @@
         g <- ggdendro::ggdendrogram(hclust(as.dist(mat), method = "complete"),
                                rotate = TRUE) +
             labs(title = paste(.capitalize(sub(".", " ", method, fixed = TRUE)),
-                               "hierarchical dendogram")) +
-            theme(axis.line = element_blank())
+                               "hierarchical dendogram"))
         saveName <- file.path(outputPath,
                               paste0(sub(".", "_", method, fixed = TRUE),
                                      ".png"))
