@@ -24,7 +24,8 @@ Imports:
     rmarkdown,
     knitr,
     vegan,
-    ggcorrplot
+    ggcorrplot,
+    ggdendro
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 

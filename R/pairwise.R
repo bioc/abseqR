@@ -419,6 +419,7 @@
 #' @include statistics.R
 #'
 #' @import ggplot2
+#' @import ggdendro
 #' @import BiocParallel
 #' @import ggcorrplot
 #' @import reshape2
@@ -487,22 +488,43 @@
     # +------------------------------------------------------------------------------------------------+
     # | ...                                                                                            |
     # +------------------------------------------------------------------------------------------------+
-    #acast(df, from ~ to, value.var = "a", fill = 0, fun.aggregate = sum)
     # step 1. save the dataframe as a TSV file
+    # NOTE: this saves the dataframe in a unidirectional format. That is,
+    # from - to pairings will not repeat (since to - from will have the exact
+    # same row values). Hence, to reload this table as a symmetric matrix,
+    # more work will have to be done (need to reflect matrix on the diag).
+    # The diagnoal must be defined during load too. (see .loadMatrixFromDF)
     write.table(file = file.path(outputPath, "distance_indices.tsv"), df,
                 quote = FALSE, row.names = FALSE, sep = "\t")
 
     # step 2. plot and save the correlograms
     lapply(c("pearson", "spearman"), function(method) {
-        mat <- acast(df, from ~ to, value.var = method)
+        mat <- .loadMatrixFromDF(df, value.var = method, diag = 1)
+        #mat.pval <- .loadMatrixFromDF(df, value.var = paste0(method, ".p"),
+        #                              diag = 0)
         p <- ggcorrplot(mat,
                         lab = TRUE,
                         ggtheme = theme_bw,
-                        #method = "circle",
+                        #p.mat = mat.pval,
                         title = paste(.capitalize(method), "correlation"))
         saveName <- file.path(outputPath, paste0(method, ".png"))
         ggsave(saveName, plot = p, width = V_WIDTH, height = V_HEIGHT)
         .saveAs(.save, saveName, p)
+    })
+
+    # step 3. plot sand save the hierarchical dendograms
+    lapply(c("morisita.horn", "jaccard", "bray.curtis"), function(method) {
+        mat <- .loadMatrixFromDF(df, value.var = method, diag = 0)
+        g <- ggdendro::ggdendrogram(hclust(as.dist(mat), method = "complete"),
+                               rotate = TRUE) +
+            labs(title = paste(.capitalize(sub(".", " ", method, fixed = TRUE)),
+                               "hierarchical dendogram")) +
+            theme(axis.line = element_blank())
+        saveName <- file.path(outputPath,
+                              paste0(sub(".", "_", method, fixed = TRUE),
+                                     ".png"))
+        ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, saveName, g)
     })
 
 }

@@ -263,3 +263,48 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
         )
     return(g)
 }
+
+
+#' Given a dataframe with the columns "from", "to", and value.var, return
+#' a symmetric matrix (with diagonal values = diag). I.e. a call to
+#' isSymmetric(return_value_of_this_function) will always be TRUE.
+#'
+#'
+#' @import reshape2
+#'
+#' @param dataframe dataframe with 3 required columns, namely:
+#' +---------------------------------------+
+#' | from | to | value.var | ...           |
+#' +---------------------------------------+
+#' |      |    |           |               |
+#' +---------------------------------------+
+#' where value.var is the string provided in the function parameter
+#' @param value.var the column to use as the matrix value
+#' @param diag what should the diagonal values be if the dataframe doesn't provide them
+#' @param unidirectional logical type. If the dataframe provided has the reverse
+#' pairs (i.e. a from-to pair AND a to-from pair with the save values in the
+#' value.var column), then this should be FALSE. Otherwise, this function will
+#' flip the from-to columns to generate a symmetric dataframe (and hence, a
+#' symmetric matrix).
+#'
+#' @return a symmetric matrix with rownames(mat) == colnames(mat)
+#' The diagonal values are filled with diag if the dataframe itself doesn't have
+#' diagonal data
+.loadMatrixFromDF <- function(dataframe, value.var, diag, unidirecional = TRUE) {
+    if (unidirecional) {
+        # swap the columns "from" and "to", while the others remain the same
+        df.r <- dataframe[, c(2, 1, tail(seq_along(names(dataframe)), -2))]
+        # rename the columns (after swapping, it's to - from, need it to be from - to)
+        names(df.r) <- names(dataframe)
+        # rowbind the dataframes into one
+        df.f <- rbind(dataframe, df.r)
+    } else {
+        # bidirectional dataframe doesn't require mirror-ing
+        df.f <- dataframe
+    }
+    mat <- reshape2::acast(df.f, from ~ to, value.var = value.var, fill = diag)
+    # make sure the matrix is symmetric
+    mat <- mat[, rownames(mat)]
+    stopifnot(isSymmetric(mat))
+    mat
+}
