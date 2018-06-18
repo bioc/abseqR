@@ -500,13 +500,18 @@
     # step 2. plot and save the correlograms
     lapply(c("pearson", "spearman"), function(method) {
         mat <- .loadMatrixFromDF(df, value.var = method, diag = 1)
-        #mat.pval <- .loadMatrixFromDF(df, value.var = paste0(method, ".p"),
-        #                              diag = 0)
+        mat.pval <- .loadMatrixFromDF(df, value.var = paste0(method, ".p"),
+                                      diag = 0)
         p <- ggcorrplot(mat,
                         lab = TRUE,
                         ggtheme = theme_bw,
-                        #p.mat = mat.pval,
-                        title = paste(.capitalize(method), "correlation"))
+                        p.mat = mat.pval,
+                        title = paste(.capitalize(method), "correlation"),
+                        hc.order = TRUE,
+                        type = "lower",
+                        outline.col = "white"
+                        #colors = c("#0570b0", "white", "#cb181d")
+                        )
         saveName <- file.path(outputPath, paste0(method, ".png"))
         ggsave(saveName, plot = p, width = V_WIDTH, height = V_HEIGHT)
         .saveAs(.save, saveName, p)
