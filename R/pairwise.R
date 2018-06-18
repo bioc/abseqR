@@ -498,7 +498,7 @@
         p <- ggcorrplot(mat,
                         lab = TRUE,
                         ggtheme = theme_bw,
-                        method = "circle",
+                        #method = "circle",
                         title = paste(.capitalize(method), "correlation"))
         saveName <- file.path(outputPath, paste0(method, ".png"))
         ggsave(saveName, plot = p, width = V_WIDTH, height = V_HEIGHT)
