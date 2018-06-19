@@ -509,8 +509,8 @@
                         title = paste(.capitalize(method), "correlation"),
                         hc.order = TRUE,
                         type = "lower",
-                        outline.col = "white"
-                        #colors = c("#0570b0", "white", "#cb181d")
+                        outline.col = "white",
+                        colors = c("#053061", "#F7F7F7", "#67001F") # see brewer.pal(11, "RdBu")
                         )
         saveName <- file.path(outputPath, paste0(method, ".png"))
         ggsave(saveName, plot = p, width = V_WIDTH, height = V_HEIGHT)
