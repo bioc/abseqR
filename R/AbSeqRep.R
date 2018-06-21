@@ -112,7 +112,10 @@ AbSeqRep <- setClass("AbSeqRep", slots = c(
     lines <- readLines(con)
     close(con)
     params <- list(Class = "AbSeqRep")
-    skip <- c("report_interim", "yaml")
+
+    # parameters that do not provide any information - ignore them so they
+    # wont be added as slots
+    skip <- c("yaml")
 
     for (line in lines) {
         # read in parameters
