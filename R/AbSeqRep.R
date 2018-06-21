@@ -61,7 +61,7 @@
 #' itself, or trimmed to \code{--trim3 <num>}.
 #' @slot domainSystem character. Domain system to use in IgBLAST, possible
 #' values are either \code{imgt} or \code{kabat}.
-#' @slot primer numeric. Dummy value - not implemented yet.
+#'
 #' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}
 #' objects.
 #' @return AbSeqRep
@@ -102,8 +102,7 @@ AbSeqRep <- setClass("AbSeqRep", slots = c(
     database = "character",
     actualqstart = "numeric",
     fr4cut = "logical",
-    domainSystem = "character",
-    primer = "numeric"
+    domainSystem = "character"
 ))
 
 
