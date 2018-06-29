@@ -1,380 +1,3 @@
-#' Title Creates a scatter plot
-#'
-#' @import ggplot2
-#' @include util.R
-#'
-#' @param df1 dataframe for sample 1
-#' @param df2 dataframe for sample 2
-#' @param name1 string type, Sample 1 name
-#' @param name2 string type. Sample 2 name
-#' @param cloneClass string type.
-#' What region was used to classify clonotypes - appears in title. For example,
-#' CDR3 or V region
-#'
-#' @return ggplot2 object
-.scatterPlot <- function(df1, df2, name1, name2, cloneClass) {
-
-    message(paste("Generating scatter plot for", name1, "and", name2))
-
-    df.union <- merge(df1, df2, by = "Clonotype", all.y = TRUE, all.x = TRUE)
-
-    # replace NaN with 0
-    df.union[is.na(df.union)] <- 0
-
-    # plot!
-    gg <- ggplot(df.union, aes(x = Count.x, y = Count.y)) +
-        geom_point() +
-        theme_bw() +
-        labs(subtitle = paste(name2, " vs ", name1,
-                            " plot based on clonotype counts"),
-             y = name2,
-             x = name1,
-             title = paste("Scatter plot of ", cloneClass, " clonotype counts"))
-    return(gg)
-}
-
-#' Creates a complex scatter plot
-#'
-#' @import ggplot2
-#' @import gridExtra grid
-#' @include util.R
-#'
-#' @param df1 dataframe for sample 1
-#' @param df2 dataframe for sample 2
-#' @param name1 string type, Sample 1 name
-#' @param name2 string type. Sample 2 name
-#' @param cloneClass string type.
-#' What region was used to classify clonotypes - appears in title. For example,
-#' CDR3 or V region
-#'
-#' this plotting techique was
-#' shamelessly plagarised from
-#' https://github.com/mikessh/vdjtools/blob/master/src/main/resources/rscripts/intersect_pair_scatter.r
-#' (VDJTools) with minor modifications
-#'
-#' @return ggplot2 object
-.scatterPlotComplex <- function(df1, df2, name1, name2, cloneClass) {
-    message(paste("Generating scatter plot for", name1, "and", name2))
-
-    df1$prop <- df1$Count / sum(df1$Count)
-    df2$prop <- df2$Count / sum(df2$Count)
-
-    # find what the smallest percentage is so we know what to use as the
-    # minimum (since log10(0) wont cut it)
-    smallestPercentage <- min(df1$prop, df2$prop)
-
-    # log10 scaled
-    df1$prop <- log10(df1$prop)
-    df2$prop <- log10(df2$prop)
-
-
-    df.union <- merge(df1, df2, by = "Clonotype", all.y = TRUE, all.x = TRUE)
-
-    intersectingClones <- df.union[complete.cases(df.union), "Clonotype"]
-
-    df.union[is.na(df.union)] <- log10(smallestPercentage * 5e-1)
-
-    xmin <- min(df.union$prop.x)
-    ymin <- min(df.union$prop.y)
-
-    sample1.margin <- .cloneDistMarginal(df1, intersectingClones, xmin, flip = F)
-    sample2.margin <- .cloneDistMarginal(df2, intersectingClones, ymin, flip = T)
-
-    g <- ggplot(df.union, aes(x = prop.x, y = prop.y)) +
-        theme_bw() +
-        geom_point(aes(size = (prop.x + prop.y / 2)),
-                       color = "black",
-                       alpha = 0.4,
-                       pch = 21,
-                       fill = BLUEHEX) +
-        scale_size_continuous(guide = "none", range = c(1, 10)) +
-        scale_x_continuous(limits = c(xmin, 0), expand = c(0, 0.1)) +
-        scale_y_continuous(limits = c(ymin, 0), expand = c(0, 0.1)) +
-        # geom_smooth(method = "lm", se = T, fullrange = T) +
-        # stat_smooth(data = df.union, aes(prop.x, prop.y,
-        #                                  weight = 10^((prop.x + prop.y) / 2)),
-        #             color = "blue", method = "lm", fullrange = T, se = T) +
-        labs(y = name2, x = name1)
-    grid.arrange(sample1.margin, .emptyPlot(), g, sample2.margin,
-                 ncol = 2, nrow = 2, widths = c(4, 1), heights = c(1, 4),
-                 top = paste("Scatter plot of", cloneClass, "clonotype frequencies\n", name2, "vs", name1)
-    )
-}
-
-#' Marginal density graph of clonotypes (blue for shared, grey for total)
-#'
-#' @import ggplot2
-#' @include util.R
-#'
-#' @param df.original
-#' @param otherClones
-#' @param lim.min
-#' @param flip
-#'
-#' @return ggplot2 object
-.cloneDistMarginal <- function(df.original, otherClones, lim.min, flip) {
-    mask <- df.original$Clonotype %in% otherClones
-    # clones that are shared between df.original and the other sample
-    df.shared <- df.original[mask, ]
-    # clones that are not shared with the other sample
-    df.exclusive <- df.original[!mask, ]
-    g <- ggplot() +
-        stat_density(data = df.original, aes(x = prop, y = ..scaled..),
-                     fill = "#808080", # grey
-                     alpha = 0.4, adjust = 1, size = 0.1, color = "black") +
-        stat_density(data = df.shared, aes(x = prop, y = ..scaled..),
-                     fill = BLUEHEX,
-                     alpha = 0.4, adjust = 1, size = 0.1, color = "black") +
-        stat_density(data = df.exclusive, aes(x = prop, y = ..scaled..),
-                     fill = "#e0ccff", # purplish blue
-                     alpha = 0.4, adjust = 1, size = 0.1, color = "black") +
-        scale_x_continuous(limits = c(lim.min, 0), expand = c(0, 0.25)) +
-        theme_bw() +
-        theme(legend.position = "none", axis.title.x = element_blank(),
-              axis.text = element_blank(), axis.ticks = element_blank(),
-              axis.title.y = element_blank(), panel.grid = element_blank())
-    if (flip) {
-        g <- g + coord_flip()
-    }
-    return(g)
-}
-
-#' Marginal histogram of clonotypes (blue for shared, grey for total). The y
-#' axis is scaled by sqrt (but it doesn't really matter anyway, since we're
-#' stripping away the y-ticks)
-#'
-#' @import ggplot2
-#' @include util.R
-#'
-#' @param df.original
-#' @param df.filtered
-#' @param lim.min
-#' @param flip
-#'
-#' @return ggplot2 object
-.cloneDistHist <- function(df.original, otherClones, lim.min, flip) {
-    df.filtered <- df.original[df.original$Clonotype %in% otherClones, ]
-    g <- ggplot() +
-        geom_histogram(data = df.original, aes(x = prop,
-                                               y = sqrt(..count../sum(..count..))),
-                       fill = "#808080", alpha = 0.4) +
-        geom_histogram(data = df.filtered, aes(x = prop,
-                                             y = sqrt(..count../sum(..count..))),
-                       fill = BLUEHEX, alpha = 0.4) +
-        scale_x_continuous(limits = c(lim.min, 0), expand = c(0, 0.25)) +
-        theme_bw() +
-        theme(legend.position = "none", axis.title.x = element_blank(),
-              axis.text = element_blank(), axis.ticks = element_blank(),
-              axis.title.y = element_blank(), panel.grid = element_blank())
-    if (flip) {
-        g <- g + coord_flip()
-    }
-    return(g)
-}
-
-
-#' Title Creates pairing scatter plots
-#'
-#' Plots a scatterplot of (i, i+1) samples. EG: given samples 1-3, plots
-#' a scatterplot of pairs: (1,2) and (2,3).
-#'
-#' @include util.R
-#' @import ggplot2
-#'
-#' @param dataframes list type. List of dataframes
-#' @param sampleNames vector type. 1-1 with dataframes
-#' @param outputPath string type. Output directory
-#' @param cloneClass string type.
-#' What region was used to classify clonotypes - appears in title. For example,
-#' CDR3 or V region
-#' @param .save logical type. Save ggplot object?
-#'
-#' @return None
-.scatterClones <- function(dataframes, sampleNames, outputPath, cloneClass,
-                           .save = T) {
-    nsamples <- length(dataframes)
-    message(paste("Plotting pairwise scatter plot for",
-                  paste(sampleNames, collapse = ", ")))
-    # this scatter plot doesn't make sense for 1 sample only
-    if (nsamples <= 1) {
-        stop("Expected > 1 samples for scatter plot")
-    }
-    if (nsamples != length(sampleNames)) {
-        stop(paste("Expected equal number of sample names and dataframes, got",
-                   length(sampleNames), "samples and", nsamples, "dataframes."))
-    }
-
-    # only need these 2 columns from dataframe
-    colnames <- c("Clonotype", "Count")
-    for (i in seq_len(nsamples - 1)) {
-        p <- .scatterPlotComplex(dataframes[[i]][colnames],
-                          dataframes[[i + 1]][colnames],
-                          sampleNames[i],
-                          sampleNames[i + 1], cloneClass)
-        saveName <- file.path(outputPath, paste0(sampleNames[i], "_vs_",
-                      sampleNames[i + 1], "_clone_scatter.png"))
-        # plot a square plot instead of rectange (axis needs to have same spacing)
-        # since they share the same axis values
-        ggsave(saveName, plot = p, width = V_WIDTH, height = V_WIDTH)
-        # scatterPlotComplex is too large to save!
-        #.saveAs(.save, saveName, p)
-    }
-}
-
-
-#' Title Creates Venndiagram for clonotype intersection
-#'
-#' @import VennDiagram
-#'
-#' @param dataframes list type. List of sample dataframes. Only accepts 2 - 5
-#' samples. Warning message will be generated for anything outside of the range
-#' @param sampleNames vector type. 1-1 with dataframes
-#' @param outFile string type. Filename to be saved as
-#' @param top int type. Top N cutoff, defaults to ALL clones if not specified
-#'
-#' @return Nothing
-.vennIntersection <- function(dataframes, sampleNames, outFile, top = Inf) {
-
-    nsample <- length(dataframes)
-
-    if (nsample != length(sampleNames)) {
-        stop(paste("Expected equal number of sample names and dataframes, got",
-                   length(sampleNames), "samples and", nsample, "dataframes."))
-    }
-
-    if (nsample >= 2 && nsample <= 5) {
-        # output
-        message(paste("Creating Venn diagram for samples",
-                      paste(sampleNames, collapse = ", ")))
-        png(file = outFile, width = 8, height = 7, units = "in", res = 300)
-
-        # Get the top N clonotypes if specified, and only use the 2 columns
-        # specified below
-        colNames <- c("Clonotype", "Count")
-        dataframes <- lapply(dataframes, function(df) {
-            head(df[colNames], top)
-        })
-
-        # merge all dataframes
-        df.union <- merge(dataframes[[1]], dataframes[[2]],
-                          by = "Clonotype", all.y = TRUE, all.x = TRUE)
-        colnames(df.union) <- c("Clonotype", sampleNames[1], sampleNames[2])
-        df.union[is.na(df.union)] <- 0
-
-        # check if there's more
-        if (nsample > 2) {
-            for (i in 3:nsample) {
-                oldColNames <- colnames(df.union)
-                df.union <- merge(df.union, dataframes[[i]], by = "Clonotype",
-                                  all.y = TRUE, all.x = TRUE)
-                colnames(df.union) <- c(oldColNames, sampleNames[i])
-                df.union[is.na(df.union)] <- 0
-            }
-        }
-
-        # plot!
-        area1 <- sum(df.union[sampleNames[1]] > 0)
-        area2 <- sum(df.union[sampleNames[2]] > 0)
-        area12 <- sum(df.union[sampleNames[1]] > 0 & df.union[sampleNames[2]] > 0)
-        if (nsample == 2) {
-            draw.pairwise.venn(area1, area2, area12, category = c(sampleNames[1], sampleNames[2]),
-                               lty = "blank",
-                               col = "transparent",
-                               cat.fontface = "bold",
-                               cex = 1.7,
-                               fill = 2:3,
-                               alpha = 0.5,
-                               filename = NULL)
-        } else {
-            area3 <- sum(df.union[sampleNames[3]] > 0)
-            area13 <- sum(df.union[sampleNames[1]] > 0 & df.union[sampleNames[3]] > 0)
-            area23 <- sum(df.union[sampleNames[2]] > 0 & df.union[sampleNames[3]] > 0)
-            area123 <- sum(df.union[sampleNames[1]] > 0 & df.union[sampleNames[2]] > 0 & df.union[sampleNames[3]] > 0)
-            if (nsample == 3) {
-                draw.triple.venn(area1 = area1, area2 = area2, area3 = area3, n12 = area12, n13 = area13, n23 = area23, n123 = area123,
-                                 category = c(sampleNames[1], sampleNames[2], sampleNames[3]),
-                                 lty = "blank",
-                                 col = "transparent", cat.fontface = "bold", cex = 1.7,
-                                 fill = 2:4, alpha = 0.5, filename = NULL)
-            } else {
-                area4 <- sum(df.union[sampleNames[4]] > 0)
-                area14 <- sum(df.union[sampleNames[1]] > 0 & df.union[sampleNames[4]] > 0)
-                area24 <- sum(df.union[sampleNames[2]] > 0 & df.union[sampleNames[4]] > 0)
-                area34 <- sum(df.union[sampleNames[3]] > 0 & df.union[sampleNames[4]] > 0)
-                area124 <- sum(df.union[sampleNames[1]] > 0 & df.union[sampleNames[2]] > 0 & df.union[sampleNames[4]] > 0)
-                area134 <- sum(df.union[sampleNames[1]] > 0 & df.union[sampleNames[3]] > 0 & df.union[sampleNames[4]] > 0)
-                area234 <- sum(df.union[sampleNames[2]] > 0 & df.union[sampleNames[3]] > 0 & df.union[sampleNames[4]] > 0)
-                area1234 <- sum(df.union[sampleNames[1]] > 0 &
-                                    df.union[sampleNames[2]] > 0 &
-                                    df.union[sampleNames[3]] > 0 &
-                                    df.union[sampleNames[4]] > 0)
-                if (nsample == 4) {
-                    draw.quad.venn(area1 = area1, area2 = area2, area3 = area3, area4 = area4,
-                                   n12 = area12, n13 = area13, n14 = area14, n23 = area23, n24 = area24, n34 = area34,
-                                   n123 = area123, n124 = area124, n134 = area134, n234 = area234, n1234 = area1234,
-                                   category = c(sampleNames[1], sampleNames[2], sampleNames[3], sampleNames[4]),
-                                   lty = "blank",
-                                   col = "transparent", cat.fontface = "bold", cex = 1.7,
-                                   fill = 2:5, alpha = 0.5, filename = NULL
-                    )
-                } else {
-                    # quuntuple plot
-                    area5 <- sum(df.union[sampleNames[5]] > 0)
-                    area15 <- sum(df.union[sampleNames[1]] > 0 & df.union[sampleNames[5]] > 0)
-                    area25 <- sum(df.union[sampleNames[2]] > 0 & df.union[sampleNames[5]] > 0)
-                    area35 <- sum(df.union[sampleNames[3]] > 0 & df.union[sampleNames[5]] > 0)
-                    area45 <- sum(df.union[sampleNames[4]] > 0 & df.union[sampleNames[5]] > 0)
-                    area125 <- sum(df.union[sampleNames[1]] > 0 & df.union[sampleNames[2]] > 0 & df.union[sampleNames[5]] > 0)
-                    area135 <- sum(df.union[sampleNames[1]] > 0 & df.union[sampleNames[3]] > 0 & df.union[sampleNames[5]] > 0)
-                    area145 <- sum(df.union[sampleNames[1]] > 0 & df.union[sampleNames[4]] > 0 & df.union[sampleNames[5]] > 0)
-                    area235 <- sum(df.union[sampleNames[2]] > 0 & df.union[sampleNames[3]] > 0 & df.union[sampleNames[5]] > 0)
-                    area245 <- sum(df.union[sampleNames[2]] > 0 & df.union[sampleNames[4]] > 0 & df.union[sampleNames[5]] > 0)
-                    area345 <- sum(df.union[sampleNames[3]] > 0 & df.union[sampleNames[4]] > 0 & df.union[sampleNames[5]] > 0)
-                    area1235 <- sum(df.union[sampleNames[1]] > 0 &
-                                        df.union[sampleNames[2]] > 0 &
-                                        df.union[sampleNames[3]] > 0 &
-                                        df.union[sampleNames[5]] > 0)
-                    area1245 <- sum(df.union[sampleNames[1]] > 0 &
-                                        df.union[sampleNames[2]] > 0 &
-                                        df.union[sampleNames[4]] > 0 &
-                                        df.union[sampleNames[5]] > 0)
-                    area1345 <- sum(df.union[sampleNames[1]] > 0 &
-                                        df.union[sampleNames[3]] > 0 &
-                                        df.union[sampleNames[4]] > 0 &
-                                        df.union[sampleNames[5]] > 0)
-                    area2345 <- sum(df.union[sampleNames[2]] > 0 &
-                                        df.union[sampleNames[3]] > 0 &
-                                        df.union[sampleNames[4]] > 0 &
-                                        df.union[sampleNames[5]] > 0)
-                    area12345 <- sum(df.union[sampleNames[1]] > 0 &
-                                         df.union[sampleNames[2]] > 0 &
-                                         df.union[sampleNames[3]] > 0 &
-                                         df.union[sampleNames[4]] > 0 &
-                                         df.union[sampleNames[5]] > 0)
-                    draw.quintuple.venn(
-                        area1 = area1, area2 = area2, area3 = area3, area4 = area4, area5 = area5,
-                        n12 = area12, n13 = area13, n14 = area14, n15 = area15, n23 = area23, n24 = area24, n25 = area25, n34 = area34,
-                        n35 = area35, n45 = area45, n123 = area123, n124 = area124, n125 = area125, n134 = area134,
-                        n135 = area135, n145 = area145, n234 = area234, n235 = area235, n245 = area245, n345 = area345, n1234 = area1234,
-                        n1235 = area1235, n1245 = area1245, n1345 = area1345, n2345 = area2345, n12345 = area12345,
-                        category = c(sampleNames[1], sampleNames[2], sampleNames[3], sampleNames[4], sampleNames[5]),
-                        lty = "blank",
-                        col = "transparent", cat.fontface = "bold", cex = 1.7,
-                        fill = 2:6, alpha = 0.5, filename = NULL
-                    )
-                }
-            }
-        }
-        dev.off()
-    } else {
-        warning(paste("Skipping venn diagram plot for",
-                      paste(sampleNames, collapse = ", "),
-                      "because they do not fall within the range of 2 <= x <= 5"))
-    }
-}
-
-
-
 #' Title
 #'
 #' @import ggplot2
@@ -554,8 +177,6 @@
 
 
 
-
-
 #' Title Plots recapture
 #'
 #' @import ggplot2
@@ -655,8 +276,6 @@
 }
 
 
-
-
 #' Title Shows varying regions for a given clonotype defined by its CDR3
 #'
 #' @import reshape2
@@ -721,80 +340,240 @@
     return(g)
 }
 
-#' Title Clonotype table
+#' Composition logo plot
 #'
-#' @import ggplot2
-#' @import RColorBrewer
+#' @param compositionDirectory string type.
+#' @param outdir string type.
+#' @param sampleName string type.
+#' @param regions logical type. vector of FR/CDR regions to plot
+#' @param .save logical type. save ggplot object
 #'
-#' @param dataframes list type. List of dataframes.
-#' @param sampleNames vector type. vector of strings representing sample
-#' names should have one-to-one correspondence with dataframes
-#' @param top int type. Top N clonotypes to plot
+#' @import stringr
 #'
-#' @return None
-.topNDist <- function(dataframes, sampleNames, top = 10) {
-    nsamples <- length(dataframes)
+#' @return none
+.aminoAcidPlot <- function(compositionDirectory, outdir, sampleName,
+                           regions = c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3", "FR4"),
+                           .save = T) {
+    for (region in regions) {
+        # todo: change dirname such that compositionDirectory and outdir
+        # is differentiated!
+        dirName <- file.path(compositionDirectory, region)
+        outputPath <- file.path(outdir, region)
+        if (!dir.exists(outputPath)) {
+            dir.create(outputPath)
+        }
 
-    if (nsamples != length(sampleNames)) {
-        stop(paste("Expected equal number of sample names and dataframes, got",
-                   length(sampleNames), "samples and", nsamples, "dataframes."))
+        summaryPlot <- file.path(dirName, paste0(sampleName, "_cumulative_logo.csv"))
+        df <- read.csv(summaryPlot)
+        g1 <- .aminoAcidBar(df, scale = F, region)
+        g2 <- .aminoAcidBar(df, scale = T, region)
+        fname1 <- file.path(outputPath, paste0(sampleName, "_cumulative_logo.png"))
+        fname2 <- file.path(outputPath, paste0(sampleName, "_cumulative_logo_scaled.png"))
+        ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
+        ggsave(fname2, plot = g2, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, fname1, g1)
+        .saveAs(.save, fname2, g2)
+
+        germlineSpecific <-
+            list.files(path = dirName,
+                       pattern = paste0(sampleName,
+                                        "_.+_cumulative_logo\\.csv(\\.gz)?$"),
+                       full.names = T)
+
+        lapply(germlineSpecific, function(gLogoFile) {
+            germName <- sub("_cumulative_logo\\.csv(\\.gz)?$", "",
+                            stringr::str_extract(gLogoFile, "IG[HKL][VDJ].*"))
+            df <- read.csv(gLogoFile)
+            g1 <- .aminoAcidBar(df, scale = F, region, germ = germName)
+            g2 <- .aminoAcidBar(df, scale = T, region, germ = germName)
+            fname1 <- file.path(outputPath, paste0(sampleName, "_", germName, "_cumulative_logo.png"))
+            fname2 <- file.path(outputPath, paste0(sampleName, "_", germName, "_cumulative_logo_scaled.png"))
+            ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
+            ggsave(fname2, plot = g2, width = V_WIDTH, height = V_HEIGHT)
+            .saveAs(.save, fname1, g1)
+            .saveAs(.save, fname2, g2)
+        })
+    }
+}
+
+.aminoAcidBar <- function(df, scale, region, germ = "") {
+    group.colors <-
+        c(
+            # oranges
+            G = "#e65c00",
+            A = "#ff751a",
+            S = "#ff8533",
+            T = "#ff944d",
+            # greens
+            C = "#003300",
+            V = "#145214",
+            I = "#006622",
+            L = "#1f7a1f",
+            P = "#009933",
+            F = "#29a329",
+            Y = "#00b33c",
+            M = "#2eb82e",
+            W = "#33cc33",
+            # purples
+            N = "#330066",
+            Q = "#4d0099",
+            H = "#6600cc",
+            # reds
+            D = "#990000",
+            E = "#b30000",
+            # blues
+            K = "#000099",
+            R = "#0000cc"
+        )
+    df.agg <- aggregate(count ~ position, df, sum)
+
+    # get the max counts for each position - then xlabel will contain
+    # the amino acid character for that position - break ties on first occurance
+    df.max <- merge(aggregate(count ~ position, df, max), df)
+    df.max <- df.max[!duplicated(df.max[c(1,2)]), ]
+    xlabels <- lapply(df.max[with(df.max, order(position)), ]$aa, as.character)
+
+    total <- max(df.agg$count)
+    if (scale) {
+        df$proportion <- df$count / total
+        subs <- "Scaled to proportion"
+    } else {
+        df.tmp <- merge(df, df.agg, by = "position")
+        df.tmp <- df.tmp[with(df.tmp, order(position)), ]
+        # if not scaled, divide within its own position rather than
+        # overall (i.e. the max)
+        df$proportion <- df.tmp$count.x / df.tmp$count.y
+        subs <- ""
     }
 
-    message(paste("Plotting top", top, "clonotype distribution for samples",
-                  paste(sampleNames, collapse = ", ")))
-
-    # --- cleanup & pre-processing ---
-    colNames <- c("Clonotype", "Count")
-    for (i in seq_len(nsamples)) {
-        df <- dataframes[[i]]
-        # only need top N, also take the columns we're interested in only
-        df <- head(df[colNames], top)
-        # append sample name to distinguish data when merged later on
-        df$sample<- rep(sampleNames[i], nrow(df))
-        # normalize percentage to top N
-        df$Count <- df$Count / sum(df$Count)
-        dataframes[[i]] <- df
-    }
-
-    df.union <- do.call("rbind", dataframes)
-    # --- done: cleanup & pre-processing ---
-
-    # plot!
-    # colour suggestion taken from
-    # https://stackoverflow.com/questions/9563711/r-color-palettes-for-many-data-classes/41230685
-    # and modified
-    palette <- c("dodgerblue2","#E31A1C", # red
-                 "green4",
-                 "#6A3D9A", # purple
-                 "#FF7F00", # orange
-                 "black","gold1",
-                 "skyblue2","#FB9A99", # lt pink
-                 "olivedrab1",
-                 "#CAB2D6", # lt purple
-                 "#FDBF6F", # lt orange
-                 "gray70", "khaki2",
-                 "maroon","orchid1","deeppink1","blue1","steelblue4",
-                 "darkturquoise","green1","yellow4","yellow3",
-                 "aquamarine", "darkorange4", "mediumpurple1", "dimgrey",
-                 "darkseagreen1", "lightyellow", "coral2")
-    if (length(unique(df.union$Clonotype)) > 30) {
-        warning(paste0("Too many unique clonotypes are being plotted",
-                      " - extrapolatingpalette for top10 clonotype dist plot."))
-        getPalatte <- colorRampPalette(brewer.pal(8, 'Accent'))
-        palette <- getPalatte(length(unique(df.union$Clonotype)))
-    }
-    g <- ggplot(df.union, aes(x = sample, y = Count)) +
-        geom_bar(stat ='identity', aes(fill = Clonotype)) +
-        theme(legend.position = "bottom", legend.box = "horizontal",
-              legend.title = element_blank(),
-              legend.text = element_text(size = 7)) +
-        labs(title = paste("Top", top, "clonotype across each sample"),
-             subtitle = paste("Colour coded clonotypes, distribution of each clonotype is scaled to top", top),
-             x = "Sample",
-             y = "Distribution")  +
-        scale_fill_manual(values = palette)
+    df$aa <-
+        factor(
+            df$aa,
+            levels = c(
+                "G",
+                "A",
+                "S",
+                "T",
+                "C",
+                "V",
+                "I",
+                "L",
+                "P",
+                "F",
+                "Y",
+                "M",
+                "W",
+                "N",
+                "Q",
+                "H",
+                "D",
+                "E",
+                "K",
+                "R"
+            )
+        )
+    g <- ggplot(df, aes(x = position, y = proportion)) +
+        geom_bar(stat = "identity", aes(fill = aa)) +
+        labs(title = paste0(germ, " ", region, " (", total, ")"),
+             subtitle = subs, x = "amino acid", y = "proportion") +
+        scale_x_continuous(breaks = df.agg$position, labels = xlabels) +
+        scale_fill_manual(values = group.colors, drop = F) +
+        theme(legend.title = element_blank(),
+              legend.text = element_text(size = 5))
     return(g)
 }
+
+##  dataframe is something like:
+##  +--------------------------+
+##  | Clonotype | Count | prop |
+##  +--------------------------+
+##  |           |       |      |
+##  |           |       |      |
+##  |           |       |      |
+##  |  .......  |  ...  | .... |
+##  +--------------------------+
+#' Reports abundance-based (Lower bound) diversity estimates using the Vegan package
+#'
+#' @import vegan
+#'
+#' @param df clonotype dataframe. Vegan format:
+#' +---------------------------+
+#' | S.1| S.2| S.3 | S.4 | ... |   (each species should have its own column)
+#' +---------------------------+
+#' | v1 |v2  | v3  | ....      |   (each species' count values are placed in the corresponding column)
+#' +---------------------------+
+#'
+#' @return dataframe with the format:
+#' +----------------------------------------------------------------+
+#' | S.obs | S.chao1 | se.chao1 | S.ACE | se.ACE | s.jack1 | s.jack2|
+#' +----------------------------------------------------------------+
+#' | v1    |  v2 ....                                               |
+#' +----------------------------------------------------------------+
+.reportLBE <- function(df) {
+    f1.f2 <- unlist(lapply(1:2, function(i) {
+        sum(df[1, ] == i)
+    }))
+
+    lbe <- estimateR(df)
+    s.obs <- lbe[1]
+    s.jack1 <- s.obs + f1.f2[1]
+    s.jack2 <- s.obs + 2 * f1.f2[1] - f1.f2[2]
+
+    lbe <- rbind(as.data.frame(lbe), S.jack1 = s.jack1, S.jack2 = s.jack2)
+
+    df.out <- as.data.frame(t(lbe[, 1]))
+    names(df.out) <- rownames(lbe)
+    return(df.out)
+}
+
+#' Calculates the "standard" diversity indices
+#'
+#' @import vegan
+#'
+#' @param df clonotype dataframe. Vegan format:
+#' +---------------------------+
+#' | S.1| S.2| S.3 | S.4 | ... |   (each species should have its own column)
+#' +---------------------------+
+#' | v1 |v2  | v3  | ....      |   (each species' count values are placed in the corresponding column)
+#' +---------------------------+
+#'
+#' @return dataframe with the column headers:
+#' shannon , simpson.con , simpson.inv , simpson.gini , renyi.0 ,
+#' renyi.1 , renyi.2 , renyi.Inf , hill.0 , hill.1 , hill.2 , hill.Inf
+#'
+#' renyi.0 => species richness
+#' renyi.1 => shannon entropy
+#' renyi.2 => inv.gini
+#' renyi.Inf => min.entropy
+#'
+#' finally:
+#'    hill_a = exp(renyi_a)
+#'
+.calculateDInd <- function(df) {
+    renyi.scales = c(0, 1, 2, Inf)
+    renyi <- renyi(df, scales = renyi.scales)
+    hill <- exp(renyi)
+    shannon <- vegan::diversity(df, index = "shannon")
+    simpson <- vegan::diversity(df, index = "simpson")
+    n.species <- ncol(df)
+
+    as.data.frame(cbind(
+          shannon = shannon,
+          shannon.norm = shannon / log(n.species),
+          simpson.gini = simpson,
+          simpson.inv = vegan::diversity(df, index = "invsimpson"),
+          simpson.con = 1 - simpson,
+          renyi.0 = renyi['0'],
+          renyi.1 = renyi['1'],
+          renyi.2 = renyi['2'],
+          renyi.Inf = renyi['Inf'],
+          hill.0 = hill['0'],
+          hill.1 = hill['1'],
+          hill.2 = hill['2'],
+          hill.Inf = hill['Inf']
+          ))
+}
+
 
 #' Title Diversity analysis
 #'
@@ -814,36 +593,6 @@
                               sampleNames, mashedNames, .save = T) {
     message(paste("Starting diversity analysis on samples",
             paste(sampleNames, collapse = ", ")))
-    # clonotype plots
-    cdr3ClonesFile <-
-        .listFilesInOrder(path = diversityDirectories,
-                          pattern = ".*_cdr3_clonotypes_.*_over\\.csv(\\.gz)?$")
-
-    # these plots can only be done if there are > 1 samples
-    if (length(cdr3ClonesFile) > 0 && length(sampleNames) > 1) {
-        # plot scatter plot (CDR3 clonotypes)
-        .scatterClones(
-            lapply(cdr3ClonesFile, read.csv, stringsAsFactors = FALSE),
-            sampleNames, diversityOut, "CDR3")
-
-        # plot venn diagram (clonotypes)
-        .vennIntersection(
-            lapply(cdr3ClonesFile, read.csv, stringsAsFactors = FALSE),
-            sampleNames,
-            file.path(diversityOut, paste0(mashedNames,
-                                           "_cdr3_clonotypeIntersection.png"))
-            )
-
-        # plot top N distribution (clonotypes)
-        g <- .topNDist(
-            lapply(cdr3ClonesFile, read.csv, stringsAsFactors = FALSE),
-            sampleNames
-            )
-        saveName <- file.path(diversityOut, paste0(mashedNames,
-                                              "_top10Clonotypes.png"))
-        ggsave(saveName, plot = g, width = V_WIDTH_L, height = V_HEIGHT_L)
-        .saveAs(.save, saveName, g)
-    }
 
     # fr/cdr plots
     # plot duplication, rarefaction, recapture
@@ -1005,149 +754,125 @@
     #  ggsave(paste0(diversityOut, mashedNames, "_region_analysis.png"),
     #         plot = g, width = V_WIDTH, height = V_HEIGHT)
     #}
-}
 
+    ####################################################
+    #                  UNSEEN SPECIES                  #
+    ####################################################
+    cdr3ClonesFile <- .listFilesInOrder(path = diversityDirectories,
+                                        pattern = ".*_cdr3_clonotypes_.*_over\\.csv(\\.gz)?$")
+    lb.fname <- "lower_bound_estimate.tsv"
+    ind.fname <- "diversity_indices.tsv"
 
-#' Composition logo plot
-#'
-#' @param compositionDirectory string type.
-#' @param outdir string type.
-#' @param sampleName string type.
-#' @param regions logical type. vector of FR/CDR regions to plot
-#' @param .save logical type. save ggplot object
-#'
-#' @import stringr
-#'
-#' @return none
-.aminoAcidPlot <- function(compositionDirectory, outdir, sampleName,
-                           regions = c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3", "FR4"),
-                           .save = T) {
-    for (region in regions) {
-        # todo: change dirname such that compositionDirectory and outdir
-        # is differentiated!
-        dirName <- file.path(compositionDirectory, region)
-        outputPath <- file.path(outdir, region)
-        if (!dir.exists(outputPath)) {
-            dir.create(outputPath)
+    if (length(cdr3ClonesFile)) {
+        # dataframes is in vegan input format, the clonotypes are now column headers
+        # instead of column values
+        dataframes <- lapply(cdr3ClonesFile, function(fname) {
+            df <- read.csv(fname, stringsAsFactors = F)
+            d.trans <- as.data.frame(t(df[, "Count"]))
+            #names(d.trans) <- df$Clonotype
+            return(d.trans)
+        })
+        lbeOut <- file.path(diversityOut, lb.fname)
+        indOut <- file.path(diversityOut, ind.fname)
+
+        if (length(dataframes) == 1) {
+            ##### Lower bound estimates of unseen species
+            message(paste("Calculating unseen species lower bound estimates for",
+                          sampleNames[1]))
+            df.lbe <- .reportLBE(dataframes[[1]])
+            write.table(df.lbe, file = lbeOut, sep = "\t", quote = F, row.names = F)
+
+            ##### Diversity indices
+            message(paste("Calculating standard diversity indices for",
+                          sampleNames[1]))
+            df.ind <- .calculateDInd(dataframes[[1]])
+            write.table(df.ind, file = indOut, sep = "\t", quote = F, row.names = F)
+
+        } else {
+            ##### Lower bound estimates of unseen species
+            # don't bother recalculating .reportLBE unless the file can't be found
+            # .reportLBE might not be calculated if the user manually combined repertoires
+            # before actually calling abseqR::report() on the individual repertoires
+
+            # try to find all lower bound estimate files in all the sample directories, if
+            # even one of them does not exist, we'll have to generate the tsv file
+            lbesFiles <- .listFilesInOrder(path = diversityDirectories,
+                                               pattern = paste0(lb.fname, "\\.tsv(\\.gz)?$"))
+            if (length(lbesFiles) != length(sampleNames)) {
+                message(paste("Calculating unseen species lower bound estimates for",
+                              paste(sampleNames, collapse = ", ")))
+                df.lbes <- lapply(dataframes, .reportLBE)
+                stopifnot(length(df.lbes) == length(sampleNames) &&
+                              length(sampleNames) == length(diversityDirectories))
+
+                # write out to individual sample directories
+                lapply(seq_along(df.lbes), function(i) {
+                    write.table(df.lbes[[i]],
+                                file = file.path(diversityDirectories[[i]], lb.fname),
+                                sep = "\t",
+                                quote = F,
+                                row.names = F)
+                })
+            } else {
+                # expect 1-1 relationship
+                message(paste("Loading precomputed lower bound estimates from",
+                              paste(sampleNames, collapse = ", ")))
+                stopifnot(length(diversityDirectories) == length(sampleNames))
+                lbesFiles <- .listFilesInOrder(path = diversityDirectories,
+                                               pattern = paste0(lb.fname, "\\.tsv(\\.gz)?$"))
+                stopifnot(length(lbesFiles) == length(sampleNames))
+                df.lbes <- lapply(lbesFiles, read.table, header = T)
+            }
+            dfs <- do.call("rbind", lapply(seq_along(df.lbes), function(i) {
+                df <- df.lbes[[i]]
+                df$sample <- sampleNames[i]
+                return(df)
+            }))
+            write.table(dfs, file = lbeOut, sep = "\t", quote = F, row.names = F)
+
+            ##### Diversity indices
+            # same logic as above
+            indFiles <- .listFilesInOrder(path = diversityDirectories,
+                                          pattern = paste0(ind.fname, "\\.tsv(\\.gz)?$"))
+            # if we can't recover all the required indices tsv file, re-generate
+            # all of them
+            if (length(indFiles) != length(sampleNames)) {
+                message(paste("Calculating standard diversity indices for",
+                              paste(sampleNames, collapse = ", ")))
+
+                df.inds <- lapply(dataframes, .calculateDInd)
+                stopifnot(length(df.inds) == length(sampleNames) &&
+                              length(sampleNames) == length(diversityDirectories))
+
+                # write out to individual sample directories
+                lapply(seq_along(df.inds), function(i) {
+                    write.table(df.inds[[i]],
+                                file = file.path(diversityDirectories[[i]],
+                                                 ind.fname),
+                                sep = "\t",
+                                quote = F,
+                                row.names = F)
+                })
+            } else {
+                message(paste("Loading precomputed diversity indices from",
+                              paste(sampleNames, collapse = ", ")))
+                stopifnot(length(diversityDirectories) == length(sampleNames))
+                indFiles <- .listFilesInOrder(path = diversityDirectories,
+                                              pattern = paste0(ind.fname, "\\.tsv(\\.gz)?$"))
+                stopifnot(length(indFiles) == length(sampleNames))
+                df.inds <- lapply(indFiles, read.table, header = T)
+            }
+            dfs <- do.call("rbind", lapply(seq_along(df.inds), function(i) {
+                df <- df.inds[[i]]
+                df$sample <- sampleNames[i]
+                return(df)
+            }))
+            write.table(dfs, file = indOut, sep = "\t", quote = F, row.names = F)
         }
 
-        summaryPlot <- file.path(dirName, paste0(sampleName, "_cumulative_logo.csv"))
-        df <- read.csv(summaryPlot)
-        g1 <- .aminoAcidBar(df, scale = F, region)
-        g2 <- .aminoAcidBar(df, scale = T, region)
-        fname1 <- file.path(outputPath, paste0(sampleName, "_cumulative_logo.png"))
-        fname2 <- file.path(outputPath, paste0(sampleName, "_cumulative_logo_scaled.png"))
-        ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
-        ggsave(fname2, plot = g2, width = V_WIDTH, height = V_HEIGHT)
-        .saveAs(.save, fname1, g1)
-        .saveAs(.save, fname2, g2)
-
-        germlineSpecific <-
-            list.files(path = dirName,
-                       pattern = paste0(sampleName,
-                                        "_.+_cumulative_logo\\.csv(\\.gz)?$"),
-                       full.names = T)
-
-        lapply(germlineSpecific, function(gLogoFile) {
-            germName <- sub("_cumulative_logo\\.csv(\\.gz)?$", "",
-                            stringr::str_extract(gLogoFile, "IG[HKL][VDJ].*"))
-            df <- read.csv(gLogoFile)
-            g1 <- .aminoAcidBar(df, scale = F, region, germ = germName)
-            g2 <- .aminoAcidBar(df, scale = T, region, germ = germName)
-            fname1 <- file.path(outputPath, paste0(sampleName, "_", germName, "_cumulative_logo.png"))
-            fname2 <- file.path(outputPath, paste0(sampleName, "_", germName, "_cumulative_logo_scaled.png"))
-            ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
-            ggsave(fname2, plot = g2, width = V_WIDTH, height = V_HEIGHT)
-            .saveAs(.save, fname1, g1)
-            .saveAs(.save, fname2, g2)
-        })
-    }
-}
-
-.aminoAcidBar <- function(df, scale, region, germ = "") {
-    group.colors <-
-        c(
-            # oranges
-            G = "#e65c00",
-            A = "#ff751a",
-            S = "#ff8533",
-            T = "#ff944d",
-            # greens
-            C = "#003300",
-            V = "#145214",
-            I = "#006622",
-            L = "#1f7a1f",
-            P = "#009933",
-            F = "#29a329",
-            Y = "#00b33c",
-            M = "#2eb82e",
-            W = "#33cc33",
-            # purples
-            N = "#330066",
-            Q = "#4d0099",
-            H = "#6600cc",
-            # reds
-            D = "#990000",
-            E = "#b30000",
-            # blues
-            K = "#000099",
-            R = "#0000cc"
-        )
-    df.agg <- aggregate(count ~ position, df, sum)
-
-    # get the max counts for each position - then xlabel will contain
-    # the amino acid character for that position - break ties on first occurance
-    df.max <- merge(aggregate(count ~ position, df, max), df)
-    df.max <- df.max[!duplicated(df.max[c(1,2)]), ]
-    xlabels <- lapply(df.max[with(df.max, order(position)), ]$aa, as.character)
-
-    total <- max(df.agg$count)
-    if (scale) {
-        df$proportion <- df$count / total
-        subs <- "Scaled to proportion"
     } else {
-        df.tmp <- merge(df, df.agg, by = "position")
-        df.tmp <- df.tmp[with(df.tmp, order(position)), ]
-        # if not scaled, divide within its own position rather than
-        # overall (i.e. the max)
-        df$proportion <- df.tmp$count.x / df.tmp$count.y
-        subs <- ""
+        warning(paste(paste(sampleNames, collapse = ", "),
+                      "is missing CDR3 clonotype counts file,",
+                      "skipping LBE and IND analysis"))
     }
-
-    df$aa <-
-        factor(
-            df$aa,
-            levels = c(
-                "G",
-                "A",
-                "S",
-                "T",
-                "C",
-                "V",
-                "I",
-                "L",
-                "P",
-                "F",
-                "Y",
-                "M",
-                "W",
-                "N",
-                "Q",
-                "H",
-                "D",
-                "E",
-                "K",
-                "R"
-            )
-        )
-    g <- ggplot(df, aes(x = position, y = proportion)) +
-        geom_bar(stat = "identity", aes(fill = aa)) +
-        labs(title = paste0(germ, " ", region, " (", total, ")"),
-             subtitle = subs, x = "amino acid", y = "proportion") +
-        scale_x_continuous(breaks = df.agg$position, labels = xlabels) +
-        scale_fill_manual(values = group.colors, drop = F) +
-        theme(legend.title = element_blank(),
-              legend.text = element_text(size = 5))
-    return(g)
 }
-
