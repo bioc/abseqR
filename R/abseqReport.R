@@ -1,7 +1,6 @@
 #' Visualize all analysis conducted by AbSePy
 #'
-#' @description Plots all samples and comparisons as specified in \code{abseq.cfg}.
-#'  This file can be found in the same output directory supplied to abseqPy's
+#' @description Plots all samples in the output directory supplied to abseqPy's
 #' \code{--outdir} or \code{-o} argument.
 #'
 #' @include util.R
@@ -16,11 +15,14 @@
 #'   \item{0 - does nothing (returns named list of \linkS4class{AbSeqRep} objects)}
 #'   \item{1 - generates plots for csv files}
 #'   \item{2 - generates a report that collates all plots}
-#'   \item{3 - generates interactive plots in report}
+#'   \item{3 - generates interactive plots in report (default)}
 #' }
 #' each higher value also does what the previous values do. For example, \code{report = 2}
 #' will return a named list of \linkS4class{AbSeqRep} objects, plot csv files,
 #' and generate a (non-interactive)HTML report that collates all the plots together.
+#' @param compare vector of strings. From the samples in \code{root}, samples can be
+#' selected and compared against each other. For example, to compare "sample1" with "sample2" and
+#' "sample3" with "sample4", \code{compare} should be c("sample1,sample2", "sample3,sample4").
 #' @param BPPARAM BiocParallel backend. Configures the parallel implementation.
 #' Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.html}{BiocParallel}
 #' for more information.
@@ -84,8 +86,41 @@
 #'# see https://www.bioconductor.org/packages/devel/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.pdf
 #'# for more information about how to use BPPARAM and BiocParallel in general.
 #' }
-abseqReport <- function(root, report = 3, BPPARAM = BiocParallel::bpparam()) {
-    # TODO: sanitize report properly using constants/functions
+abseqReport <- function(root, report, compare, BPPARAM) {
+    #  ------ sanitize function arguments ---------
+    root <- normalizePath(root)
+    if (missing(report)) {
+        report <- 3
+    }
+    if (missing(BPPARAM)) {
+        BPPARAM <- BiocParallel::bpparam()
+    }
+    if (missing(compare)) {
+        compare <- list.files(file.path(root, RESULT_DIR))
+    } else {
+        # make sure samples in "compare" actually exists
+        availSamples <- list.files(file.path(root, RESULT_DIR))
+        lapply(compare, function(s) {
+            user.sample.name <- unlist(lapply(strsplit(s, ","), trimws))
+            if (length(user.sample.name) > 1) {
+                lapply(user.sample.name, function(si) {
+                    if (!(si %in% availSamples)) {
+                        stop(paste("Sample", si, "in 'compare' argument cannot",
+                                   "be found in", file.path(root, RESULT_DIR)))
+                    }
+                })
+            } else {
+                if (!(s %in% availSamples)) {
+                    stop(paste("Sample", s, "in 'compare' argument cannot",
+                               "be found in", file.path(root, RESULT_DIR)))
+                }
+            }
+        })
+
+        compare <- unique(c(availSamples, compare))
+    }
+
+    # TODO: sanitize 'report' properly using constants/functions
     stopifnot(report %in% c(0, 1, 2, 3))
     if (report == 0) {
         report <- FALSE
@@ -105,17 +140,10 @@ abseqReport <- function(root, report = 3, BPPARAM = BiocParallel::bpparam()) {
         loop <- TRUE
     }
 
-    root <- normalizePath(root)
-    metaFile <- file.path(root, ABSEQ_CFG)
-
-    con <- file(metaFile, "r")
-    pairings <- tail(readLines(con), n = -1)
-    close(con)
-
     if (loop) {
-        #lapply(pairings, function(pair) {
-        BiocParallel::bplapply(pairings, function(pair) {
-            sampleNames <- unlist(strsplit(pair, ","))
+        #lapply(compare, function(pair) {
+        BiocParallel::bplapply(compare, function(pair) {
+            sampleNames <- unlist(lapply(strsplit(pair, ","), trimws))
 
             # depending on the number of samples requested to plot, outputDir
             # is either a <sample>_vs_<sample> format or just <sample> meanwhile,
@@ -177,7 +205,7 @@ abseqReport <- function(root, report = 3, BPPARAM = BiocParallel::bpparam()) {
     individualReports <- list()
     # populate individualSample list with samples for user to browse and
     # create report if asked to.
-    for (pair in pairings) {
+    for (pair in compare) {
         sampleNames <- unlist(strsplit(pair, ","))
         if (length(sampleNames) == 1) {
             outputDir <- file.path(root, RESULT_DIR, sampleNames[1])

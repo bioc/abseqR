@@ -4,7 +4,7 @@
 \alias{abseqReport}
 \title{Visualize all analysis conducted by AbSePy}
 \usage{
-abseqReport(root, report = 3, BPPARAM = BiocParallel::bpparam())
+abseqReport(root, report, compare, BPPARAM)
 }
 \arguments{
 \item{root}{string type. Root directory as specified in
@@ -16,11 +16,15 @@ abseqPy's output.}
   \item{0 - does nothing (returns named list of \linkS4class{AbSeqRep} objects)}
   \item{1 - generates plots for csv files}
   \item{2 - generates a report that collates all plots}
-  \item{3 - generates interactive plots in report}
+  \item{3 - generates interactive plots in report (default)}
 }
 each higher value also does what the previous values do. For example, \code{report = 2}
 will return a named list of \linkS4class{AbSeqRep} objects, plot csv files,
 and generate a (non-interactive)HTML report that collates all the plots together.}
+
+\item{compare}{vector of strings. From the samples in \code{root}, samples can be
+selected and compared against each other. For example, to compare "sample1" with "sample2" and
+"sample3" with "sample4", \code{compare} should be c("sample1,sample2", "sample3,sample4").}
 
 \item{BPPARAM}{BiocParallel backend. Configures the parallel implementation.
 Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.html}{BiocParallel}
@@ -32,8 +36,7 @@ the list are taken directly from the repertoire object itself. This return
 value is consistent with the return value of \code{\link{report}}
 }
 \description{
-Plots all samples and comparisons as specified in \code{abseq.cfg}.
- This file can be found in the same output directory supplied to abseqPy's
+Plots all samples in the output directory supplied to abseqPy's
 \code{--outdir} or \code{-o} argument.
 }
 \examples{

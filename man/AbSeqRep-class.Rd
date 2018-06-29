@@ -99,8 +99,6 @@ itself, or trimmed to \code{--trim3 <num>}.}
 
 \item{\code{domainSystem}}{character. Domain system to use in IgBLAST, possible
 values are either \code{imgt} or \code{kabat}.}
-
-\item{\code{primer}}{numeric. Dummy value - not implemented yet.}
 }}
 
 \examples{
