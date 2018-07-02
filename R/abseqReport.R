@@ -96,10 +96,12 @@ abseqReport <- function(root, report, compare, BPPARAM) {
         BPPARAM <- BiocParallel::bpparam()
     }
     if (missing(compare)) {
-        compare <- list.files(file.path(root, RESULT_DIR))
+        # if user didn't specify which to compare, don't compare, just load
+        # all samples in root/RESULT_DIR, EXCLUDING sample comparisons
+        compare <- .findRepertoires(file.path(root, RESULT_DIR))
     } else {
         # make sure samples in "compare" actually exists
-        availSamples <- list.files(file.path(root, RESULT_DIR))
+        availSamples <- .findRepertoires(file.path(root, RESULT_DIR))
         lapply(compare, function(s) {
             user.sample.name <- unlist(lapply(strsplit(s, ","), trimws))
             if (length(user.sample.name) > 1) {
@@ -116,7 +118,6 @@ abseqReport <- function(root, report, compare, BPPARAM) {
                 }
             }
         })
-
         compare <- unique(c(availSamples, compare))
     }
 
