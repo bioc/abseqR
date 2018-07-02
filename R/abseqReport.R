@@ -89,6 +89,11 @@
 abseqReport <- function(root, report, compare, BPPARAM) {
     #  ------ sanitize function arguments ---------
     root <- normalizePath(root)
+    if (!(all(c(RESULT_DIR, AUX_DIR) %in% list.files(root)))) {
+        stop(paste("Expected to find", RESULT_DIR, "and", AUX_DIR, "in", root,
+                   "but they are missing. This directory should be the output",
+                   "directory as specified in abseqPy. Aborting."))
+    }
     if (missing(report)) {
         report <- 3
     }
@@ -207,7 +212,7 @@ abseqReport <- function(root, report, compare, BPPARAM) {
     # populate individualSample list with samples for user to browse and
     # create report if asked to.
     for (pair in compare) {
-        sampleNames <- unlist(strsplit(pair, ","))
+        sampleNames <- unlist(lapply(strsplit(pair, ","), trimws))
         if (length(sampleNames) == 1) {
             outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
             samples <- .loadAbSeqRepFromParams(file.path(outputDir, ANALYSIS_PARAMS))

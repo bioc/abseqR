@@ -326,7 +326,8 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
     # given a directory (d), return True if d is a repository
     .isRepo <- function(d) {
         hasLog <- length(list.files(pattern = ".*\\.log$", path = d)) == 1
-        return(c("analysis.params", "summary.txt") %in% list.files(d) && hasLog)
+        return(all(c("analysis.params", "summary.txt") %in% list.files(d))
+               && hasLog)
     }
     sapply(Filter(.isRepo, repos), basename, USE.NAMES = FALSE)
 }
