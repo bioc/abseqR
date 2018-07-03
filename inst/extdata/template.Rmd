@@ -292,6 +292,14 @@ alignmentQuality.pt3 <- .renderHMText(alignQual)
 
 `r if (params$hasAbun && params$single) { paste(knitr::knit(text = paste(alignmentQuality.pt3, collapse = "\n"))) }`
 
+
+### Placeholder
+
+```{r abseq_quality_heatmaps_pt4, echo = FALSE, eval =(params$single && params$hasAbun)}
+ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Placeholder")
+```
+
+
 `r if(!params$hasAbun || !params$single) {"\\end{comment}"}`
 
 
