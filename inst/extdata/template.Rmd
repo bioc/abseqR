@@ -1170,7 +1170,7 @@ if (!is.na(fname)) {
 > Clonotype distributions are scaled to top 10
 
 
-### Number of shared (and exclusive) clonotypes among samples
+### Number of overlapping and exclusive clonotypes
 
 ```{r abseq_clone_venn, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = ".*_cdr3_clonotypeIntersection\\.png")
@@ -1188,7 +1188,7 @@ if (!is.na(fname)) {
 > Counts show number of clonotypes
 
 
-Row {.tabset .tabset-fade}
+Row
 -----------------------------------------------------------------------
 
 ### Pearson correlation
@@ -1225,7 +1225,7 @@ if (!is.na(fname)) {
 ```
 
 
-Row {.tabset .tabset-fade}
+Row
 -----------------------------------------------------------------------
 
 ### Morisita Horn
