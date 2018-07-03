@@ -443,7 +443,7 @@
                               all.y = T,
                               all.x = T)
 
-            # --- scatter plot ---
+            # --- clonotype scatter plot ---
             p <- .scatterPlotComplex(df.union,
                                      dataframes[[i]],
                                      dataframes[[j]],
@@ -457,17 +457,16 @@
             ggsave(saveName, plot = p, width = V_WIDTH, height = V_WIDTH)
             # too large to save, skip this!
             # .saveAs(.save, saveName, p)
-            # -- end scatter plot --
 
             # make all NAs 0 before conducting distance / similarity analyses
             df.union <- replace(df.union, is.na(df.union), 0)
+
             # --- pearson correlation of clonotype frequencies ---
             correlations <- suppressWarnings(.correlationTest(df.union))
-            # -- end pearson correaltion --
 
-            # --- Morisita Horn similarity index ---
+
+            # --- Morisita Horn, Jaccard, and Dice distance scores ---
             distance <- .distanceMeasure(df.union)
-            # -- end Morisita Horn similarity index --
 
 
             data.frame(from = sampleNames[i],
