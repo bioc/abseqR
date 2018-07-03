@@ -1170,7 +1170,7 @@ if (!is.na(fname)) {
 > Clonotype distributions are scaled to top 10
 
 
-### Number of shared (and exclusive) clonotypes among samples
+### Number of overlapping and exclusive clonotypes
 
 ```{r abseq_clone_venn, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = ".*_cdr3_clonotypeIntersection\\.png")
@@ -1188,4 +1188,85 @@ if (!is.na(fname)) {
 > Counts show number of clonotypes
 
 
+Row
+-----------------------------------------------------------------------
+
+### Pearson correlation
+
+```{r abseq_pearson_correlation, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = "pearson\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+
+### Spearman correlation
+
+```{r abseq_spearman_correlation, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = "spearman\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+
+Row
+-----------------------------------------------------------------------
+
+<!-- There are issues with ggplotly and ggdendro, ignore the interactiveness
+for now. -->
+
+### Morisita Horn
+
+```{r abseq_morisita_horn_similarity, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = "morisita_horn\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    plot
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+### Bray Curtis
+
+```{r abseq_bray_curtis_similarity, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = "bray_curtis\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    plot
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+### Jaccard
+
+```{r abseq_jaccard_similarity, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = "jaccard\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    plot
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+
 `r if(!params$hasDiv || params$single) {"\\end{comment}"}`
+
