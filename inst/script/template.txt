@@ -1,0 +1,7 @@
+This file describes the use of inst/extdata/template.Rmd
+
+template.Rmd is used as a template Rmarkdown to generate parameterized reports.
+It collates all plots and images into an interactive HTML page.
+
+Users should not concern themselves with template.Rmd and is taken care of automatically
+by abseqR.

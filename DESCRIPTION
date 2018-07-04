@@ -44,3 +44,4 @@ Collate:
     'statistics.R'
     'pairwise.R'
 SystemRequirements: pandoc
+Suggests: knitr, BiocStyle, rmarkdown
