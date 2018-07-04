@@ -151,6 +151,10 @@ in the HTML report. To install it, type `install.packages("gridExtra")`
 * [knitr](https://cran.r-project.org/package=knitr) provides the capability to
 dynamically generate reports in R. To install it, type `install.packages("knitr")`
 
+* [plotly](https://cran.r-project.org/package=plotly) is used to translate
+`ggplot2` graphs to an interactive web-based version. To install it, type
+`install.packages("plotly")`
+
 * [plyr](https://cran.r-project.org/package=plyr) offers a set of tools used in
 this package to apply operations on subsets of data in manageable pieces. To
 install it, type `install.packages("plyr")`
@@ -208,7 +212,7 @@ file.copy(toyData, sandboxDirectory, recursive = TRUE)
 
 The contents of `abseqR_example` should be familar to users of `r sabseqPy()`.
 ```{r abseqR_data_contents}
-# toyDataPath how holds the path to a local copy of the toy data
+# toyDataPath now holds the path to a local copy of the toy data
 toyDataPath <- file.path(sandboxDirectory, "abseqR_example")
 list.files(path = toyDataPath)
 ```
@@ -232,7 +236,8 @@ samples <-  abseqReport(toyDataPath, compare = c("PCR1, PCR2, PCR3, PCR4, PCR5")
 # ignore the warning message:
 # "Sample output directory <path> is different from provided path
 #   <path> assuming directory was moved"
-# This warning message tells us that the directory has been moved (we copied it elsewhere)
+# This warning message tells us that the directory has
+# been moved (we copied it elsewhere)
 ```
 Here, `abseqReport` was told to also compare samples
 `PCR1`, `PCR2`, `PCR3`, `PCR4`, and `PCR5` in addition to analyzing the samples
