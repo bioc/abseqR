@@ -10,3 +10,7 @@ inst/extdata/index.html
 ._.DS_Store
 abseqR.png
 abseqR.xml
+
+# ignore vignette generated folders
+vignettes/abseqR_example
+vignettes/refined_comparison
