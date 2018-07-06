@@ -125,65 +125,66 @@ library and will work on any major operating system [^windows_biocparallel].
 `r sabseqR()` depends on several packages from [CRAN](https://cran.r-project.org/)
 and [Bioconductor](https://bioconductor.org/):
 
-* [RColorBrewer](https://cran.r-project.org/package=RColorBrewer) provides colour
+* `r CRANpkg("RColorBrewer")` provides colour
 schemes for maps and graphics generated in this package. To install it, type 
 `install.packages("RColorBrewer")`
 
-* [VennDiagram](https://cran.r-project.org/package=VennDiagram) provides a set of
+* `r CRANpkg("VennDiagram")` provides a set of
 functions to generate Venn diagrams. To install it, type `install.packages("VennDiagram")`
 
-* [circlize](https://cran.r-project.org/package=circlize) is a visualization tool
+* `r CRANpkg("circlize")` is a visualization tool
 used to summarize the distributions of associations between segments in this
 package. To install it, type `install.packages("circlize")`
 
-* [flexdashboard](https://cran.r-project.org/package=flexdashboard) is a package
+* `r CRANpkg("flexdashboard")` is a package
 that provides a template for RMarkdown that resembles a grid oriented dashboard.
 This is used to generate the HTML report in a dashboard fashion. To
 install it, type `install.packages("flexdashboard")`
 
-* [ggplot2](https://cran.r-project.org/package=ggplot2) is an implementation of
+* `r CRANpkg("ggplot2")` is an implementation of
 the "Grammar of Graphics" in R. It is used extensively within this package to
 generate plots. To install it, type `install.packages("ggplot2")`
 
-* [ggcorrplot](https://cran.r-project.org/package=ggcorrplot) is used to visualize
-a correlation matrix using `ggplot2`. To install it, type `install.packages("ggcorrplot")`
+* `r CRANpkg("ggcorrplot")` is used to visualize
+a correlation matrix using `r CRANpkg("ggplot2")`.
+To install it, type `install.packages("ggcorrplot")`
 
-* [ggdendro](https://cran.r-project.org/package=ggdendro) provides a set of tools
-for drawing dendrograms and tree plots using `ggplot2`. To install it, type
+* `r CRANpkg("ggdendro")` provides a set of tools
+for drawing dendrograms and tree plots using `r CRANpkg("ggplot2")`. To install it, type
 `install.packages("ggdendro")`
 
-* [grid](https://cran.r-project.org/package=grid) is used to arrange plots.
+* `r CRANpkg("grid")` is used to arrange plots.
 It has been integrated into the base R package.
 
-* [gridExtra](https://cran.r-project.org/package=gridExtra) provides functions
+* `r CRANpkg("gridExtra")` provides functions
 to work with "grid" graphics, used in this package to arrange grid-based plots
 in the HTML report. To install it, type `install.packages("gridExtra")`
 
-* [knitr](https://cran.r-project.org/package=knitr) provides the capability to
+* `r CRANpkg("knitr")` provides the capability to
 dynamically generate reports in R. To install it, type `install.packages("knitr")`
 
-* [plotly](https://cran.r-project.org/package=plotly) is used to translate
-`ggplot2` graphs to an interactive web-based version. To install it, type
+* `r CRANpkg("plotly")` is used to translate
+`r CRANpkg("ggplot2")` graphs to an interactive web-based version. To install it, type
 `install.packages("plotly")`
 
-* [plyr](https://cran.r-project.org/package=plyr) offers a set of tools used in
+* `r CRANpkg("plyr")` offers a set of tools used in
 this package to apply operations on subsets of data in manageable pieces. To
 install it, type `install.packages("plyr")`
 
-* [png](https://cran.r-project.org/package=png) is used to read and display PNG images.
+* `r CRANpkg("png")` is used to read and display PNG images.
 To install it, type `install.packages("png")`
 
-* [reshape2](https://cran.r-project.org/package=reshape2) allows this package to
+* `r CRANpkg("reshape2")` allows this package to
 restructure and aggregate dataframes. To install it, type `install.packages("reshape2")`
 
-* [rmarkdown](https://cran.r-project.org/package=rmarkdown) converts R Markdown
+* `r CRANpkg("rmarkdown")` converts R Markdown
 documents into a variety of formats. To install it, type `install.packages("rmarkdown")`
 
-* [vegan](https://cran.r-project.org/package=vegan) [@vegan] provides a suite of functions
+* `r CRANpkg("vegan")` [@vegan] provides a suite of functions
 to calculate diversity and distance statistics between repertoires. To install it,
 type `install.packages("vegan")`
 
-* [BiocParallel](https://bioconductor.org/packages/release/bioc/html/BiocParallel.html) is
+* `r Biocpkg("BiocParallel")` is
 a package from [Bioconductor](https://bioconductor.org) used to parallelize
 operations in this package. To install it, type
 ```r
@@ -673,9 +674,10 @@ and J family germlines in a plot generated using `r CRANpkg("circlize")`
 (inspired by [VDJTools](https://github.com/mikessh/vdjtools/)[@vdjtools] )
 
 
-```{r vjassoc, fig.cap="V-J family germline association. Segment size represents germline proportion while the arcs show associations between V and J families", echo=FALSE}
+```{r vjassoc, fig.cap="V-J family germline association. Segment size represents germline proportion while the thickness of the arcs shows the proportion of associations between V and J families.", echo=FALSE}
 grid.raster(readPNG(file.path(sdir, "abundance", "PCR1_vjassoc.png")))
 ```
+
 
 # Miscellaneous
 
