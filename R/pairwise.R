@@ -180,7 +180,7 @@
         #                                  weight = 10^((prop.x + prop.y) / 2)),
         #             color = "blue", method = "lm", fullrange = T, se = T) +
         labs(y = name2, x = name1)
-    grid.arrange(sample1.margin, .emptyPlot(), g, sample2.margin,
+    arrangeGrob(sample1.margin, .emptyPlot(), g, sample2.margin,
                  ncol = 2, nrow = 2, widths = c(4, 1), heights = c(1, 4),
                  top = paste("Scatter plot of", cloneClass, "clonotype frequencies\n", name2, "vs", name1)
     )
