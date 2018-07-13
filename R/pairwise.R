@@ -188,7 +188,8 @@
 
 
 
-#' Marginal density graph of clonotypes (blue for shared, grey for total)
+#' Marginal density graph of clonotypes (blue for shared, grey for total, purple
+#' for exclusive clones)
 #'
 #' @import ggplot2
 #' @include util.R
@@ -219,7 +220,8 @@
         theme_bw() +
         theme(legend.position = "none", axis.title.x = element_blank(),
               axis.text = element_blank(), axis.ticks = element_blank(),
-              axis.title.y = element_blank(), panel.grid = element_blank())
+              axis.title.y = element_blank(), panel.grid = element_blank(),
+              panel.border = element_blank())
     if (flip) {
         g <- g + coord_flip()
     }
