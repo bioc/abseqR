@@ -180,7 +180,7 @@
         #                                  weight = 10^((prop.x + prop.y) / 2)),
         #             color = "blue", method = "lm", fullrange = T, se = T) +
         labs(y = name2, x = name1)
-    arrangeGrob(sample1.margin, .emptyPlot(), g, sample2.margin,
+    grid.arrange(sample1.margin, .emptyPlot(), g, sample2.margin,
                  ncol = 2, nrow = 2, widths = c(4, 1), heights = c(1, 4),
                  top = paste("Scatter plot of", cloneClass, "clonotype frequencies\n", name2, "vs", name1)
     )
@@ -446,17 +446,19 @@
                               all.x = T)
 
             # --- clonotype scatter plot ---
-            p <- .scatterPlotComplex(df.union,
-                                     dataframes[[i]],
-                                     dataframes[[j]],
-                                     sampleNames[i],
-                                     sampleNames[j],
-                                     "CDR3")
             saveName <- file.path(outputPath,
                                   paste0(sampleNames[i], "_vs_",
                                          sampleNames[j], "_clone_scatter.png"))
             # square plot to get a evenly scaled scatter plot on both the x and y axis
-            ggsave(saveName, plot = p, width = V_WIDTH, height = V_WIDTH)
+            png(saveName, width = V_WIDTH, height = V_WIDTH,
+                units = "in", res = 1200, pointsize = 10)
+            .scatterPlotComplex(df.union,
+                                dataframes[[i]],
+                                dataframes[[j]],
+                                sampleNames[i],
+                                sampleNames[j],
+                                "CDR3")
+            dev.off()
             # too large to save, skip this!
             # .saveAs(.save, saveName, p)
 
