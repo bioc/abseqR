@@ -261,7 +261,7 @@ paste(c("PCR1", "PCR2", "PCR3"), collapse = ", ")
 After [obtaining the dataset](#obtain-dataset), visualizing the results of
 `r sabseqPy()` is done using the `abseqReport` function:
 
-```{r abseqR_quick_run, eval=FALSE, results=FALSE, warning=FALSE}
+```{r abseqR_quick_run, eval=params$release, results=FALSE, warning=FALSE}
 # visualize all the datasets individually,
 # then "compare" PCR1 with PCR2 with PCR3
 samples <-  abseqReport(toyDataPath,
@@ -273,14 +273,8 @@ samples <-  abseqReport(toyDataPath,
 # This warning message tells us that the directory has
 # been moved (we copied the provided examples to "toyDataPath")
 ```
-<!-- For some reason, rmarkdown refuses to render if BPPARAM is not Serialized?
-Always show user the above line without parameter, because this section is not
-responsible for explaining BPPARM. But behind the scenes, run the code below.
--->
-```{r abseqR_quick_run_hidden, eval=params$release, warning=FALSE, echo=FALSE, results=FALSE, warning=FALSE}
-# visualize the datasets, then compare PCR1, PCR2, and PCR3
-samples <-  abseqReport(toyDataPath, compare = c("PCR1, PCR2, PCR3"),
-                        BPPARAM = BiocParallel::SerialParam())
+```{r abseqR_quick_run_hidden, eval=(!params$release), echo=FALSE}
+samples <- abseqReport(toyDataPath, report = 0)
 ```
 
 Here, `abseqReport` was told to also compare samples
