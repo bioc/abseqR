@@ -237,7 +237,6 @@ To verify that the 3 `PCR`s are present:
 ```{r abseqR_data_contents}
 # toyDataPath now holds the path to a local copy of the toy data
 toyDataPath <- file.path(sandboxDirectory, "abseqR_example")
-
 # the sample names can be found inside the auxiliary directory
 list.files(path = file.path(toyDataPath, "auxiliary"))
 ```
@@ -270,28 +269,17 @@ Save time by only plotting the PNGs -->
 samples <- abseqReport(toyDataPath, compare = c("PCR1,PCR2,PCR3"), report = 1)
 ```
 
-Here, `abseqReport` was told to also compare samples
-`PCR1`, `PCR2`, and `PCR3` in addition to analyzing the samples
-within `toyDataPath`. Other possible arguments to `compare` will be described in
+`abseqReport` will look for samples contained within `toyDataPath` and create
+visuals for all of them. In addition, `compare = c("PCR1, PCR2, PCR3")` specifies
+that samples named `PCR1`, `PCR2`, and `PCR3` should be compared against each
+other. Other possible arguments to `compare` will be described in
 detail in the next [section](#abseqReport-compare).
 
-`abseqReport` returns a named list of objects[^abseqRep], the use of this return
-value will be described in the [section below](#customize-cmp).
-
-**Note**, regardless of the arguments to `compare`, `abseqReport` always returns
-a list of **all** the samples in `toyDataPath`:
-
-```{r abseqR_named_list}
-# PCR1, PCR2, and PCR3
-stopifnot(length(samples) == 3)
-# display the samples found within "toyDataPath"
-names(samples)
-```
-
 The above call to `abseqReport` generates PNG plots in the same folder as the
-corresponding csv files within `auxiliary`
-but they are collated together in a standalone
-HTML document found in the `report` directory. Within the `report` directory:
+corresponding csv files within `auxiliary` but they are
+collated together in a standalone HTML document found in the `report` directory.
+
+The contents inside the `report` directory:
 
 * `index.html` is a document which summarizes the analysis and provides a convenient way
 of navigating to multiple samples. For example, within this file, there are links to
@@ -300,7 +288,7 @@ the reports generated for `PCR1`, `PCR2`, `PCR3` and `PCR1 vs PCR2 vs PCR3`.
 * `html_files` contains individual HTML files that are _not_ meant to be accessed by the user,
 but rather through `index.html`. The files within this directory are standalone HTML documents,
 but the landing page `index.html` (is **not** because it) contains relative links to the aforementioned HTML documents,
-and should be shared together with the `html_files` folder, if required.
+and should be shared together with the `html_files` folder.
 
 In conclusion, the folder of interest is `report`, and the file of interest is
 `index.html`. The individual sample reports (HTML files) in `html_files` can
@@ -316,10 +304,9 @@ compare "`PCR1` with `PCR2` with `PCR3`". However,
 it is also possible to compare only a subset of samples in `toyDataPath`,
 or multiple subsets of samples, or none at all.
 
-Each comparison can be represented by a string.
-The way to instruct `abseqReport` to compare samples _against_ each other is
-to separate them with commas _within_ a string (e.g. `compare = c("PCR1,PCR2")`)[^compare-ws].
-Since `compare` accepts a `vector`, it is possible to specify multiple comparisons (multiple strings).
+The `compare` parameter accepts a vector of one or more strings. Each string
+denotes a comparison between samples separated by commas
+(e.g. `compare = c("PCR1, PCR2, PCR3")`)[^compare-ws].
 
 If sample comparison was not required, then the command can be
 simplified to `samples <- abseqReport(toyDataPath)`.
@@ -338,7 +325,7 @@ pcr1.pcr2 <- abseqReport(toyDataPath, compare = c("PCR1,PCR2"))
 multiComparison <- abseqReport(toyDataPath, compare = c("PCR1,PCR2",
                                                         "PCR2,PCR3"))
 ```
-<!-- always execute this chunk, these are used in demonstartion examples
+<!-- always execute this chunk, these are used in demonstration examples
 that don't require any run -->
 ```{r abseqR_abseqReport_copare_argument_hidden, echo=FALSE, eval=TRUE}
 pcr1.pcr2 <- suppressWarnings(abseqReport(toyDataPath, compare = c("PCR1,PCR2"),
@@ -349,20 +336,16 @@ multiComparison <- suppressWarnings(abseqReport(toyDataPath, compare = c(
 ), report = 0))
 ```
 
-
-The extra plots generated when at least one comparison is specified will be shown
-in the section [below](#abseqR-interpret).
-
-As mentioned earlier, `abseqReport` always return _all_ samples in `toyDataPath`.
-That is, the following assertion is always true, regardless of the arguments
+__Note__, `abseqReport` always return _all_ samples in `toyDataPath`.
+That is, the following is always true regardless of the arguments
 to `compare`:
 
 ```{r abseqR_show_return_of_abseqReport, eval=TRUE}
-# both had different values to "compare", but they both still return all 5 PCRs
-stopifnot(names(pcr1.pcr2) == names(multiComparison))
+# both had different values to "compare", but they both still return all 3 PCRs
+cat(names(pcr1.pcr2))
 names(multiComparison)
 ```
-The next subsection explains the reason for this behaviour.
+The next subsection explains the motivation for this behaviour.
 
 ### Customizing sample comparison with `report` {#customize-cmp}
 
@@ -382,9 +365,8 @@ This code shows how to further refine sample comparisons:
 # where each element's name is the sample's own name (see names(samples))
 pcr1.pcr3 <- samples[["PCR1"]] + samples[["PCR3"]]
 refinedComparison <- report(pcr1.pcr3,
-                            outputDir =
-                                file.path(sandboxDirectory,
-                                          "refined_comparison"))
+                            outputDir = file.path(sandboxDirectory,
+                                                  "refined_comparison"))
 ```
 
 ```{r abseqR_refine_comparison_simple_hidden, eval=TRUE, echo=FALSE, results=FALSE, warning=FALSE}
@@ -395,9 +377,8 @@ refinedComparison <- report(pcr1.pcr3,
                             report = 1)
 ```
 
-Here, the `+` operator creates a new comparison for `PCR1` and `PCR3`,
-in preperation for visualization and analysis.
-The return value of this expression is then used
+Here, the `+` operator creates a new comparison between`PCR1` and `PCR3`.
+The return value of this expression was used
 as the first argument to `r sabseqR()`'s `report` function. The second argument
 of `report` specifies the directory where the results should be stored.
 
@@ -417,8 +398,8 @@ function.
 
 ## Comparing samples from different abseqPy output directories
 
-Occasionally, there might be a need to compare datasets from different `r sabseq()`
-runs. For example:
+Occasionally, it might be useful to compare datasets from different `r sabseq()`
+directories. For example:
 
 ```{bash abseqR_different_dirs, eval=FALSE}
 # first abseqPy run on SRR dataset from control group
@@ -455,7 +436,7 @@ before it can be used to compare with `SRRExp` in
 `all.samples <- Reduce("+", c(SRRControl, SRRExp))`.
 However, this is inefficent because `SRRControl <- abseqReport("SRR_CTRL")`
 will **regenerate** all visuals and reports.
-This dataset might have already been analyzed before the `SRRExp`
+This dataset might have already been analyzed long before the `SRRExp`
 dataset came along.
 
 Instead, the following function call will let `abseqReport` know that it should
@@ -705,7 +686,6 @@ sessionInfo()
 [^Repseq]: Repertoire sequencing
 [^windows_biocparallel]: The performace offered by
 [BiocParallel](https://bioconductor.org/packages/release/bioc/html/BiocParallel.html) may differ across OSes
-[^abseqRep]: The "objects" returned are `AbSeqRep` S4 class instances.
 [^compare-ws]: Trailing and leading whitespace between sample names are trimmed. That is, "PCR1,PCR2" is identical to
 "PCR1 , PCR2"
 
