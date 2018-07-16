@@ -294,7 +294,7 @@ _Note, regardless of the arguments to `compare`, `abseqReport` always returns_
 _a list of **all** the samples in `toyDataPath`._
 
 ```{r abseqR_named_list}
-# PCR1 - PCR5
+# PCR1 - PCR3
 stopifnot(length(samples) == 3)
 # display the samples found within "toyDataPath"
 names(samples)
@@ -615,11 +615,11 @@ Figure \@ref(fig:align-qual) shows the percentage of sequences that will be reta
 value is chosen for filtering.
 
 ```{r align-qual, fig.cap="Alignment quality heatmaps. From left to right: bitscore, percent identity, gaps, and mismatches against the alignment length. Last plot shows subject vs query start index.", echo=FALSE, fig.wide=TRUE}
-bitscoreHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_bitscore_hm.png")
-identityHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_identity_hm.png")
-gapsHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_gaps_hm.png")
-misHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_mismatches_hm.png")
-startHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_start_hm.png")
+bitscoreHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_bitscore_hm_static.png")
+identityHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_identity_hm_static.png")
+gapsHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_gaps_hm_static.png")
+misHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_mismatches_hm_static.png")
+startHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_start_hm_static.png")
 bitscoreHM <- rasterGrob(as.raster(readPNG(bitscoreHM)), interpolate = FALSE)
 identityHM <- rasterGrob(as.raster(readPNG(identityHM)), interpolate = FALSE)
 gapsHM <- rasterGrob(as.raster(readPNG(gapsHM)), interpolate = FALSE)
