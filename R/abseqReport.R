@@ -64,7 +64,7 @@
 #' #### Bonus Section (what to do with the list "samples"?):
 #' # assume:
 #' # > names(samples)
-#' # [1] "Sample1" "Sampel2" "Sample3" "Sample4"
+#' # [1] "Sample1" "Sample2" "Sample3" "Sample4"
 #'
 #' # we want to explicitly compare Sample1 with Sample3:
 #' new.combination <- samples[["Sample1"]] + samples[["Sample3"]]
@@ -81,7 +81,7 @@
 #'
 #' # run sequentially - no multiprocessing
 #' samples <- abseqReport("/path/to/output/directory/",
-#'                        BPPARAM = SerialParam())
+#'                        BPPARAM = BiocParallel::SerialParam())
 #'
 #'# see https://www.bioconductor.org/packages/devel/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.pdf
 #'# for more information about how to use BPPARAM and BiocParallel in general.

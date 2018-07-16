@@ -117,13 +117,17 @@
 
 #' Plots a plotly heatmap from provided matrix
 #'
+#' @import reshape2
+#' @import ggplot2
+#' @importFrom plotly subplot plot_ly plotly_empty layout
+#'
 #' @param m matrix type
 #' @param title character type
 #' @param xlabel character type
 #' @param ylabel character type
 #'
-#' @return None
-#' @importFrom plotly subplot plot_ly plotly_empty layout
+#' @return list with keys: static and interactive (ggplot2 object and plotly
+#' object respectivelyb)
 .hmFromMatrix <- function(m, title, xlabel = "", ylabel = "") {
     x <- colSums(m)
     y <- rowSums(m)
@@ -135,7 +139,7 @@
         title = ylabel
     )
 
-    s <- suppressMessages(subplot(plot_ly(x = as.numeric(colnames(m)),
+    interactive <- suppressMessages(subplot(plot_ly(x = as.numeric(colnames(m)),
                          y = x,
                          type = "bar",
                          color = I("DarkBlue")),
@@ -151,25 +155,17 @@
                  widths = c(0.8, 0.2), margin = 0, shareX = T,
                  shareY = T, titleX = F, titleY = F
     ))
-    return(plotly::layout(s, title = title, showlegend = F, xaxis = xax, yaxis = yax))
-    # non interactive version:
-    # library(ComplexHeatmap)
-    # library(ggExtra)
-    #
-    # mat <- m
-    #
-    # ha1 <- HeatmapAnnotation(dist1 = anno_barplot(colSums(mat), bar_width = 1,
-    #                          border = FALSE,
-    #                          axis = TRUE))
-    # ha2 <- rowAnnotation(dist2 = anno_barplot(rowSums(mat), bar_width = 1,
-    #                      border = FALSE,
-    #                      axis = TRUE, which = "row"), width = unit(1, "cm"))
-    #
-    # g <- Heatmap(mat, name = "cases", cluster_columns = F,
-    #         show_row_dend = F, show_column_names = T,
-    #         row_names_side = "left", column_title = "Testing title",
-    #         top_annotation = ha1, top_annotation_height = unit(1, "cm")) +
-    #     ha2
+
+    static <- ggplot(melt(m), aes(x = Var2, y = Var1)) +
+        geom_tile(aes(fill = value)) +
+        labs(title = title, x = xlabel, y = ylabel)
+
+    return(list(
+        interactive =  plotly::layout(interactive, title = title,
+                                      showlegend = FALSE, xaxis = xax,
+                                      yaxis = yax),
+        static = static
+    ))
 }
 
 
@@ -197,17 +193,23 @@
         heatmapFile <- file.path(abundanceDirectory, paste0(sampleName, "_igv_align_quality_", qual, "_hm.tsv"))
         if (file.exists(heatmapFile)) {
             mat <- as.matrix(read.table(heatmapFile, skip = 1, check.names = F))
+            xlabel <- "Alignment Length"
             if (qual == "identity") {
                 qual <- "%Identity"
             } else if (qual == "start") {
                 qual <- "Subject start"
+                xlabel <- "Query start"
             }
             totalCount <- .getTotal(heatmapFile)
             p <- .hmFromMatrix(mat,
                                title = paste("Alignment Quality of", sampleName, "\nTotal is", totalCount),
-                               xlabel = "Alignment Length",
+                               xlabel = xlabel,
                                ylabel = qual)
-            .saveAs(T, heatmapFile, plot = p)
+            .saveAs(TRUE, heatmapFile, plot = p[["interactive"]])
+            .saveAs(TRUE, sub(".tsv", "_static.tsv", heatmapFile, fixed = TRUE),
+                    plot = p[["static"]])
+            ggsave(sub(".tsv", "_static.png", heatmapFile, fixed = TRUE),
+                   plot = p[["static"]], width = V_WIDTH, height = V_HEIGHT)
             return(p)
         } else {
             warning(paste("Could not find", heatmapFile, "for sample", sampleName))

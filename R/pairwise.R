@@ -188,7 +188,8 @@
 
 
 
-#' Marginal density graph of clonotypes (blue for shared, grey for total)
+#' Marginal density graph of clonotypes (blue for shared, grey for total, purple
+#' for exclusive clones)
 #'
 #' @import ggplot2
 #' @include util.R
@@ -219,7 +220,8 @@
         theme_bw() +
         theme(legend.position = "none", axis.title.x = element_blank(),
               axis.text = element_blank(), axis.ticks = element_blank(),
-              axis.title.y = element_blank(), panel.grid = element_blank())
+              axis.title.y = element_blank(), panel.grid = element_blank(),
+              panel.border = element_blank())
     if (flip) {
         g <- g + coord_flip()
     }
@@ -444,17 +446,19 @@
                               all.x = T)
 
             # --- clonotype scatter plot ---
-            p <- .scatterPlotComplex(df.union,
-                                     dataframes[[i]],
-                                     dataframes[[j]],
-                                     sampleNames[i],
-                                     sampleNames[j],
-                                     "CDR3")
             saveName <- file.path(outputPath,
                                   paste0(sampleNames[i], "_vs_",
                                          sampleNames[j], "_clone_scatter.png"))
             # square plot to get a evenly scaled scatter plot on both the x and y axis
-            ggsave(saveName, plot = p, width = V_WIDTH, height = V_WIDTH)
+            png(saveName, width = V_WIDTH, height = V_WIDTH,
+                units = "in", res = 1200, pointsize = 10)
+            .scatterPlotComplex(df.union,
+                                dataframes[[i]],
+                                dataframes[[j]],
+                                sampleNames[i],
+                                sampleNames[j],
+                                "CDR3")
+            dev.off()
             # too large to save, skip this!
             # .saveAs(.save, saveName, p)
 
