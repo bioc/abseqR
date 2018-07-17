@@ -33,8 +33,8 @@ knitr::opts_chunk$set(message = FALSE)
 # but not the execution time (only executes when in 'debug' mode)
 
 sandboxDirectory <- "."
-toyDataPath <- file.path(sandboxDirectory, "abseqR_example")
-if (!file.exists(toyDataPath)) {
+dataPath <- file.path(sandboxDirectory, "abseqR_example")
+if (!file.exists(dataPath)) {
     stop(paste("You must run this vignette with release = TRUE at least",
                "once before you run it with release = FALSE"))
 }
@@ -199,20 +199,20 @@ operations in this package. To install it, type
 
 To leverage _all_ the functionalities provided by `r sabseqR()`, the main
 functions to note are `abseqR::abseqReport`, `abseqR::report`, and `+`.
-This section will use a toy example to walk through the use cases of each function.
+This section will use a small dataset to walk through the use cases of each function.
 
 TODO: show class diagram here
 
 ## Dataset
 
-The toy example mentioned previously comes installed with `r sabseqR()`.
+The datast mentioned previously comes installed with `r sabseqR()`.
 For the sake of brevity, the samples are described under the
-[miscellaneous](#toy-data) section. Briefly, the dataset contains 3 samples generated
+[miscellaneous](#example-data) section. Briefly, the dataset contains 3 samples generated
 from _in silico_ simulation, each named PCR1, PCR2, and PCR3.
 The output directory specified in `r sabseqPy()`'s `--outdir` was
 `"abseqR_example"`
 
-### Obtaining the toy dataset {#obtain-dataset}
+### Obtaining the dataset {#obtain-dataset}
 
 To obtain the dataset, the following R code demonstrates the steps needed to copy it
 to a _sandbox directory_:
@@ -224,21 +224,21 @@ if (!file.exists(sandboxDirectory)) {
     file.create(sandboxDirectory)
 }
 
-# path to provided toy data (comes installed with abseqR)
-toyData <- system.file("extdata", "abseqR_example", package = "abseqR")
-# copy the provided toy data to sandboxDirectory
-file.copy(toyData, sandboxDirectory, recursive = TRUE)
+# path to provided data (comes installed with abseqR)
+exdata <- system.file("extdata", "abseqR_example", package = "abseqR")
+# copy the provided data to sandboxDirectory
+file.copy(exdata, sandboxDirectory, recursive = TRUE)
 ```
 
-### Exploring the toy dataset
+### Exploring the dataset
 
 To verify that the 3 `PCR`s are present:
 
 ```{r abseqR_data_contents}
-# toyDataPath now holds the path to a local copy of the toy data
-toyDataPath <- file.path(sandboxDirectory, "abseqR_example")
+# dataPath now holds the path to a local copy of the data
+dataPath <- file.path(sandboxDirectory, "abseqR_example")
 # the sample names can be found inside the auxiliary directory
-list.files(path = file.path(toyDataPath, "auxiliary"))
+list.files(path = file.path(dataPath, "auxiliary"))
 ```
 
 
@@ -252,24 +252,24 @@ After [obtaining the dataset](#obtain-dataset), visualizing the results of
 ```{r abseqR_quick_run, eval=FALSE, results=FALSE, warning=FALSE}
 # visualize all the datasets individually,
 # then "compare" PCR1 with PCR2 with PCR3
-samples <-  abseqReport(toyDataPath,
+samples <-  abseqReport(dataPath,
                         compare = c("PCR1, PCR2, PCR3"))
 
 # ignore the warning message:
 # "Sample output directory <path> is different from provided path
 #   <path> assuming directory was moved"
 # This warning message tells us that the directory has
-# been moved (we copied the provided examples to "toyDataPath")
+# been moved (we copied the provided examples to "dataPath")
 ```
 <!-- We showed the users with report = 3, however that's redundant
 in this vignette because we're not going to be using the HTML report - the
 users are advised to explore the HTML themselves.
 Save time by only plotting the PNGs -->
 ```{r abseqR_quick_run_hidden, eval=TRUE, echo=FALSE, results=FALSE, warning=FALSE}
-samples <- abseqReport(toyDataPath, compare = c("PCR1,PCR2,PCR3"), report = 1)
+samples <- abseqReport(dataPath, compare = c("PCR1,PCR2,PCR3"), report = 1)
 ```
 
-`abseqReport` will look for samples contained within `toyDataPath` and create
+`abseqReport` will look for samples contained within `dataPath` and create
 visuals for all of them. In addition, `compare = c("PCR1, PCR2, PCR3")` specifies
 that samples named `PCR1`, `PCR2`, and `PCR3` should be compared against each
 other. Other possible arguments to `compare` will be described in
@@ -301,7 +301,7 @@ This section describes the possible inputs for `abseqReport`'s
 `compare` parameter. Earlier, `abseqReport` was called with
 `compare = c("PCR1, PCR2, PCR3")`. This tells the function to
 compare "`PCR1` with `PCR2` with `PCR3`". However,
-it is also possible to compare only a subset of samples in `toyDataPath`,
+it is also possible to compare only a subset of samples in `dataPath`,
 or multiple subsets of samples, or none at all.
 
 The `compare` parameter accepts a vector of one or more strings. Each string
@@ -309,40 +309,40 @@ denotes a comparison between samples separated by commas
 (e.g. `compare = c("PCR1, PCR2, PCR3")`)[^compare-ws].
 
 If sample comparison was not required, then the command can be
-simplified to `samples <- abseqReport(toyDataPath)`.
+simplified to `samples <- abseqReport(dataPath)`.
 
 Example of other combinations:
 
 ```{r abseqR_abseqReport_compare_argument, eval=FALSE}
 # Example of 1 comparison
 # Analyze all samples, but only compare PCR1 with PCR2
-pcr1.pcr2 <- abseqReport(toyDataPath, compare = c("PCR1,PCR2"))
+pcr1.pcr2 <- abseqReport(dataPath, compare = c("PCR1,PCR2"))
 
 # Example of 3 comparisons
 # Analyze all samples. In addition, compare:
 #  * PCR1 with PCR2
 #  * PCR2 with PCR3
-multiComparison <- abseqReport(toyDataPath, compare = c("PCR1,PCR2",
+multiComparison <- abseqReport(dataPath, compare = c("PCR1,PCR2",
                                                         "PCR2,PCR3"))
 ```
 <!-- always execute this chunk, these are used in demonstration examples
 that don't require any run -->
 ```{r abseqR_abseqReport_copare_argument_hidden, echo=FALSE, eval=TRUE}
-pcr1.pcr2 <- suppressWarnings(abseqReport(toyDataPath, compare = c("PCR1,PCR2"),
+pcr1.pcr2 <- suppressWarnings(abseqReport(dataPath, compare = c("PCR1,PCR2"),
                               report = 0))
-multiComparison <- suppressWarnings(abseqReport(toyDataPath, compare = c(
+multiComparison <- suppressWarnings(abseqReport(dataPath, compare = c(
     "PCR1,PCR2",
     "PCR2,PCR3"
 ), report = 0))
 ```
 
-__Note__, `abseqReport` always return _all_ samples in `toyDataPath`.
+__Note__, `abseqReport` always return _all_ samples in `dataPath`.
 That is, the following is always true regardless of the arguments
 to `compare`:
 
 ```{r abseqR_show_return_of_abseqReport, eval=TRUE}
 # both had different values to "compare", but they both still return all 3 PCRs
-cat(names(pcr1.pcr2))
+names(pcr1.pcr2)
 names(multiComparison)
 ```
 The next subsection explains the motivation for this behaviour.
@@ -377,7 +377,7 @@ refinedComparison <- report(pcr1.pcr3,
                             report = 1)
 ```
 
-Here, the `+` operator creates a new comparison between`PCR1` and `PCR3`.
+Here, the `+` operator creates a new comparison between `PCR1` and `PCR3`.
 The return value of this expression was used
 as the first argument to `r sabseqR()`'s `report` function. The second argument
 of `report` specifies the directory where the results should be stored.
@@ -417,7 +417,7 @@ SRRExp <- abseqReport("SRR_EXP")
 ```
 
 then comparing _all_ samples in `SRRControl` with _all_ samples in `SRRExp`
-can be done using [using `+` and `report`](#customize-cmp).
+can be done using [`+` and `report`](#customize-cmp).
 
 ```{r abseqR_adv_compare_old_new, eval=FALSE}
 # short for SRRControl[[1]] + SRRControl[[2]] + ... + SRRExp[[1]] + ...
@@ -494,12 +494,12 @@ Below is a simplified example of using 4 cores and serializing the loop.
 
 # use 4 CPU cores
 nproc <- 4
-samples <- abseqReport(toyDataPath,
+samples <- abseqReport(dataPath,
                        BPPARAM = BiocParallel::MulticoreParam(nproc))
 
 
 # run sequentially - no multiprocessing
-samples <- abseqReport(toyDataPath,
+samples <- abseqReport(dataPath,
                        BPPARAM = BiocParallel::SerialParam())
 ```
 
@@ -507,9 +507,9 @@ samples <- abseqReport(toyDataPath,
 
 ```{r abseqR_plot_path_setup, include=FALSE}
 # [s]ingle sample [dir]ectory
-sdir <- file.path(toyDataPath, "auxiliary", "PCR1")
+sdir <- file.path(dataPath, "auxiliary", "PCR1")
 # [m]ulti sample [dir]ectory
-mdir <- file.path(toyDataPath, "auxiliary", "PCR1_vs_PCR2_vs_PCR3")
+mdir <- file.path(dataPath, "auxiliary", "PCR1_vs_PCR2_vs_PCR3")
 ```
 
 This section aims to walk through each plot generated by `r sabseqR()` when
@@ -625,9 +625,9 @@ grid.raster(readPNG(file.path(sdir, "abundance", "PCR1_vjassoc.png")))
 
 # Miscellaneous
 
-## Dataset {#toy-data}
+## Dataset {#example-data}
 
-The toy dataset used in the above examples
+The dataset used in the above examples
 was obtained from a combination of synthetic sample datasets generated
 using [MiXCR](https://github.com/milaboratory/mixcr)'s program 
 [here](http://files.milaboratory.com/mixcr/paper/mixcr-test-1.2-SNAPSHOT.jar). 
@@ -649,14 +649,14 @@ repertoire of 3 samples, named PCR1, PCR2, and PCR3.
 Finally, these 3 samples were analyzed by `r sabseqPy()`. The command used to
 analyze these samples are as follows:
 
-```{bash abseqR_toy_data_abseqPy_run, eval=FALSE}
-abseq -y toy.yml
+```{bash abseqR__data_abseqPy_run, eval=FALSE}
+abseq -y params.yml
 ```
 
-where the contents of `toy.yml` is:
+where the contents of `params.yml` is:
 
 ```yaml
-# toy.yml
+# params.yml
 defaults:
     bitscore: 300
     sstart: 1-3
@@ -675,7 +675,7 @@ file1: PCR3.fasta
 name: PCR3
 ```
 
-These 3 samples form the final toy dataset described in this vignette.
+These 3 samples form the final dataset described in this vignette.
 
 # Session Info
 
