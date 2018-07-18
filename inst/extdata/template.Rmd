@@ -475,7 +475,7 @@ if (!is.na(fname)) {
 `r if(!params$hasProd) {"\\begin{comment}"}`
 
 
-Productivity {data-orientation=rows data-icon="fa-dna"}
+Productivity {data-orientation=rows data-icon="fa-check"}
 =======================================================================
 
 Row
