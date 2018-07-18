@@ -48,7 +48,7 @@ lapply(c("abseqR_example", "refined_comparison"), unlink, recursive = TRUE)
 ```{r abseqR_vignette_helper_functions, include=FALSE}
 sabseqR <- function() { return(Biocpkg("abseqR")); }
 #sabseqR <- function() { return("`abseqR`"); }
-sabseqPy <- function() { return("`abseqPy`"); }
+sabseqPy <- function() { return("[abseqPy](https://github.com/malhamdoosh/abseqPy)"); }
 sabseq <- function() { return("`AbSeq`"); }
 ```
 
@@ -197,7 +197,7 @@ operations in this package. To install it, type
 
 # Quick start
 
-To leverage _all_ the functionalities provided by `r sabseqR()`, the main
+To leverage all the functionalities provided by `r sabseqR()`, the main
 functions to note are `abseqR::abseqReport`, `abseqR::report`, and `+`.
 This section will use a small dataset to walk through the use cases of each function.
 
@@ -205,17 +205,20 @@ TODO: show class diagram here
 
 ## Dataset
 
-The datast mentioned previously comes installed with `r sabseqR()`.
+The example dataset comes installed with `r sabseqR()`.
 For the sake of brevity, the samples are described under the
-[miscellaneous](#example-data) section. Briefly, the dataset contains 3 samples generated
-from _in silico_ simulation, each named PCR1, PCR2, and PCR3.
-The output directory specified in `r sabseqPy()`'s `--outdir` was
-`"abseqR_example"`
+[miscellaneous](#example-data) section.
+
+Briefly, the dataset contains 3 samples generated using
+_in silico_ simulation, named PCR1, PCR2, and PCR3.
+`r sabseqPy()` was then used to analyze the dataset and
+the output directory specified in `r sabseqPy()`'s `--outdir` was
+`"abseqR_example"`.
 
 ### Obtaining the dataset {#obtain-dataset}
 
-To obtain the dataset, the following R code demonstrates the steps needed to copy it
-to a _sandbox directory_:
+To obtain the dataset, the following R code demonstrates
+the steps needed to copy it to a _sandbox directory_:
 
 ```{r abseqR_copy_data_files, eval=params$release, results=FALSE}
 # substitute with any directory that you have read/write access to
@@ -242,7 +245,7 @@ list.files(path = file.path(dataPath, "auxiliary"))
 ```
 
 
-## Analyzing the datasets
+## Analyzing the dataset
 
 ### Basic analysis with `abseqReport` {#basic-analysis}
 
@@ -269,13 +272,13 @@ Save time by only plotting the PNGs -->
 samples <- abseqReport(dataPath, compare = c("PCR1,PCR2,PCR3"), report = 1)
 ```
 
-`abseqReport` will look for samples contained within `dataPath` and create
-visuals for all of them. In addition, `compare = c("PCR1, PCR2, PCR3")` specifies
-that samples named `PCR1`, `PCR2`, and `PCR3` should be compared against each
-other. Other possible arguments to `compare` will be described in
-detail in the next [section](#abseqReport-compare).
+The call to `abseqReport` create plots for all samples contained within `dataPath`.
+In addition, `compare = c("PCR1, PCR2, PCR3")` specifies
+that samples named `PCR1`, `PCR2`, and `PCR3` should be explicitly
+compared against each other. Other possible arguments to
+`compare` will be described in detail in the next [section](#abseqReport-compare).
 
-The above call to `abseqReport` generates PNG plots in the same folder as the
+Invoking `abseqReport` generates PNG plots in the same folder as the
 corresponding csv files within `auxiliary` but they are
 collated together in a standalone HTML document found in the `report` directory.
 
@@ -287,8 +290,9 @@ the reports generated for `PCR1`, `PCR2`, `PCR3` and `PCR1 vs PCR2 vs PCR3`.
 
 * `html_files` contains individual HTML files that are _not_ meant to be accessed by the user,
 but rather through `index.html`. The files within this directory are standalone HTML documents,
-but the landing page `index.html` (is **not** because it) contains relative links to the aforementioned HTML documents,
-and should be shared together with the `html_files` folder.
+but the landing page `index.html` (is **not** because it)
+contains relative links to the aforementioned HTML documents, and should be
+shared together with the `html_files` folder.
 
 In conclusion, the folder of interest is `report`, and the file of interest is
 `index.html`. The individual sample reports (HTML files) in `html_files` can
@@ -305,8 +309,8 @@ it is also possible to compare only a subset of samples in `dataPath`,
 or multiple subsets of samples, or none at all.
 
 The `compare` parameter accepts a vector of one or more strings. Each string
-denotes a comparison between samples separated by commas
-(e.g. `compare = c("PCR1, PCR2, PCR3")`)[^compare-ws].
+denotes a comparison between samples separated by commas, for example,
+`compare = c("PCR1, PCR2, PCR3")`[^compare-ws].
 
 If sample comparison was not required, then the command can be
 simplified to `samples <- abseqReport(dataPath)`.
@@ -316,14 +320,14 @@ Example of other combinations:
 ```{r abseqR_abseqReport_compare_argument, eval=FALSE}
 # Example of 1 comparison
 # Analyze all samples, but only compare PCR1 with PCR2
-pcr1.pcr2 <- abseqReport(dataPath, compare = c("PCR1,PCR2"))
+pcr1.pcr2 <- abseqReport(dataPath, compare = c("PCR1, PCR2"))
 
 # Example of 3 comparisons
 # Analyze all samples. In addition, compare:
 #  * PCR1 with PCR2
 #  * PCR2 with PCR3
-multiComparison <- abseqReport(dataPath, compare = c("PCR1,PCR2",
-                                                        "PCR2,PCR3"))
+multiComparison <- abseqReport(dataPath, compare = c("PCR1, PCR2",
+                                                     "PCR2, PCR3"))
 ```
 <!-- always execute this chunk, these are used in demonstration examples
 that don't require any run -->
@@ -336,13 +340,14 @@ multiComparison <- suppressWarnings(abseqReport(dataPath, compare = c(
 ), report = 0))
 ```
 
-__Note__, `abseqReport` always return _all_ samples in `dataPath`.
-That is, the following is always true regardless of the arguments
-to `compare`:
+__Note__, `abseqReport` always return _all_ samples in `dataPath` regardless
+of the arguments in `compare`:
 
 ```{r abseqR_show_return_of_abseqReport, eval=TRUE}
-# both had different values to "compare", but they both still return all 3 PCRs
+# compare = c("PCR1,PCR2")
 names(pcr1.pcr2)
+
+# compare = c("PCR1, PCR2", "PCR2 ,PCR3")
 names(multiComparison)
 ```
 The next subsection explains the motivation for this behaviour.
@@ -350,13 +355,13 @@ The next subsection explains the motivation for this behaviour.
 ### Customizing sample comparison with `report` {#customize-cmp}
 
 [Previously](#basic-analysis), the return value of `abseqReport` was stored in a variable
-named `samples`. This allows for further customizations in sample comparison.
+named `samples`.
+This return value can be used to further customize sample comparisons.
 
 As a hypothetical example,
-if the reports show an interesting behaviour between `PCR1` and `PCR3`,
+if the reports show an interesting observation between `PCR1` and `PCR3`,
 it might be of interest to isolate the 2 samples from the rest. That is,
-comparing `PCR1` with `PCR3` exclusively instead of a comparison with all 3 `PCR`s,
-as was done before.
+comparing `PCR1` with `PCR3` exclusively.
 
 This code shows how to further refine sample comparisons:
 
@@ -512,19 +517,15 @@ sdir <- file.path(dataPath, "auxiliary", "PCR1")
 mdir <- file.path(dataPath, "auxiliary", "PCR1_vs_PCR2_vs_PCR3")
 ```
 
-This section aims to walk through each plot generated by `r sabseqR()` when
+This section will walk through each plot generated by `r sabseqR()` when
 the `abseqReport` or `report` function was invoked on the provided `PCR` samples.
 The visualizations and analyses can be broken down into 5 categories:
 
 1. Sequence quality
 2. V-(D)-J germline abundance
-3. Clonotype productivity analysis (also referred as functional clones)
+3. Clonotype productivity analysis (also referred to as functional clones)
 4. Clonotype diversity analysis
 5. Overlapping clonotypes analysis
-
-It is important to note that all the graphs generated by `r sabseqR()` are
-plotted **after** the filtering criteria specified in `r sabseqPy()`
-has been applied on the sequences.
 
 ## Sequence quality
 
