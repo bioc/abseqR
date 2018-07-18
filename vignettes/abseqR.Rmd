@@ -522,7 +522,7 @@ sdir <- file.path(dataPath, "auxiliary", "PCR1")
 mdir <- file.path(dataPath, "auxiliary", "PCR1_vs_PCR2_vs_PCR3")
 
 read_png <- function(path) {
-    if (all(unlist(lapply(path, file.exists)))) {
+    if (file.exists(path)) {
         #rasterGrob(as.raster(readPNG(path)), interpolate = TRUE)
         knitr::include_graphics(path)
     } else {
@@ -554,7 +554,7 @@ The sequence length distribution is a simple way of validating the quality
 of a sequencing run. The histogram is expected to show a large proportion of
 sequences falling within the expected lengths.
 
-```{r seq-len, fig.cap="Sequence length distribution. Histogram of (merged) sequence lengths.", echo=FALSE}
+```{r seq-len, fig.cap="Sequence length distribution. Histogram of (merged) sequence lengths.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "annot", "PCR1_all_clones_len_dist.png"))
 ```
 
@@ -582,7 +582,7 @@ of sequences falling within a given range.
 For example, Figure \@ref(fig:align-qual) shows one of the 5 heatmaps: bitscore
 against V germline alignment length.
 
-```{r align-qual, fig.cap="Bitscore vs V germline alignment length in PCR1. Heatmap of bitscore vs alignment length shows percentage of sequences in a given value range.", echo=FALSE}
+```{r align-qual, fig.cap="Bitscore vs V germline alignment length in PCR1. Heatmap of bitscore vs alignment length shows percentage of sequences in a given value range.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "abundance", "PCR1_igv_align_quality_bitscore_hm_static.png"))
 ```
 
@@ -595,7 +595,7 @@ Figure \@ref(fig:indel) shows the rate of indels in `PCR1`. This graph plots the
 percentage (y-axis) of insertions or deletions (x-axis) in the V germlines of `PCR1`.
 A similar plot for rate of mismatches in V germlines can be found in the same directory.
 
-```{r indel, fig.cap="Rate of insertions and deletions in PCR1. The percentage of indels found within the V germlines of PCR1.", echo=FALSE}
+```{r indel, fig.cap="Rate of insertions and deletions in PCR1. The percentage of indels found within the V germlines of PCR1.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "abundance", "PCR1_igv_gaps_dist.png"))
 ```
 
@@ -612,7 +612,7 @@ in-house antibody library is in-line with the natural antibody repertoire.
 Experiments that artifically amplify certain germline families can also
 be validated similarly using this plot.
 
-```{r vgermline, fig.cap="V family germline distribution in PCR1. The percentage of IGHV families after germline annotation using IgBLAST.", echo=FALSE}
+```{r vgermline, fig.cap="V family germline distribution in PCR1. The percentage of IGHV families after germline annotation using IgBLAST.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "abundance", "PCR1_igv_dist_family_level.png"))
 ```
 
@@ -629,7 +629,7 @@ recombination process of V and J germlines.
 Figure \@ref(fig:vjassoc) summarizes the associations between V
 and J family germlines in a plot generated using `r CRANpkg("circlize")`.
 
-```{r vjassoc, fig.cap="V-J family germline association in PCR1. Segment size represents germline proportion while the thickness of the arcs shows the proportion of associations between V and J germline families. This plot was heavily inspired by [VDJTools](https://github.com/mikessh/vdjtools/)[@vdjtools])", echo=FALSE}
+```{r vjassoc, fig.cap="V-J family germline association in PCR1. Segment size represents germline proportion while the thickness of the arcs shows the proportion of associations between V and J germline families. This plot was heavily inspired by [VDJTools](https://github.com/mikessh/vdjtools/)[@vdjtools])", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "abundance", "PCR1_vjassoc.png"))
 ```
 
@@ -655,7 +655,7 @@ Factors that cause sequences to be unproductive are colour coded as such:
 2. Cyan -- sequences _without stop codons_ that has a frameshift
 3. Purple -- _in-frame_ sequences that contains at least one stop codon
 
-```{r prod-summ, fig.cap="Productivity rate of sequences in PCR1. This plot shows the percentage of productive and unproductive sequences, the reason for unproductive sequences are colour coded.", echo=FALSE}
+```{r prod-summ, fig.cap="Productivity rate of sequences in PCR1. This plot shows the percentage of productive and unproductive sequences, the reason for unproductive sequences are colour coded.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "productivity", "PCR1_productivity.png"))
 ```
 
@@ -665,7 +665,7 @@ Figure \@ref(fig:frameshift) shows the percentage of sequences that are
 out-of-frame due to either misaligned V-J coding frame or non-multiple of 3 indels
 in one of the framework or complementarity regions.
 
-```{r frameshift, fig.cap="Rate of in-frame and out-of-frame sequences in PCR1. Misaligned V-J frame or non-multiple of 3 indels in either one of the framework or complementarity regions causes a frameshift and therefore renders the sequence unproductive.", echo=FALSE}
+```{r frameshift, fig.cap="Rate of in-frame and out-of-frame sequences in PCR1. Misaligned V-J frame or non-multiple of 3 indels in either one of the framework or complementarity regions causes a frameshift and therefore renders the sequence unproductive.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "productivity", "PCR1_vjframe_dist.png"))
 ```
 
@@ -677,7 +677,7 @@ introduced by upstream indels that are not a multiple of 3.
 Figure \@ref(fig:stopcod) shows the hot spots for stop codons segregated by
 framework and complementarity regions.
 
-```{r stopcod, fig.cap="Proportion of stop codons in any given CDR or FR in PCR1. The percentages show the frequency of stop codons in a given region relative to the total number of stop codons present.", echo=FALSE}
+```{r stopcod, fig.cap="Proportion of stop codons in any given CDR or FR in PCR1. The percentages show the frequency of stop codons in a given region relative to the total number of stop codons present.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "productivity", "PCR1_stopcodon_region_outframe.png"))
 ```
 
@@ -705,15 +705,15 @@ are expected to be low because they are relatively conserved regions. Similarly,
 the number of indels in productive sequences are expected to be low or some
 multiple of 3.
 
-```{r mismatches, fig.cap="Proportion of mismatches in productive sequences of PCR1.", echo=FALSE}
+```{r mismatches, fig.cap="Proportion of mismatches in productive sequences of PCR1.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "productivity", "PCR1_fr3_mismatches_dist.png"))
 ```
 
-```{r gaps, fig.cap="Proportion of indels in productive sequences of PCR1.", echo=FALSE}
+```{r gaps, fig.cap="Proportion of indels in productive sequences of PCR1.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "productivity", "PCR1_fr3_gaps_dist.png"))
 ```
 
-```{r gaps-out, fig.cap="Proportion of indels in out-of-frame sequences of PCR1.", echo=FALSE}
+```{r gaps-out, fig.cap="Proportion of indels in out-of-frame sequences of PCR1.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "productivity", "PCR1_fr3_gaps_dist_out_of_frame.png"))
 ```
 
@@ -749,15 +749,15 @@ used to define a "clonotype" is mapped on the `linetype` aesthetic. Similar plot
 for framework regions (FR) and the entire variable domain is also available within
 the same directory.
 
-```{r dup, fig.cap="Proportion of duplicated clonotypes in PCR1. Higher-order duplication levels starting from 10 are binned.", echo=FALSE}
+```{r dup, fig.cap="Proportion of duplicated clonotypes in PCR1. Higher-order duplication levels starting from 10 are binned.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "diversity", "PCR1_cdr_duplication.png"))
 ```
 
-```{r rare, fig.cap="Rarefaction curve of clonotypes in PCR1. The number of deduplicated sequences are taken over the mean of 5 resampling rounds, where the shaded areas indicate 95% confidence interval.", echo=FALSE}
+```{r rare, fig.cap="Rarefaction curve of clonotypes in PCR1. The number of deduplicated sequences are taken over the mean of 5 resampling rounds, where the shaded areas indicate 95% confidence interval.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "diversity", "PCR1_cdr_rarefaction.png"))
 ```
 
-```{r recap, fig.cap="Capture-recapture of clonotypes in PCR1. The number of recaptured sequences are taken over the mean of 5 resampling rounds, where the shaded areas indicate 95% confidence interval.", echo=FALSE}
+```{r recap, fig.cap="Capture-recapture of clonotypes in PCR1. The number of recaptured sequences are taken over the mean of 5 resampling rounds, where the shaded areas indicate 95% confidence interval.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "diversity", "PCR1_cdr_recapture.png"))
 ```
 
@@ -768,7 +768,7 @@ Spectratypes are histograms of clonotype lengths.
 Figure \@ref(fig:spectra) shows a CDR3 amino acid spectratype with outliers removed.
 Spectratypes for other FRs and CDRs are available in the same directory.
 
-```{r spectra, fig.cap="CDR3 amino acid spectratype for PCR1 with outliers removed.", echo=FALSE}
+```{r spectra, fig.cap="CDR3 amino acid spectratype for PCR1 with outliers removed.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "diversity", "spectratypes", "PCR1_cdr3_spectratype_no_outliers.png"))
 ```
 
@@ -818,9 +818,9 @@ tabl <- "
 cat(tabl)
 ```
 
-Following that, to introduce overlapping sequences between the samples, a script was written
-to randomly mix and amplify sequences from these samples, resulting in a final
-repertoire of 3 samples, named PCR1, PCR2, and PCR3.
+Following that, a random number of sequences were drawn from each sample
+and randomly amplified, resulting in a final repertoire of 3 samples,
+named PCR1, PCR2, and PCR3.
 
 Finally, these 3 samples were analyzed by `r sabseqPy()`. The command used to
 analyze these samples are as follows:
