@@ -526,7 +526,10 @@
         g <- ggdendro::ggdendrogram(hclust(as.dist(mat), method = "complete"),
                                rotate = TRUE) +
             labs(title = paste(.capitalize(sub(".", " ", method, fixed = TRUE)),
-                               "hierarchical dendrogram"))
+                               "hierarchical dendrogram")) +
+            theme(panel.border = element_blank(),
+                  panel.grid = element_blank())
+
         saveName <- file.path(outputPath,
                               paste0(sub(".", "_", method, fixed = TRUE),
                                      ".png"))
