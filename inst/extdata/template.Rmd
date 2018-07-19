@@ -1152,7 +1152,7 @@ scatterOut <- lapply(seq_along(files), function(i) {
 Row
 -----------------------------------------------------------------------
 
-### Distribution of top 10 (colour coded) clonotypes from each sample
+### Distribution of top 10 clonotypes from each sample
 
 ```{r abseq_top_10, eval=(params$hasDiv && !params$single), fig.width=params$widthL, fig.height=params$heightL}
 fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = ".*_top10Clonotypes\\.Rdata")
