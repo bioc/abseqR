@@ -554,7 +554,7 @@ The sequence length distribution is a simple way of validating the quality
 of a sequencing run. The histogram is expected to show a large proportion of
 sequences falling within the expected lengths.
 
-```{r seq-len, fig.cap="Sequence length distribution. Histogram of (merged) sequence lengths.", echo=FALSE, out.width="100%"}
+```{r seq-len, fig.cap="Sequence length distribution of PCR1. Histogram of (merged) sequence lengths.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "annot", "PCR1_all_clones_len_dist.png"))
 ```
 
@@ -643,7 +643,7 @@ Briefly, the main factors affecting the productiveness of a sequence by
 
 1. Misaligned V-J germline coding frame
 3. Presence of stop condons
-2. Non-multiple of 3 indels within a framework or complementarity region
+2. Non-multiple of 3 indels within a framework or complementarity-determining region
 
 Any sequence that satisfies at least one of the above condition will be classified
 as unproductive.
@@ -663,9 +663,9 @@ read_png(file.path(sdir, "productivity", "PCR1_productivity.png"))
 
 Figure \@ref(fig:frameshift) shows the percentage of sequences that are
 out-of-frame due to either misaligned V-J coding frame or non-multiple of 3 indels
-in one of the framework or complementarity regions.
+in one of the framework or complementarity-determining regions.
 
-```{r frameshift, fig.cap="Rate of in-frame and out-of-frame sequences in PCR1. Misaligned V-J frame or non-multiple of 3 indels in either one of the framework or complementarity regions causes a frameshift and therefore renders the sequence unproductive.", echo=FALSE, out.width="100%"}
+```{r frameshift, fig.cap="Rate of in-frame and out-of-frame sequences in PCR1. Misaligned V-J frame or non-multiple of 3 indels in either one of the framework or complementarity-determining regions causes a frameshift and therefore renders the sequence unproductive.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "productivity", "PCR1_vjframe_dist.png"))
 ```
 
@@ -675,9 +675,9 @@ Another contributing factor of unproductive sequences are the presence of
 stop codons. Stop codons may exist originally in the sequence or can be
 introduced by upstream indels that are not a multiple of 3.
 Figure \@ref(fig:stopcod) shows the hot spots for stop codons segregated by
-framework and complementarity regions.
+framework and complementarity-determining regions.
 
-```{r stopcod, fig.cap="Proportion of stop codons in any given CDR or FR in PCR1. The percentages show the frequency of stop codons in a given region relative to the total number of stop codons present.", echo=FALSE, out.width="100%"}
+```{r stopcod, fig.cap="Proportion of stop codons in any given CDR or FR of out-of-frame sequences in PCR1. The percentages show the frequency of stop codons in a given region relative to the total number of stop codons present.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "productivity", "PCR1_stopcodon_region_outframe.png"))
 ```
 
@@ -690,13 +690,13 @@ a similar plot for _in-frame_ sequences can also be found within the same direct
 Some sequences are productive despite having indels and mismatches. This occurs
 when indels are a multiple of 3 and mismatches do not introduce stop codons.
 The following figures plot indels and mismatches for each germline,
-framework region, and complementarity region on _productive sequences_ (unless
+framework region, and complementarity-determining region on _productive sequences_ (unless
 specified otherwise).
 
 Figure \@ref(fig:mismatches), Figure \@ref(fig:gaps), and Figure \@ref(fig:gaps-out)
 plots the proportion of mismatches in productive sequences,
 indels in productive sequences, and indels in out-of-frame (unproductive) sequences
-for the thrid framework region (FR3).
+for framework region 3 (FR3).
 The motivation behind these plots is to quickly identify the quality of productive
 sequences.
 
@@ -730,7 +730,7 @@ of `PCR1` or in the `Diversity` tab in `PCR1`'s HTML report.
 
 ### Sequence duplication, rarefaction, and recapture analysis
 
-To estimate repertoire diversity, `r sabseqR()` employs 3 common techniques:
+To estimate repertoire diversity, `r sabseqR()` employs 3 commonly used techniques:
 
 _Sequence duplication levels_ in Figure \@ref(fig:dup) plots the proportion (y-axis) of singletons, doubletons,
 and higher-order clonotypes (x-axis).
@@ -744,7 +744,7 @@ a capture-recapture experiment from varying sample sizes (x-axis).
 For every sample size, the percentage of recaptured clonotypes denotes the average
 of 5 repeated capture-recapture experiments.
 
-In all the figures, the complementarity determining region (CDR)
+In all the figures, the complementarity-determining region (CDR)
 used to define a "clonotype" is mapped on the `linetype` aesthetic. Similar plots
 for framework regions (FR) and the entire variable domain is also available within
 the same directory.
@@ -776,10 +776,14 @@ read_png(file.path(sdir, "diversity", "spectratypes", "PCR1_cdr3_spectratype_no_
 
 In addition to spectratypes, `r sabseqR()` also visualizes the amino acid
 composition of each FRs and CDRs in a set of bar plots.
-Figure \@ref(fig:comp) shows the composition of `PCR1`'s CDR3. Similar plots
-for other FRs and CDRs are in the same directory.
+Figure \@ref(fig:comp) shows the composition of `PCR1`'s CDR3.
+The left shows an unscaled composition logo, where the proportion is normalized
+using the total number of available amino acids in a given position. The right
+shows a scaled composition logo, where the proportion is nomalized using
+the total number of clonotypes. Similar plots for other FRs and CDRs
+are available in the same directory.
 
-```{r comp, fig.cap="Amino acid composition logo for PCR1's CDR3. The unscaled (left) composition logo is normalized by the total number of amino acids in a given position, while the scaled (right) composition logo is normalized by the total number of clones.", echo=FALSE, fig.wide=TRUE}
+```{r comp, fig.cap="Amino acid composition logo for PCR1's CDR3. The unscaled (left) and the scaled (right) composition logos are colour coded and grouped by their physiochemical properties.", echo=FALSE, fig.wide=TRUE}
 unscaled <- file.path(sdir, "diversity", "composition_logos", "CDR3", "PCR1_cumulative_logo.png")
 scaled <- file.path(sdir, "diversity", "composition_logos", "CDR3", "PCR1_cumulative_logo_scaled.png")
 img1 <-  rasterGrob(as.raster(readPNG(unscaled)), interpolate = TRUE)
