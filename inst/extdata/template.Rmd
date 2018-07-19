@@ -1171,7 +1171,7 @@ if (!is.na(fname)) {
 > Clonotype distributions are scaled to top 10
 
 
-### Number of overlapping and exclusive clonotypes
+### Number of overlapping and non-overlapping clonotypes
 
 ```{r abseq_clone_venn, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = ".*_cdr3_clonotypeIntersection\\.png")
