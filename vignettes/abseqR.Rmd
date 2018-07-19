@@ -8,7 +8,8 @@ title: "abseqR"
 author: "Jia Hong Fong"
 package: "abseqR"
 output:
-    BiocStyle::html_document
+    BiocStyle::html_document: default
+    BiocStyle::pdf_document:
 vignette: >
     %\VignetteIndexEntry{Introduction to abseqR}
     %\VignetteEngine{knitr::rmarkdown}
