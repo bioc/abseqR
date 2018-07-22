@@ -119,7 +119,7 @@ install_github("malhamdoosh/abseqR")
 ## System prerequisites
 
 `r sabseqR()` requires [pandoc](http://pandoc.org/) version _1.19.2.1_ or higher
-to render the HTML report. If pandoc can not be detected while executing `r sabseqR()`,
+to render the HTML report. If pandoc cannot be detected while executing `r sabseqR()`,
 the HTML report will __not__ be generated. `r sabseqR()` is a cross-platform
 library and will work on any major operating system [^windows_biocparallel].
 
