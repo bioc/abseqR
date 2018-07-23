@@ -718,6 +718,9 @@ read_png(file.path(sdir, "productivity", "PCR1_fr3_gaps_dist.png"))
 read_png(file.path(sdir, "productivity", "PCR1_fr3_gaps_dist_out_of_frame.png"))
 ```
 
+Similar plots for other regions and IGV, IGD, and IGJ can be found in the
+same directory.
+
 <!-- TODO: missing plot 1: skipped IGV productive dist,
 IGV inframe unproductive dist, IGV out-of-frame dist-->
 
