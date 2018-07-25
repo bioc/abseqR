@@ -787,7 +787,7 @@ shows a scaled composition logo, where the proportion is nomalized using
 the total number of clonotypes. Similar plots for other FRs and CDRs
 are available in the same directory.
 
-```{r comp, fig.cap="Amino acid composition logo for PCR1's CDR3. The unscaled (left) and the scaled (right) composition logos are colour coded and grouped by their physiochemical properties.", echo=FALSE, fig.wide=TRUE}
+```{r comp, fig.cap="Amino acid composition logo for PCR1's CDR3. The unscaled (left) and the scaled (right) composition logos are colour coded and grouped by their physicochemical properties.", echo=FALSE, fig.wide=TRUE}
 unscaled <- file.path(sdir, "diversity", "composition_logos", "CDR3", "PCR1_cumulative_logo.png")
 scaled <- file.path(sdir, "diversity", "composition_logos", "CDR3", "PCR1_cumulative_logo_scaled.png")
 img1 <-  rasterGrob(as.raster(readPNG(unscaled)), interpolate = TRUE)
