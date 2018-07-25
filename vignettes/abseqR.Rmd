@@ -819,9 +819,9 @@ one of them, plotting the clonotype frequencies in `PCR2` against `PCR1`.
 
 The scatter plot:
 
-* has $log_e$-scaled clonotype frequencies
+* has $log_{10}$-scaled clonotype frequencies
 * has a point for each clonotype
-    * the coordinate of each point denotes the $log_e(frequency)$ in the sample
+    * the coordinate of each point denotes the $log_{10}(frequency)$ in the sample
     on the x and y axis respectively
     * point sizes are mapped to the mean frequency of a clonotype
 * has marginal density plots colour coded as such:
