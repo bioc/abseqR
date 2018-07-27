@@ -5,7 +5,7 @@ Version: 0.99.0
 Author: Jia Hong Fong
 Maintainer: Jia Hong Fong <jfong361@gmail.com>
 Description: Visualizes data generated from python package abseqPy.
-License: MIT
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.4)
