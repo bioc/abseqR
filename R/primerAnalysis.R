@@ -30,9 +30,9 @@
     if (str == "outframe") {
         return("Out-of-frame")
     } else if (str == "indel_pos") {
-        return("Abundance of Indel Positions")
+        return("Abundance of Indel Positions in")
     } else if (str == "indelled") {
-        return("Indelled abundance")
+        return("Abundance of Indelled")
     } else {
         return(.capitalize(str))
     }
@@ -167,7 +167,7 @@
                             lapply(files, read.csv, skip = 1),
                             sampleNames,
                             paste(paste0(.canonicalizeTitle(analysisType[j]),
-                                         " of ", pend,
+                                         " ", pend,
                                          "'-end Primer Sequence (",
                                          .canonicalizeTitle(ctg), ") in"),
                                   combinedNames),

@@ -158,7 +158,8 @@
 
     static <- ggplot(melt(m), aes(x = Var2, y = Var1)) +
         geom_tile(aes(fill = value)) +
-        labs(title = title, x = xlabel, y = ylabel)
+        labs(title = title, x = xlabel, y = ylabel, fill = "percent") +
+        theme_bw()
 
     return(list(
         interactive =  plotly::layout(interactive, title = title,

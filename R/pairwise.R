@@ -520,13 +520,16 @@
         .saveAs(.save, saveName, p)
     })
 
-    # step 3. plot sand save the hierarchical dendograms
+    # step 3. plot sand save the hierarchical dendrograms
     lapply(c("morisita.horn", "jaccard", "bray.curtis"), function(method) {
         mat <- .loadMatrixFromDF(df, value.var = method, diag = 0)
         g <- ggdendro::ggdendrogram(hclust(as.dist(mat), method = "complete"),
                                rotate = TRUE) +
             labs(title = paste(.capitalize(sub(".", " ", method, fixed = TRUE)),
-                               "hierarchical dendogram"))
+                               "hierarchical dendrogram")) +
+            theme(panel.border = element_blank(),
+                  panel.grid = element_blank())
+
         saveName <- file.path(outputPath,
                               paste0(sub(".", "_", method, fixed = TRUE),
                                      ".png"))

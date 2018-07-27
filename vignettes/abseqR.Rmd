@@ -8,7 +8,8 @@ title: "abseqR"
 author: "Jia Hong Fong"
 package: "abseqR"
 output:
-    BiocStyle::html_document
+    BiocStyle::html_document: default
+    BiocStyle::pdf_document:
 vignette: >
     %\VignetteIndexEntry{Introduction to abseqR}
     %\VignetteEngine{knitr::rmarkdown}
@@ -33,8 +34,8 @@ knitr::opts_chunk$set(message = FALSE)
 # but not the execution time (only executes when in 'debug' mode)
 
 sandboxDirectory <- "."
-toyDataPath <- file.path(sandboxDirectory, "abseqR_example")
-if (!file.exists(toyDataPath)) {
+dataPath <- file.path(sandboxDirectory, "abseqR_example")
+if (!file.exists(dataPath)) {
     stop(paste("You must run this vignette with release = TRUE at least",
                "once before you run it with release = FALSE"))
 }
@@ -48,7 +49,7 @@ lapply(c("abseqR_example", "refined_comparison"), unlink, recursive = TRUE)
 ```{r abseqR_vignette_helper_functions, include=FALSE}
 sabseqR <- function() { return(Biocpkg("abseqR")); }
 #sabseqR <- function() { return("`abseqR`"); }
-sabseqPy <- function() { return("`abseqPy`"); }
+sabseqPy <- function() { return("[abseqPy](https://github.com/malhamdoosh/abseqPy)"); }
 sabseq <- function() { return("`AbSeq`"); }
 ```
 
@@ -118,7 +119,7 @@ install_github("malhamdoosh/abseqR")
 ## System prerequisites
 
 `r sabseqR()` requires [pandoc](http://pandoc.org/) version _1.19.2.1_ or higher
-to render the HTML report. If pandoc can not be detected while executing `r sabseqR()`,
+to render the HTML report. If pandoc cannot be detected while executing `r sabseqR()`,
 the HTML report will __not__ be generated. `r sabseqR()` is a cross-platform
 library and will work on any major operating system [^windows_biocparallel].
 
@@ -197,23 +198,28 @@ operations in this package. To install it, type
 
 # Quick start
 
-To leverage _all_ the functionalities provided by `r sabseqR()`, the main
+To leverage all the functionalities provided by `r sabseqR()`, the main
 functions to note are `abseqR::abseqReport`, `abseqR::report`, and `+`.
-This section will use a toy example to walk through the use cases of each function.
+This section will use a small dataset to walk through the use cases of each function.
 
 TODO: show class diagram here
 
 ## Dataset
 
-The toy example mentioned previously comes installed with `r sabseqR()`.
+The example dataset comes installed with `r sabseqR()`.
 For the sake of brevity, the samples are described under the
-[miscellaneous](#toy-data) section. Briefly, the dataset contains 3 samples generated
-from _in silico_ simulation, each named PCR1, PCR2, and PCR3.
+[miscellaneous](#example-data) section.
 
-### Obtaining the toy dataset {#obtain-dataset}
+Briefly, the dataset contains 3 samples generated using
+_in silico_ simulation, named PCR1, PCR2, and PCR3.
+`r sabseqPy()` was then used to analyze the dataset and
+the output directory specified in `r sabseqPy()`'s `--outdir` was
+`"abseqR_example"`.
 
-To obtain the dataset, the following R code demonstrates the steps needed to copy it
-to a _sandbox directory_ for play-testing:
+### Obtaining the dataset {#obtain-dataset}
+
+To obtain the dataset, the following R code demonstrates
+the steps needed to copy it to a _sandbox directory_:
 
 ```{r abseqR_copy_data_files, eval=params$release, results=FALSE}
 # substitute with any directory that you have read/write access to
@@ -222,90 +228,64 @@ if (!file.exists(sandboxDirectory)) {
     file.create(sandboxDirectory)
 }
 
-# path to provided toy data (comes installed with abseqR)
-toyData <- system.file("extdata", "abseqR_example", package = "abseqR")
-# copy the provided toy data to sandboxDirectory
-file.copy(toyData, sandboxDirectory, recursive = TRUE)
+# path to provided data (comes installed with abseqR)
+exdata <- system.file("extdata", "abseqR_example", package = "abseqR")
+# copy the provided data to sandboxDirectory
+file.copy(exdata, sandboxDirectory, recursive = TRUE)
 ```
 
-### Exploring the toy dataset
+### Exploring the dataset
 
-The contents of `abseqR_example` should be familar to users of `r sabseqPy()`.
+To verify that the 3 `PCR`s are present:
 
-<!-- Note, this code block is not evaluated. abseqPyOutputContents
-is hard coded with 2 strings.
-(Reason: because the toy example in sandBoxDirectory
-already ran abseqR to save time rendering this vignette) -->
-```{r abseqR_data_contents, eval=params$release}
-# toyDataPath now holds the path to a local copy of the toy data
-toyDataPath <- file.path(sandboxDirectory, "abseqR_example")
-list.files(path = toyDataPath)
-```
-```{r abseqR_data_contents_hidden, eval=(!params$release), echo=FALSE}
-c("auxiliary", "hdf")
-```
-
-Peeking into the `auxiliary` folder, the names of the samples are:
-```{r abseqR_sample_names, eval=params$release}
-paste(list.files(path = file.path(toyDataPath, "auxiliary")), collapse = ", ")
-```
-```{r abseqR_sample_names_hidden, eval=(!params$release), echo=FALSE}
-paste(c("PCR1", "PCR2", "PCR3"), collapse = ", ")
+```{r abseqR_data_contents}
+# dataPath now holds the path to a local copy of the data
+dataPath <- file.path(sandboxDirectory, "abseqR_example")
+# the sample names can be found inside the auxiliary directory
+list.files(path = file.path(dataPath, "auxiliary"))
 ```
 
 
-## Analyzing the datasets
+## Analyzing the dataset
 
 ### Basic analysis with `abseqReport` {#basic-analysis}
 
 After [obtaining the dataset](#obtain-dataset), visualizing the results of
-`r sabseqPy()` is done using the `abseqReport` function:
+`r sabseqPy()` is done using the `abseqReport` function.
 
-```{r abseqR_quick_run, eval=params$release, results=FALSE, warning=FALSE}
+```{r abseqR_quick_run, eval=FALSE, results=FALSE, warning=FALSE}
 # visualize all the datasets individually,
 # then "compare" PCR1 with PCR2 with PCR3
-samples <-  abseqReport(toyDataPath,
+samples <-  abseqReport(dataPath,
                         compare = c("PCR1, PCR2, PCR3"))
 
 # ignore the warning message:
 # "Sample output directory <path> is different from provided path
 #   <path> assuming directory was moved"
 # This warning message tells us that the directory has
-# been moved (we copied the provided examples to "toyDataPath")
+# been moved (we copied the provided examples to "dataPath")
 ```
-```{r abseqR_quick_run_hidden, eval=(!params$release), echo=FALSE}
-samples <- abseqReport(toyDataPath, report = 0)
-```
-
-Here, `abseqReport` was told to also compare samples
-`PCR1`, `PCR2`, and `PCR3` in addition to analyzing the samples
-within `toyDataPath`. Other possible arguments to `compare` will be described in
-detail in the next [section](#abseqReport-compare).
-
-`abseqReport` returns a named list of objects[^abseqRep], each object encapsulates
-information about the samples within `toyDataPath`.
-_Note, regardless of the arguments to `compare`, `abseqReport` always returns_
-_a list of **all** the samples in `toyDataPath`._
-
-```{r abseqR_named_list}
-# PCR1 - PCR3
-stopifnot(length(samples) == 3)
-# display the samples found within "toyDataPath"
-names(samples)
+<!-- We showed the users with report = 3, however that's redundant
+in this vignette because we're not going to be using the HTML report - the
+users are advised to explore the HTML themselves.
+Save time by only plotting the PNGs -->
+```{r abseqR_quick_run_hidden, eval=TRUE, echo=FALSE, results=FALSE, warning=FALSE}
+samples <- abseqReport(dataPath, compare = c("PCR1,PCR2,PCR3"), report = 1)
 ```
 
-The real work done by this function can be seen in the directory 
-``r file.path(toyDataPath, "report")``. The PNG plots
-are kept in the same folders as the corresponding csv files,
-but they are collated together in one HTML document found in the `report` directory
-to summarize the analysis.
+The call to `abseqReport` create plots for all samples contained within `dataPath`.
+In addition, `compare = c("PCR1, PCR2, PCR3")` specifies
+that samples named `PCR1`, `PCR2`, and `PCR3` should be explicitly
+compared against each other. Other possible arguments to
+`compare` will be described in detail in the next [section](#abseqReport-compare).
 
-```{r abseqR_abseqReport_report_output, eval=params$release}
-list.files(path = file.path(toyDataPath, "report"))
-```
-```{r abseqR_abseqReport_report_output_hidden, eval=(!params$release), echo=FALSE}
-c("index.html", "html_files")
-```
+### Sharing output
+
+Invoking `abseqReport` generates PNG plots in the same folder as the
+corresponding csv files within `auxiliary` but they are
+collated together in a standalone HTML document found in the `report` directory.
+
+The contents inside the `report` directory:
 
 * `index.html` is a document which summarizes the analysis and provides a convenient way
 of navigating to multiple samples. For example, within this file, there are links to
@@ -313,12 +293,16 @@ the reports generated for `PCR1`, `PCR2`, `PCR3` and `PCR1 vs PCR2 vs PCR3`.
 
 * `html_files` contains individual HTML files that are _not_ meant to be accessed by the user,
 but rather through `index.html`. The files within this directory are standalone HTML documents,
-but the landing page `index.html` (is **not** because it) contains relative links to the aforementioned HTML documents,
-and should be shared together with the `html_files` folder, if required.
+but the landing page `index.html` (is **not** because it)
+contains relative links to the aforementioned HTML documents, and should be
+shared together with the `html_files` folder.
 
 In conclusion, the folder of interest is `report`, and the file of interest is
 `index.html`. The individual sample reports (HTML files) in `html_files` can
-be shared as-is, but it is recommended to share the `report` folder in its entirety.
+be shared as-is, but `index.html` __must__ be accompanied by `html_files` folder.
+
+
+It is recommended to share the `report` folder in its entirety.
 
 
 ### Configuring sample comparison in `abseqReport` {#abseqReport-compare}
@@ -327,94 +311,85 @@ This section describes the possible inputs for `abseqReport`'s
 `compare` parameter. Earlier, `abseqReport` was called with
 `compare = c("PCR1, PCR2, PCR3")`. This tells the function to
 compare "`PCR1` with `PCR2` with `PCR3`". However,
-it is also possible to compare only a subset of samples in `toyDataPath`,
+it is also possible to compare only a subset of samples in `dataPath`,
 or multiple subsets of samples, or none at all.
 
-Each comparison can be represented by a string.
-The way to instruct `abseqReport` to compare samples _against_ each other is
-to separate them with commas _within_ a string (e.g. `compare = c("PCR1,PCR2")`)[^compare-ws].
-Since `compare` accepts a `vector`, it is possible to specify multiple comparisons (multiple strings).
+The `compare` parameter accepts a vector of one or more strings. Each string
+denotes a comparison between samples separated by commas, for example,
+`compare = c("PCR1, PCR2, PCR3")`[^compare-ws].
 
 If sample comparison was not required, then the command can be
-simplified to `samples <- abseqReport(toyDataPath)`.
+simplified to `samples <- abseqReport(dataPath)`.
 
 Example of other combinations:
 
 ```{r abseqR_abseqReport_compare_argument, eval=FALSE}
 # Example of 1 comparison
 # Analyze all samples, but only compare PCR1 with PCR2
-pcr1.pcr2 <- abseqReport(toyDataPath, compare = c("PCR1,PCR2"))
+pcr1.pcr2 <- abseqReport(dataPath, compare = c("PCR1, PCR2"))
 
 # Example of 3 comparisons
 # Analyze all samples. In addition, compare:
 #  * PCR1 with PCR2
 #  * PCR2 with PCR3
-multiComparison <- abseqReport(toyDataPath, compare = c(
-    "PCR1,PCR2",
-    "PCR2,PCR3",
-))
-
+multiComparison <- abseqReport(dataPath, compare = c("PCR1, PCR2",
+                                                     "PCR2, PCR3"))
 ```
-<!-- always execute this chunk, these are used in demonstartion examples
+<!-- always execute this chunk, these are used in demonstration examples
 that don't require any run -->
 ```{r abseqR_abseqReport_copare_argument_hidden, echo=FALSE, eval=TRUE}
-pcr1.pcr2 <- suppressWarnings(abseqReport(toyDataPath, compare = c("PCR1,PCR2"),
+pcr1.pcr2 <- suppressWarnings(abseqReport(dataPath, compare = c("PCR1,PCR2"),
                               report = 0))
-multiComparison <- suppressWarnings(abseqReport(toyDataPath, compare = c(
+multiComparison <- suppressWarnings(abseqReport(dataPath, compare = c(
     "PCR1,PCR2",
     "PCR2,PCR3"
 ), report = 0))
 ```
 
-
-The extra plots generated when at least one comparison is specified will be shown
-in the section [below](#abseqR-interpret).
-
-As mentioned earlier, `abseqReport` always return _all_ samples in `toyDataPath`.
-That is, the following assertion is always true, regardless of the arguments
-to `compare`:
+__Note__, `abseqReport` always return _all_ samples in `dataPath` regardless
+of the arguments in `compare`:
 
 ```{r abseqR_show_return_of_abseqReport, eval=TRUE}
-# both had different values to "compare", but they both still return all 5 PCRs
-stopifnot(names(pcr1.pcr2) == names(multiComparison))
+# compare = c("PCR1,PCR2")
+names(pcr1.pcr2)
+
+# compare = c("PCR1, PCR2", "PCR2 ,PCR3")
 names(multiComparison)
 ```
-The next subsection explains the reason for this behaviour.
+The next subsection explains the motivation for this behaviour.
 
 ### Customizing sample comparison with `report` {#customize-cmp}
 
 [Previously](#basic-analysis), the return value of `abseqReport` was stored in a variable
-named `samples`. This allows for further customizations in sample comparison.
+named `samples`.
+This return value can be used to further customize sample comparisons.
 
 As a hypothetical example,
-if the reports show an interesting behaviour between `PCR1` and `PCR3`,
+if the reports show an interesting observation between `PCR1` and `PCR3`,
 it might be of interest to isolate the 2 samples from the rest. That is,
-comparing `PCR1` with `PCR3` exclusively instead of a comparison with all 3 `PCR`s,
-as was done before.
+comparing `PCR1` with `PCR3` exclusively.
 
 This code shows how to further refine sample comparisons:
 
-```{r abseqR_refine_comparison_simple, eval=params$release, results=FALSE, warning=FALSE}
+```{r abseqR_refine_comparison_simple, eval=FALSE, results=FALSE, warning=FALSE}
 # recall that samples is a named list
 # where each element's name is the sample's own name (see names(samples))
 pcr1.pcr3 <- samples[["PCR1"]] + samples[["PCR3"]]
 refinedComparison <- report(pcr1.pcr3,
-                            outputDir =
-                                file.path(sandboxDirectory,
-                                          "refined_comparison"))
+                            outputDir = file.path(sandboxDirectory,
+                                                  "refined_comparison"))
 ```
 
-```{r abseqR_refine_comparison_simple_hidden, eval=(!params$release), echo=FALSE, results=FALSE, warning=FALSE}
+```{r abseqR_refine_comparison_simple_hidden, eval=TRUE, echo=FALSE, results=FALSE, warning=FALSE}
 pcr1.pcr3 <- samples[["PCR1"]] + samples[["PCR3"]]
 refinedComparison <- report(pcr1.pcr3,
                             outputDir = file.path(sandboxDirectory,
                                                   "refined_comparison"),
-                            report = 0)
+                            report = 1)
 ```
 
-Here, the `+` operator creates a new comparison for `PCR1` and `PCR3`,
-in preperation for visualization and analysis.
-The return value of this expression is then used
+Here, the `+` operator creates a new comparison between `PCR1` and `PCR3`.
+The return value of this expression was used
 as the first argument to `r sabseqR()`'s `report` function. The second argument
 of `report` specifies the directory where the results should be stored.
 
@@ -426,18 +401,6 @@ in which it returns all the samples in its first argument - `PCR1` and `PCR3`.
 names(refinedComparison)
 ```
 
-The plots and HTML report can be found in the directory
-specified in the arugment to `outputDir`:
-```{r abseqR_refine_comparison_sample_directory_contents, eval=params$release}
-list.files(file.path(sandboxDirectory, "refined_comparison"))
-```
-```{r abseqR_refine_comparison_sample_directory_contents_hidden, eval=(!params$release), echo=FALSE}
-c("abundance", "annot", "clonotype_analysis", "diversity",
-  "PCR1_vs_PCR3.html", "productivity")
-```
-
-`PCR1_vs_PCR3.html` is a standalone HTML report ready for sharing.
-
 In conclusion, the return value is valuable when there is a need to refine the
 comparison between samples. It can be accomplished using `+` and the `report`
 function.
@@ -446,8 +409,8 @@ function.
 
 ## Comparing samples from different abseqPy output directories
 
-Occasionally, there might be a need to compare datasets from different `r sabseq()`
-runs. For example:
+Occasionally, it might be useful to compare datasets from different `r sabseq()`
+directories. For example:
 
 ```{bash abseqR_different_dirs, eval=FALSE}
 # first abseqPy run on SRR dataset from control group
@@ -465,7 +428,7 @@ SRRExp <- abseqReport("SRR_EXP")
 ```
 
 then comparing _all_ samples in `SRRControl` with _all_ samples in `SRRExp`
-can be done using [using `+` and `report`](#customize-cmp).
+can be done using [`+` and `report`](#customize-cmp).
 
 ```{r abseqR_adv_compare_old_new, eval=FALSE}
 # short for SRRControl[[1]] + SRRControl[[2]] + ... + SRRExp[[1]] + ...
@@ -484,7 +447,7 @@ before it can be used to compare with `SRRExp` in
 `all.samples <- Reduce("+", c(SRRControl, SRRExp))`.
 However, this is inefficent because `SRRControl <- abseqReport("SRR_CTRL")`
 will **regenerate** all visuals and reports.
-This dataset might have already been analyzed before the `SRRExp`
+This dataset might have already been analyzed long before the `SRRExp`
 dataset came along.
 
 Instead, the following function call will let `abseqReport` know that it should
@@ -542,51 +505,58 @@ Below is a simplified example of using 4 cores and serializing the loop.
 
 # use 4 CPU cores
 nproc <- 4
-samples <- abseqReport(toyDataPath,
+samples <- abseqReport(dataPath,
                        BPPARAM = BiocParallel::MulticoreParam(nproc))
 
 
 # run sequentially - no multiprocessing
-samples <- abseqReport(toyDataPath,
+samples <- abseqReport(dataPath,
                        BPPARAM = BiocParallel::SerialParam())
 ```
 
-# abseqR on simulated data {#abseqR-interpret}
+# abseqR on example dataset {#abseqR-interpret}
 
 ```{r abseqR_plot_path_setup, include=FALSE}
 # [s]ingle sample [dir]ectory
-sdir <- file.path(toyDataPath, "auxiliary", "PCR1")
+sdir <- file.path(dataPath, "auxiliary", "PCR1")
 # [m]ulti sample [dir]ectory
-mdir <- file.path(toyDataPath, "auxiliary", "PCR1_vs_PCR2_vs_PCR3")
+mdir <- file.path(dataPath, "auxiliary", "PCR1_vs_PCR2_vs_PCR3")
+
+read_png <- function(path) {
+    if (file.exists(path)) {
+        #rasterGrob(as.raster(readPNG(path)), interpolate = TRUE)
+        knitr::include_graphics(path)
+    } else {
+        stop("File at", path, "not found, fatal.")
+    }
+}
 ```
 
-This section aims to walk through each plot generated by `r sabseqR()` when
-the `abseqReport` or `report` function was invoked on the provided `PCR` samples.
+This section will walk through the plots generated by `r sabseqR()` on the
+provided dataset.
+
 The visualizations and analyses can be broken down into 5 categories:
 
 1. Sequence quality
 2. V-(D)-J germline abundance
-3. Clonotype productivity analysis (also referred as functional clones)
+3. Productivity analysis
 4. Clonotype diversity analysis
 5. Overlapping clonotypes analysis
 
-It is important to note that all the graphs generated by `r sabseqR()` are
-plotted **after** the filtering criteria specified in `r sabseqPy()`
-has been applied on the sequences.
-
 ## Sequence quality
 
-The plots in this section can be found in the `annot` and `abundance` directory
-of `PCR1` or in the `Summary` and `Quality` tab in `PCR1`'s HTML report.
+The plots described in this section can be found in
+the `annot` and `abundance` directory of `PCR1`
+or in the `Summary` and `Quality` tab in `PCR1`'s HTML report.
 
 ### Sequence length
 
-The sequence length distribution of a sample is of great interest when attempting
-to validate the quality of a sequencing run. 
+The sequence length distribution is a simple way of validating the quality
+of a sequencing run. The histogram is expected to show a large proportion of
+sequences falling within the expected lengths.
 
-```{r seq-len, fig.cap="Sequence length distribution. Shows the sequence length distribution of (merged) raw reads post filtering.", echo=FALSE}
-load(file.path(sdir, "annot", "PCR1_all_clones_len_dist.Rdata"))
-plot
+```{r seq-len, fig.cap="Sequence length distribution of PCR1. Histogram of (merged) sequence lengths.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "annot", "PCR1_all_clones_len_dist.png"))
 ```
 
 Figure \@ref(fig:seq-len) plots sequence length (x-axis) against proportion (y-axis).
@@ -594,51 +564,40 @@ A similar plot with outliers removed can be found in the same directory.
 
 ### Alignment quality
 
-Recall that the filtering criteria of `r sabseqPy()` on v genes consist of:
+Recall that the filtering criteria of `r sabseqPy()` consist of:
 
 1. Bitscore
 2. Subject start index
 3. Query start index
 4. Alignment length
 
-Setting the filtering criteria for `r sabseqPy()` might be challenging on new datasets --
+These criteria aim to remove low quality sequences, however, setting the
+optimal filtering criteria for `r sabseqPy()` is challenging --
 stringent values might filter too many sequences while lenient values might retain
-noise.
+low quality sequences.
 
-Figure \@ref(fig:align-qual) shows the percentage of sequences that will be retained when a given
-value is chosen for filtering.
+The alignment quality heatmaps generated in `r sabseqR()` shows the relationship
+between alignment lengths and the filtering criteria to help determine the percentage
+of sequences falling within a given range.
 
-```{r align-qual, fig.cap="Alignment quality heatmaps. From left to right: bitscore, percent identity, gaps, and mismatches against the alignment length. Last plot shows subject vs query start index.", echo=FALSE, fig.wide=TRUE}
-bitscoreHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_bitscore_hm_static.png")
-identityHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_identity_hm_static.png")
-gapsHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_gaps_hm_static.png")
-misHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_mismatches_hm_static.png")
-startHM <- file.path(sdir, "abundance", "PCR1_igv_align_quality_start_hm_static.png")
-bitscoreHM <- rasterGrob(as.raster(readPNG(bitscoreHM)), interpolate = FALSE)
-identityHM <- rasterGrob(as.raster(readPNG(identityHM)), interpolate = FALSE)
-gapsHM <- rasterGrob(as.raster(readPNG(gapsHM)), interpolate = FALSE)
-misHM <- rasterGrob(as.raster(readPNG(misHM)), interpolate = FALSE)
-startHM <- rasterGrob(as.raster(readPNG(startHM)), interpolate = FALSE)
-grid.arrange(bitscoreHM, identityHM, gapsHM, misHM, startHM, nrow = 2)
+For example, Figure \@ref(fig:align-qual) shows one of the 5 heatmaps: bitscore
+against V germline alignment length.
+
+```{r align-qual, fig.cap="Bitscore vs V germline alignment length in PCR1. Heatmap of bitscore vs alignment length shows percentage of sequences in a given value range.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "abundance", "PCR1_igv_align_quality_bitscore_hm_static.png"))
 ```
 
-They provide a good starting point in choosing the right values for filtering.
+### Insertions, deletions, and mismatches
 
-### Gaps and mismatches
+Insertions or deletions (indels) and mismatches
+can be used as an indicator for sequence quality.
 
-Gaps (insertions or deletions -- _indels_) and mismatches are also a common
-marker for sequence quality.
-Figure \@ref(fig:indel) and \@ref(fig:mis) shows the percentage of sequences for a
-given number of gaps or mismatches.
+Figure \@ref(fig:indel) shows the rate of indels in `PCR1`. This graph plots the 
+percentage (y-axis) of insertions or deletions (x-axis) in the V germlines of `PCR1`.
+A similar plot for rate of mismatches in V germlines can be found in the same directory.
 
-```{r indel, fig.cap="Rate of insertions and deletions in V genes.", echo=FALSE}
-load(file.path(sdir, "abundance", "PCR1_igv_gaps_dist.Rdata"))
-plot
-```
-
-```{r mis, fig.cap="Mismatch rate in V genes.", echo=FALSE}
-load(file.path(sdir, "abundance", "PCR1_igv_mismatches_dist.Rdata"))
-plot
+```{r indel, fig.cap="Rate of insertions and deletions in PCR1. The percentage of indels found within the V germlines of PCR1.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "abundance", "PCR1_igv_gaps_dist.png"))
 ```
 
 ## V-(D)-J germline abundance
@@ -648,63 +607,340 @@ of `PCR1` or in the `Abundance` tab in `PCR1`'s HTML report.
 
 ### Germline abundance
 
-```{r vgermline, fig.cap="V family germline distribution", echo=FALSE}
-load(file.path(sdir, "abundance", "PCR1_igv_dist_family_level.Rdata"))
-plot
+The proportions of V-(D)-J germlines is essential in some experiment designs.
+For example, it can be used to validate that the germline abundance of an
+in-house antibody library is in-line with the natural antibody repertoire.
+Experiments that artifically amplify certain germline families can also
+be validated similarly using this plot.
+
+```{r vgermline, fig.cap="V family germline distribution in PCR1. The percentage of IGHV families after germline annotation using IgBLAST.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "abundance", "PCR1_igv_dist_family_level.png"))
 ```
 
-Figure \@ref(fig:vgermline) shows the proprotion in percentage of sequences
-belonging in different V "family" germlines.
-The granularity can be adjusted between V-family (e.g. `IGHV3`) and
+Figure \@ref(fig:vgermline) shows the percentage of IGHV families in `PCR1`.
+The granularity varies between V-family (e.g. `IGHV3`) and
 V-gene (e.g. `IGHV3-9`); these plots are available
-in the same directory. The same applies to _D_ and _J_ genes.
+in the same directory. The same applies to D and J germlines.
+
 
 ### V-J germline associations
 
+In addition to Figure \@ref(fig:vgermline), it might be of interest to visualize the
+recombination process of V and J germlines.
 Figure \@ref(fig:vjassoc) summarizes the associations between V
-and J family germlines in a plot generated using `r CRANpkg("circlize")`
-(inspired by [VDJTools](https://github.com/mikessh/vdjtools/)[@vdjtools] )
+and J family germlines in a plot generated using `r CRANpkg("circlize")`.
+
+```{r vjassoc, fig.cap="V-J family germline association in PCR1. Segment size represents germline proportion while the thickness of the arcs shows the proportion of associations between V and J germline families. This plot was heavily inspired by [VDJTools](https://github.com/mikessh/vdjtools/)[@vdjtools])", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "abundance", "PCR1_vjassoc.png"))
+```
+
+## Productivity analysis
+
+The plots described in this section can be found in the `productivity` directory
+of `PCR1` or in the `Productivity` tab in `PCR1`'s HTML report.
+
+Briefly, the main factors affecting the productiveness of a sequence by
+`r sabseq()`'s interpretation are:
+
+1. Misaligned V-J germline coding frame
+3. Presence of stop condons
+2. Non-multiple of 3 indels within a framework or complementarity-determining region
+
+Any sequence that satisfies at least one of the above condition will be classified
+as unproductive.
+
+`r sabseqR()` summarizes the productivity of sequences in `PCR1` in Figure \@ref(fig:prod-summ).
+Factors that cause sequences to be unproductive are colour coded as such:
+
+1. Green -- sequences that contains at least one stop codon _and_ has a frameshift
+2. Cyan -- sequences _without stop codons_ that has a frameshift
+3. Purple -- _in-frame_ sequences that contains at least one stop codon
+
+```{r prod-summ, fig.cap="Productivity rate of sequences in PCR1. This plot shows the percentage of productive and unproductive sequences, the reason for unproductive sequences are colour coded.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "productivity", "PCR1_productivity.png"))
+```
+
+### Frameshifts
+
+Figure \@ref(fig:frameshift) shows the percentage of sequences that are
+out-of-frame due to either misaligned V-J coding frame or non-multiple of 3 indels
+in one of the framework or complementarity-determining regions.
+
+```{r frameshift, fig.cap="Rate of in-frame and out-of-frame sequences in PCR1. Misaligned V-J frame or non-multiple of 3 indels in either one of the framework or complementarity-determining regions causes a frameshift and therefore renders the sequence unproductive.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "productivity", "PCR1_vjframe_dist.png"))
+```
+
+### Stop codons
+
+Another contributing factor of unproductive sequences are the presence of
+stop codons. Stop codons may exist originally in the sequence or can be
+introduced by upstream indels that are not a multiple of 3.
+Figure \@ref(fig:stopcod) shows the hot spots for stop codons segregated by
+framework and complementarity-determining regions.
+
+```{r stopcod, fig.cap="Proportion of stop codons in any given CDR or FR of out-of-frame sequences in PCR1. The percentages show the frequency of stop codons in a given region relative to the total number of stop codons present.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "productivity", "PCR1_stopcodon_region_outframe.png"))
+```
+
+The figure above shows the percentage of stop codons in regions of _out-of-frame_ sequences.
+As discussed earlier, these stop codons may be introduced by the frameshift itself, hence
+a similar plot for _in-frame_ sequences can also be found within the same directory.
+
+### Indels and mismatches
+
+Some sequences are productive despite having indels and mismatches. This occurs
+when indels are a multiple of 3 and mismatches do not introduce stop codons.
+The following figures plot indels and mismatches for each germline,
+framework region, and complementarity-determining region on _productive sequences_ (unless
+specified otherwise).
+
+Figure \@ref(fig:mismatches), Figure \@ref(fig:gaps), and Figure \@ref(fig:gaps-out)
+plots the proportion of mismatches in productive sequences,
+indels in productive sequences, and indels in out-of-frame (unproductive) sequences
+for framework region 3 (FR3).
+The motivation behind these plots is to quickly identify the quality of productive
+sequences.
+
+For example, the number of mismatches in framework regions and IGJ
+are expected to be low because they are relatively conserved regions. Similarly,
+the number of indels in productive sequences are expected to be low or some
+multiple of 3.
+
+```{r mismatches, fig.cap="Proportion of mismatches in productive sequences of PCR1.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "productivity", "PCR1_fr3_mismatches_dist.png"))
+```
+
+```{r gaps, fig.cap="Proportion of indels in productive sequences of PCR1.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "productivity", "PCR1_fr3_gaps_dist.png"))
+```
+
+```{r gaps-out, fig.cap="Proportion of indels in out-of-frame sequences of PCR1.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "productivity", "PCR1_fr3_gaps_dist_out_of_frame.png"))
+```
+
+Similar plots for other regions and IGV, IGD, and IGJ can be found in the
+same directory.
+
+<!-- TODO: missing plot 1: skipped IGV productive dist,
+IGV inframe unproductive dist, IGV out-of-frame dist-->
 
 
-```{r vjassoc, fig.cap="V-J family germline association. Segment size represents germline proportion while the thickness of the arcs shows the proportion of associations between V and J families.", echo=FALSE}
-grid.raster(readPNG(file.path(sdir, "abundance", "PCR1_vjassoc.png")))
+## Clonotype diversity analysis
+
+The plots described in this section can be found in the `diversity` directory
+of `PCR1` or in the `Diversity` tab in `PCR1`'s HTML report.
+
+`r sabseq()` only conducts diversity analysis on clones that are productive.
+
+### Sequence duplication, rarefaction, and recapture analysis
+
+To estimate repertoire diversity, `r sabseqR()` employs 3 commonly used techniques:
+
+_Sequence duplication levels_ in Figure \@ref(fig:dup) plots the proportion (y-axis) of singletons, doubletons,
+and higher-order clonotypes (x-axis).
+
+_Rarefaction curve_ in Figure \@ref(fig:rare) plots the number of deduplicated clonotypes (y-axis)
+from varying sample sizes (x-axis). For every sample size, the number of deduplicated
+clonotypes were sampled 5 times and the average value was used.
+
+_Percent recapture_ in Figure \@ref(fig:recap) plots the percentage of clonotypes recaptured (y-axis) in
+a capture-recapture experiment from varying sample sizes (x-axis).
+For every sample size, the percentage of recaptured clonotypes denotes the average
+of 5 repeated capture-recapture experiments.
+
+In all the figures, the complementarity-determining region (CDR)
+used to define a "clonotype" is mapped on the `linetype` aesthetic. Similar plots
+for framework regions (FR) and the entire variable domain is also available within
+the same directory.
+
+```{r dup, fig.cap="Proportion of duplicated clonotypes in PCR1. Higher-order duplication levels starting from 10 are binned.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "diversity", "PCR1_cdr_duplication.png"))
+```
+
+```{r rare, fig.cap="Rarefaction curve of clonotypes in PCR1. The number of deduplicated sequences are taken over the mean of 5 resampling rounds, where the shaded areas indicate 95% confidence interval.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "diversity", "PCR1_cdr_rarefaction.png"))
+```
+
+```{r recap, fig.cap="Capture-recapture of clonotypes in PCR1. The number of recaptured sequences are taken over the mean of 5 resampling rounds, where the shaded areas indicate 95% confidence interval.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "diversity", "PCR1_cdr_recapture.png"))
+```
+
+### Spectratype
+
+Spectratypes are histograms of clonotype lengths.
+
+Figure \@ref(fig:spectra) shows a CDR3 amino acid spectratype with outliers removed.
+Spectratypes for other FRs and CDRs are available in the same directory.
+
+```{r spectra, fig.cap="CDR3 amino acid spectratype for PCR1 with outliers removed.", echo=FALSE, out.width="100%"}
+read_png(file.path(sdir, "diversity", "spectratypes", "PCR1_cdr3_spectratype_no_outliers.png"))
+```
+
+#### Amino acid composition logos
+
+In addition to spectratypes, `r sabseqR()` also visualizes the amino acid
+composition of each FRs and CDRs in a set of bar plots.
+Figure \@ref(fig:comp) shows the composition of `PCR1`'s CDR3.
+The left shows an unscaled composition logo, where the proportion is normalized
+using the total number of available amino acids in a given position. The right
+shows a scaled composition logo, where the proportion is nomalized using
+the total number of clonotypes. Similar plots for other FRs and CDRs
+are available in the same directory.
+
+```{r comp, fig.cap="Amino acid composition logo for PCR1's CDR3. The unscaled (left) and the scaled (right) composition logos are colour coded and grouped by their physicochemical properties.", echo=FALSE, fig.wide=TRUE}
+unscaled <- file.path(sdir, "diversity", "composition_logos", "CDR3", "PCR1_cumulative_logo.png")
+scaled <- file.path(sdir, "diversity", "composition_logos", "CDR3", "PCR1_cumulative_logo_scaled.png")
+img1 <-  rasterGrob(as.raster(readPNG(unscaled)), interpolate = TRUE)
+img2 <- rasterGrob(as.raster(readPNG(scaled)), interpolate = TRUE)
+grid.arrange(img1, img2, ncol = 2)
+```
+
+
+## Overlapping clonotype analysis
+
+The plots described in this section can be found in the `clonotype_analysis`
+directory of `PCR1_vs_PCR2_vs_PCR3` or in the `Clonotypes` tab in
+`PCR1 vs PCR2 vs PCR3`'s HTML report.
+
+Since overlapping clonotype analysis deals with _overlapping_ clonotypes,
+this analysis only applies when `compare` was supplied with at
+least one sample comparison. Earlier, the call to `abseqReport`
+had `compare = c("PCR1, PCR2, PCR3")`, therefore
+`PCR1`, `PCR2,` and `PCR3` are compared against each other.
+
+Throughout this analysis, a clonotype is synonymous to its CDR3 amino acid sequence.
+
+
+### Scatter plot of clonotype frequencies
+
+In order to visualize the linearity between any pair of samples, `r sabseqR()` plots
+a scatter plot of every possible combination. Figure \@ref(fig:scatter) shows
+one of them, plotting the clonotype frequencies in `PCR2` against `PCR1`.
+
+The scatter plot:
+
+* has $log_{10}$-scaled clonotype frequencies
+* has a point for each clonotype
+    * the coordinate of each point denotes the $log_{10}(frequency)$ in the sample
+    on the x and y axis respectively
+    * point sizes are mapped to the mean frequency of a clonotype
+* has marginal density plots colour coded as such:
+    * blue: density of _overlapping clonotypes_
+    * purple: density of _non-overlapping clonotypes_
+    * grey: density of _all clonotypes_
+    
+
+```{r scatter, fig.cap="Log-scaled scatter plot of clonotype frequencies in PCR1 and PCR2. Point size denotes mean frequency of the 2 samples and marginal density plots are colour coded by overlapping (blue), non-overlapping (purple), and all (grey) clonotypes.", echo=FALSE, out.width="100%"}
+read_png(file.path(mdir, "clonotype_analysis", "PCR1_vs_PCR2_clone_scatter.png"))
+```
+
+This plot is heavily inspired by [VDJTools](https://github.com/mikessh/vdjtools/)[@vdjtools].
+
+### Top 10 clones
+
+
+Figure \@ref(fig:topclones) offers a simple overview of the top 10 clones found
+in each sample. Since the clonotypes are colour coded, overlapping clonotypes
+can easily be identified within the top 10 of each samples. Note that the
+proportions are scaled relative to the top 10 clones in the respective samples.
+
+This plot complements the scatter plot; it displays the most abundant clonotypes
+in each sample with the amino acid sequence in the legend. 
+
+```{r topclones, fig.cap="Top 10 clonotypes from PCR1, PCR2, and PCR3. The clonotype proportions displayed are scaled relative to the top 10 clones in each sample.", echo=FALSE, out.width="100%"}
+read_png(file.path(mdir, "clonotype_analysis", "PCR1_PCR2_PCR3_top10Clonotypes.png"))
+```
+
+
+### Overlapping clones
+
+While Figure \@ref(fig:topclones) is capable of showing overlapping clones,
+it is restricted to the top 10 clones from each sample. Figure \@ref(fig:overlap)
+aims to overcome the restriction by using a venn diagram to visualize the number
+of overlapping (and non-overlapping) clones from each sample. Each number within
+the venn diagram shows the number of unique clonotypes that are overlapping (in
+an intersection) or are non-overlapping (not in any intersection).
+That is, by taking the sum of all the numbers in a sample segment,
+it becomes the number of unique clonotypes found in that sample.
+
+
+```{r overlap, fig.cap="Number of unique overlapping clones found in PCR1, PCR2, and PCR3. The numbers in an intersection denotes the number of unique clones that are shared between the samples involved in the said intersection.", echo=FALSE, out.width="100%"}
+read_png(file.path(mdir, "clonotype_analysis", "PCR1_PCR2_PCR3_cdr3_clonotypeIntersection.png"))
+```
+
+Note that this venn diagram will __not__ be plotted if there are more than 5
+samples.
+
+### Correlations
+
+In addition to Figure \@ref(fig:scatter), the linearity of clonotype frequencies
+between samples can be directly quantified using Pearson's correlation coefficient.
+Figure \@ref(fig:corr) shows the plot generated by `r CRANpkg("ggcorrplot")` used to visualize
+pearson coefficients. A similar plot using Spearman's correlation coefficient (rank-based)
+is also available in the same directory.
+
+```{r corr, fig.cap="Pearson correlation between PCR1, PCR2, and PCR3. Values denote the pearson correlation coefficient of the clonotypes frequencies between the samples. These values will appear with a cross 'x' to signify an insignificant coefficient if the p-value of the coefficient is larger than 0.05.", echo=FALSE, out.width="100%"}
+read_png(file.path(mdir, "clonotype_analysis", "pearson.png"))
+```
+
+
+### Clustering samples
+
+The `r CRANpkg("vegan")` package was used to calculate distances between samples.
+The distances between samples are calculated using its clonotype frequencies by
+applying methods from Morisita-Horn's overlap index, Jaccard index, and Dice's coefficient.
+
+Figure \@ref(fig:cluster) shows a dendrogram plotted using
+Morisita-Horn's overlap index. The length of each line denotes the distance
+between the 2 samples or clusters it is connected to.
+Other dendrograms using Jaccard and Dice's formula are available in the same directory.
+
+```{r cluster, fig.cap="Morisita-Horn distances of PCR1, PCR2, and PCR3. The distances are calculated using clonotype frequencies and are visualized as the length of the lines connecting samples or clusters.", echo=FALSE, out.width="100%"}
+read_png(file.path(mdir, "clonotype_analysis", "morisita_horn.png"))
 ```
 
 
 # Miscellaneous
 
-## Dataset {#toy-data}
+## Dataset {#example-data}
 
-The toy dataset used in the above examples
+The dataset used in the above examples
 was obtained from a combination of synthetic sample datasets generated
 using [MiXCR](https://github.com/milaboratory/mixcr)'s program 
 [here](http://files.milaboratory.com/mixcr/paper/mixcr-test-1.2-SNAPSHOT.jar). 
 Firstly, three distinct samples were generated, each simulated with the following parameters
 in `MiXCR`:
-```
-* reads   = 10000, 10000, 10000
-* clones  =  5000,  5000,  2000
-* seed    =  4228,  2428,  2842
-* conf    = MiSeq-300-300      (for all 3)
-* loci    = IGH                (for all 3)
-* species = hsa                (for all 3)
+
+```{r mixr-test-params, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+tabl <- "
+| Parameter     | sample 1      | sample 2      | sample 3      |
+|---------------|---------------|---------------|---------------|
+| reads         |  10000        |  10000        | 10000         |
+| clones        |  5000         |  5000         | 2000          |
+| seed          |  4228         |  2428         | 2842          |
+| conf          | MiSeq-300-300 | MiSeq-300-300 | MiSeq-300-300 |
+| loci          |  IGH          | IGH           | IGH           |
+| species       | hsa           | hsa           | hsa           |
+"
+cat(tabl)
 ```
 
-Following that, to introduce overlapping sequences between the samples, a script was written
-to randomly mix and amplify sequences from these samples, resulting in a final
-repertoire of 3 samples, named PCR1, PCR2, and PCR3.
+Following that, an arbitrary number of sequences were randomly
+drawn from each of the 3 samples and randomly amplified.
+This process was repeated 3 times, resulting in a final repertoire
+of 3 samples, named PCR1, PCR2, and PCR3.
 
 Finally, these 3 samples were analyzed by `r sabseqPy()`. The command used to
 analyze these samples are as follows:
 
-```{bash abseqR_toy_data_abseqPy_run, eval=FALSE}
-abseq -y toy.yml
+```{bash abseqR__data_abseqPy_run, eval=FALSE}
+abseq -y params.yml
 ```
 
-where the contents of `toy.yml` is:
+where the contents of `params.yml` is:
 
 ```yaml
-# toy.yml
+# params.yml
 defaults:
     bitscore: 300
     sstart: 1-3
@@ -723,10 +959,12 @@ file1: PCR3.fasta
 name: PCR3
 ```
 
-These 3 samples form the final toy dataset described in this vignette.
+`r sabseqPy()`'s analysis output on these 3 samples are contained
+within the dataset described in this vignette.
 
 # Session Info
 
+This vignette was rendered in the following environment:
 ```{r abseqR_session_info, echo=FALSE}
 sessionInfo()
 ```
@@ -734,7 +972,6 @@ sessionInfo()
 [^Repseq]: Repertoire sequencing
 [^windows_biocparallel]: The performace offered by
 [BiocParallel](https://bioconductor.org/packages/release/bioc/html/BiocParallel.html) may differ across OSes
-[^abseqRep]: The "objects" returned are `AbSeqRep` S4 class instances.
 [^compare-ws]: Trailing and leading whitespace between sample names are trimmed. That is, "PCR1,PCR2" is identical to
 "PCR1 , PCR2"
 
