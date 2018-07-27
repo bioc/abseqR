@@ -1,11 +1,6 @@
 ---
-title: "AbSeq"
-header-evals:
-  - \usepackage{comment}
-output: 
-  flexdashboard::flex_dashboard:
-    vertical_layout: scroll
 params:
+    title: "AbSeq"
     
     # img dimensions
     width: 8
@@ -47,6 +42,14 @@ params:
     alignfilters: "260-inf"
     sstartfilters: "1-3.0"
     qstartfilters: "1-inf"
+header-evals:
+  - \usepackage{comment}
+title: "`r params$title`"
+output: 
+    flexdashboard::flex_dashboard:
+        vertical_layout: scroll
+        navbar: 
+            - {title: "Home", href: "#", icon: "fa-home", align: right}
 ---
 
 <style type="text/css">
@@ -97,7 +100,7 @@ library(gridExtra)
 `r if(!params$hasAnnot) {"\\begin{comment}"}`
 
 
-Summary {data-orientation=rows}
+Summary {data-orientation=rows data-icon="fa-list-ul"}
 =======================================================================
 
 
@@ -163,7 +166,7 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 }
 ```
 
@@ -183,7 +186,7 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 }
 ```
 
@@ -194,7 +197,116 @@ if (!is.na(fname)) {
 `r if(!params$hasAbun) {"\\begin{comment}"}`
 
 
-Abundance {data-orientation=rows}
+Quality {data-orientation=rows data-icon="fa-clipboard-list"}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+### Indels (Gaps)
+```{r abseq_v_indel, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
+                  pattern = ".*_igv_gaps_dist\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+> Plot of insertions and deletions found within the __V gene__
+
+### Mismatches
+```{r abseq_v_mismatch, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "abundance"),
+                  pattern = ".*_igv_mismatches_dist\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+> Plot of nucleotide base mismatches found within the __V gene__
+
+
+`r if(!params$hasAbun) {"\\end{comment}"}`
+
+`r if(!params$hasAbun || !params$single) {"\\begin{comment}"}`
+
+Row
+-----------------------------------------------------------------------
+
+```{r abseq_qual_heatmap_helper_function, echo = FALSE}
+.renderHMText <- function(alignQual) {
+    fileInteractiveness <- if (params$interactive) "" else "_static"
+    alignmentQuality <- lapply(seq_along(alignQual), function(i) {
+        line1 <- knitr::knit_expand(text = sprintf("### %s\n", names(alignQual)[i]))
+        line2 <- knitr::knit_expand(text = sprintf("\n```{r abseq_align_qual_chunk_%d, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}", i))
+        line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(path = file.path(params$rootDir, "abundance"), pattern = ".*_igv_align_quality_%s_hm%s\\\\.Rdata")', alignQual[[i]], fileInteractiveness))
+        line4 <- knitr::knit_expand(text = '\nif(!is.na(fname)) { load(fname); plot } else { ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "404!") }')
+        line5 <- knitr::knit_expand(text = "\n```\n")
+        paste(line1, line2, line3, line4, line5, collapse = "\n")
+    })
+    return(alignmentQuality)
+}
+
+```
+
+```{r abseq_quality_heatmaps, echo = FALSE, eval =(params$single && params$hasAbun)}
+alignQual <- list("Bitscore vs Alignment Length" = "bitscore",
+                  "Identity vs Alignment Length" = "identity")
+alignmentQuality <- .renderHMText(alignQual)
+```
+
+`r if (params$hasAbun && params$single) { paste(knitr::knit(text = paste(alignmentQuality, collapse = "\n"))) }`
+
+Row
+-----------------------------------------------------------------------
+
+```{r abseq_quality_heatmaps_pt2, echo = FALSE, eval =(params$single && params$hasAbun)}
+alignQual <- list("Gaps vs Alignment Length" = "gaps",
+                  "Mismatches vs Alignment Length" = "mismatches")
+alignmentQuality.pt2 <- .renderHMText(alignQual)
+```
+
+`r if (params$hasAbun && params$single) { paste(knitr::knit(text = paste(alignmentQuality.pt2, collapse = "\n"))) }`
+
+
+Row
+-----------------------------------------------------------------------
+
+```{r abseq_quality_heatmaps_pt3, echo = FALSE, eval =(params$single && params$hasAbun)}
+alignQual <- list("Subject Start vs Query Start" = "start")
+alignmentQuality.pt3 <- .renderHMText(alignQual)
+```
+
+`r if (params$hasAbun && params$single) { paste(knitr::knit(text = paste(alignmentQuality.pt3, collapse = "\n"))) }`
+
+
+### Placeholder
+
+```{r abseq_quality_heatmaps_pt4, echo = FALSE, eval =(params$single && params$hasAbun)}
+ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Placeholder")
+```
+
+
+`r if(!params$hasAbun || !params$single) {"\\end{comment}"}`
+
+
+`r if(!params$hasAbun) {"\\begin{comment}"}`
+
+Abundance {data-orientation=rows data-icon="fa-chart-bar"}
 =======================================================================
 
 Row
@@ -202,7 +314,7 @@ Row
 
 ### V family 
 
-```{r abseq_v_familly, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
+```{r abseq_v_family, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
 fname <- .getFile(path = file.path(params$rootDir, "abundance"),
                   pattern = ".*igv_dist_family_level\\.Rdata")
 if (!is.na(fname)) {
@@ -213,7 +325,7 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 }
 ```
 
@@ -232,7 +344,7 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 }
 ```
 
@@ -259,7 +371,7 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 }
 ```
 
@@ -278,7 +390,7 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 }
     
 ```
@@ -307,7 +419,7 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 }
 ```
 
@@ -326,7 +438,7 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 }
 ```
 
@@ -350,7 +462,7 @@ if (!is.na(fname)) {
     img <- readPNG(fname)
     grid.raster(img)
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 }
 ```
 
@@ -358,82 +470,12 @@ if (!is.na(fname)) {
 
 
 
-
-Row {.tabset .tabset-fade}
------------------------------------------------------------------------
-```{r abseq_quality_heatmaps, echo = FALSE, eval =(params$single && params$hasAbun)}
-alignQual <- list("Bitscore vs Alignment Length" = "bitscore",
-               "Gaps vs Alignment Length" = "gaps",
-               "Identity vs Alignment Length" = "identity",
-               "Mismatches vs Alignment Length" = "mismatches",
-               "Subject Start vs Query Start" = "start")
-alignmentQuality <- lapply(seq_along(alignQual), function(i) {
-    line1 <- knitr::knit_expand(text = sprintf("### %s\n", names(alignQual)[i]))
-    line2 <- knitr::knit_expand(text = sprintf("\n```{r abseq_align_qual_chunk_%d, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}", i))
-    line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(path = file.path(params$rootDir, "abundance"), pattern = ".*_igv_align_quality_%s_hm\\\\.png")', alignQual[[i]]))
-    line4 <- knitr::knit_expand(text = '\nif(!is.na(fname)) { img <- readPNG(fname); grid.raster(img) } else { cat("404!") }')
-    line5 <- knitr::knit_expand(text = "\n```\n")
-    paste(line1, line2, line3, line4, line5, collapse = "\n")
-})
-```
-
-`r if (params$hasAbun && params$single) { paste(knitr::knit(text = paste(alignmentQuality, collapse = "\n"))) }`
-
-
 `r if(!params$hasAbun || !params$single) {"\\end{comment}"}`
-
-`r if(!params$hasAbun) {"\\begin{comment}"}`
-
-
-Row
------------------------------------------------------------------------
-
-### Indels (Gaps)
-```{r abseq_v_indel, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "abundance"),
-                  pattern = ".*_igv_gaps_dist\\.Rdata")
-if (!is.na(fname)) {
-    load(fname)
-    if (params$interactive) {
-        ggplotly(plot)
-    } else {
-        plot
-    }
-} else {
-    cat("404!")
-}
-```
-
-> Plot of insertions and deletions found within the __V gene__
-
-### Mismatches
-```{r abseq_v_mismatch, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "abundance"),
-                  pattern = ".*_igv_mismatches_dist\\.Rdata")
-if (!is.na(fname)) {
-    load(fname)
-    if (params$interactive) {
-        ggplotly(plot)
-    } else {
-        plot
-    }
-} else {
-    cat("404!")
-}
-```
-
-> Plot of nucleotide base mismatches found within the __V gene__
-
-
-`r if(!params$hasAbun) {"\\end{comment}"}`
-
-
-
 
 `r if(!params$hasProd) {"\\begin{comment}"}`
 
 
-Productivity {data-orientation=rows}
+Productivity {data-orientation=rows data-icon="fa-check"}
 =======================================================================
 
 Row
@@ -553,13 +595,14 @@ frcdrMisGaps <- lapply(seq_along(titles), function(i) {
     line8 <- knitr::knit_expand(text = '\nif (!is.na(fname)) { load(fname); if (params$interactive) { gapsOut <- ggplotly(plot + labs(title = "")) } else { gapsOut <- plot } } else { df <- data.frame(); gapsOut <- ggplot(df) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable") }')
     line9 <- knitr::knit_expand(text = "\nif (params$interactive) { subplot(mismatch, gaps, gapsOut, titleX = T, titleY = T) } else { grid.arrange(mismatch, gaps, gapsOut, nrow = 1)}")
     line10 <- knitr::knit_expand(text = "\n```\n")
-    line11 <- knitr::knit_expand(text = sprintf("\n> Mismatches, gaps and gaps (in out-of-frame sequences) distribution in %s region\n", titles[i]))
+    line11 <- knitr::knit_expand(text = sprintf("\n> Proportion of mismatches in productive sequences, gaps in productive sequences, and gaps in out-of-frame sequences in %s region\n", titles[i]))
     paste(line1, line2, line3, line4, line5, line6, line7, line8, line9, line10,
           line11, collapse = "\n")
 })
 ```
 
-`r paste(knitr::knit(text = paste(frcdrMisGaps, collapse = "\n")))`
+
+
 
 <!--- Example of this knitr output:
 ### IGV
@@ -601,6 +644,7 @@ if (params$interactive) {
 -->
 
 <!--- TODO: fix legend && beware of missing samples when doing so -->
+
 ```{r abseq_vdj_gap_mismatch, echo = FALSE, eval = TRUE}
 if (params$inclD) {
     titles <- c("IGV", "IGD", "IGJ")
@@ -616,12 +660,14 @@ vdjMisGaps <- lapply(seq_along(titles), function(i) {
     line6 <- knitr::knit_expand(text = '\nif (!is.na(fname)) { load(fname); if (params$interactive) { gaps <- ggplotly(plot + labs(title = "")) } else { gaps <- plot } } else { df <- data.frame(); gaps <- ggplot(df) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable") }')
     line7 <- knitr::knit_expand(text = "\nif (params$interactive) { subplot(mismatch, gaps, titleX = T, titleY = T) } else { grid.arrange(mismatch, gaps, nrow = 1)}")
     line8 <- knitr::knit_expand(text = "\n```\n")
-    line9 <- knitr::knit_expand(text = sprintf("\n> Mismatchesa and gaps distribution in %s\n", titles[i]))
+    line9 <- knitr::knit_expand(text = sprintf("\n> Proportion of mismatches and gaps in productive sequences in %s\n", titles[i]))
     paste(line1, line2, line3, line4, line5, line6, line7, line8, line9, collapse = "\n")
 })
 ```
 
+`r paste(knitr::knit(text = paste(frcdrMisGaps, collapse = "\n")))`
 `r paste(knitr::knit(text = paste(vdjMisGaps, collapse = "\n")))`
+
 
 
 Row {.tabset .tabset-fade}
@@ -641,7 +687,7 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 }
 ```
 
@@ -661,7 +707,7 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 }
 ```
 
@@ -681,7 +727,7 @@ if (!is.na(fname)) {
         plot
     }
 } else {
-    cat("404!")
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 }
 ```
 
@@ -697,8 +743,7 @@ Row {.tabset .tabset-fade}
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_stopcodon_region_inframe\\.Rdata", .stop = F)
 if (is.na(fname)) {
-    cat(paste("Plot is not available for this sample, probably because there's",
-                "no such distribution present in this sample"))
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 } else {
     load(fname)
     if (params$interactive) {
@@ -717,8 +762,7 @@ if (is.na(fname)) {
 fname <- .getFile(path = file.path(params$rootDir, "productivity"),
                   pattern = ".*_stopcodon_region_outframe\\.Rdata", .stop = F)
 if (is.na(fname)) {
-    cat(paste("Plot is not available for this sample, probably because there's",
-                "no such distribution present in this sample"))
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
 } else {
     load(fname)
     if (params$interactive) {
@@ -744,7 +788,7 @@ if (is.na(fname)) {
 <!--- TODO: currently, assumes that all 3 rarefaction, duplication, and recapture
 are present because of the ggplotly legend hack -->
 
-Diversity {data-orientation=rows}
+Diversity {data-orientation=rows data-icon="fa-chart-line"}
 =======================================================================
 
 Row {.tabset .tabset-fade}
@@ -938,7 +982,7 @@ specOut <- lapply(seq_along(regions), function(i) {
     line1 <- knitr::knit_expand(text = sprintf("### %s\n", names(regions)[[i]]))
     line2 <- knitr::knit_expand(text = sprintf("\n```{r abseq_spec_out_%d, eval=params$hasDiv, fig.width=params$width, fig.height=params$height}\n", i))
     line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(path = file.path(params$rootDir, "diversity", "spectratypes"), pattern = ".*%s\\\\.Rdata")\n', regions[[i]]))
-    line4 <- knitr::knit_expand(text = '\nif (!is.na(fname)) { load(fname); if (params$interactive) { ggplotly(plot); } else { plot; } } else { cat("404!"); }')
+    line4 <- knitr::knit_expand(text = '\nif (!is.na(fname)) { load(fname); if (params$interactive) { ggplotly(plot); } else { plot; } } else { ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable"); }')
     line5 <- knitr::knit_expand(text = "\n```\n")
     line6 <- knitr::knit_expand(text = sprintf("\n> Amino acid length distribution for %s region\n", names(regions)[[i]]))
     paste(line1, line2, line3, line4, line5, line6, collapse = "\n")
@@ -949,74 +993,6 @@ specOut <- lapply(seq_along(regions), function(i) {
 
 
 `r if(!params$hasDiv) {"\\end{comment}"}`
-
-`r if(!params$hasDiv || params$single) {"\\begin{comment}"}`
-
-
-Row {.tabset .tabset-fade}
------------------------------------------------------------------------
-<!--- Always use static plot even if it's interactive - good luck rendering it
- otherwise -->
-```{r abseq_scatter_diversity, echo=FALSE, eval=(!params$single && params$hasDiv)}
-files <- list.files(path = file.path(params$rootDir, "diversity"),
-                    pattern = ".*_clone_scatter\\.Rdata",
-                    full.names = T)
-scatterOut <- lapply(seq_along(files), function(i) {
-    line1 <- knitr::knit_expand(text = sprintf("### sample %d vs sample %d\n", i, i + 1))
-    line2 <- knitr::knit_expand(text = sprintf("\n```{r abseq_scatter_out_%d, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}\n", i))
-    line3 <- knitr::knit_expand(text = sprintf('fname <- "%s"; load(fname); if (params$interactive) { plot; } else { plot; }', files[[i]]))
-    line4 <- knitr::knit_expand(text = "\n```\n")
-    line5 <- knitr::knit_expand(text = "\n> Clonotype counts from 2 samples\n")
-    paste(line1, line2, line3, line4, line5, collapse = "\n")
-})
-
-```
-
-`r if(!params$single && params$hasDiv) { paste(knitr::knit(text = paste(scatterOut, collapse = '\n'))) }`
-
-
-Row
------------------------------------------------------------------------
-
-### Distribution of top 10 (colour coded) clonotypes from each sample
-
-```{r abseq_top_10, eval=(params$hasDiv && !params$single), fig.width=params$widthL, fig.height=params$heightL}
-fname <- .getFile(path = file.path(params$rootDir, "diversity"), pattern = ".*_top10Clonotypes\\.Rdata")
-if (!is.na(fname)) {
-    load(fname)
-    if (params$interactive) {
-        ggplotly(plot)
-    } else {
-        plot
-    }
-} else {
-    cat("404!")
-}
-```
-
-> Clonotype distributions are scaled to top 10
-
-
-### Number of shared (and exclusive) clonotypes among samples
-
-```{r abseq_clone_venn, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
-fname <- .getFile(path = file.path(params$rootDir, "diversity"), pattern = ".*_cdr3_clonotypeIntersection\\.png")
-if (!is.na(fname)) {
-    img <- readPNG(fname)
-    grid.raster(img)
-} else {
-    ggplot(data.frame()) +
-        xlim(0, 10) +
-        ylim(0, 10) +
-        annotate("text", x = 5, y = 5, label = "Can't find clonotype venn diagram, you probably have > 5 samples")
-}
-```
-
-> Counts show number of clonotypes
-
-
-`r if(!params$hasDiv || params$single) {"\\end{comment}"}`
-
 
 
 `r if(!params$hasDiv || !params$single) {"\\begin{comment}"}`
@@ -1139,3 +1115,159 @@ motifOut <- lapply(seq_along(regions), function(i) {
 
 
 `r if(!params$hasDiv || !params$single) {"\\end{comment}"}`
+
+
+
+`r if(!params$hasDiv || params$single) {"\\begin{comment}"}`
+
+
+Clonotypes {data-orientation=rows data-icon="fa-dna"}
+=======================================================================
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+<!--- Always use static plot even if it's interactive - good luck rendering it
+ otherwise -->
+```{r abseq_scatter_clonotype, echo=FALSE, eval=(!params$single && params$hasDiv)}
+files <- list.files(path = file.path(params$rootDir, "clonotype_analysis"),
+                    pattern = ".*_clone_scatter\\.png",
+                    full.names = T)
+scatterOut <- lapply(seq_along(files), function(i) {
+    line1 <- knitr::knit_expand(text = sprintf("### %s\n",
+                                               gsub("_", " ",
+                                                    stringr::str_extract(basename(files[[i]]),
+                                                                         "^.*(?=(_clone_scatter))"))))
+    line2 <- knitr::knit_expand(text = sprintf("\n```{r abseq_scatter_out_%d, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}\n", i))
+    line3 <- knitr::knit_expand(text = sprintf('grid.raster(readPNG("%s"))', files[[i]]))
+    line4 <- knitr::knit_expand(text = "\n```\n")
+    line5 <- knitr::knit_expand(text = "\n> Clonotype frequencies from 2 samples. The axis values are scaled to log10 of the clone proportion. The marginal density plots show the density of total(grey), non-overlapping(purple), and overlapping(blue) clonotype abundances.\n")
+    paste(line1, line2, line3, line4, line5, collapse = "\n")
+})
+
+```
+
+`r if(!params$single && params$hasDiv) { paste(knitr::knit(text = paste(scatterOut, collapse = '\n'))) }`
+
+
+Row
+-----------------------------------------------------------------------
+
+### Distribution of top 10 clonotypes from each sample
+
+```{r abseq_top_10, eval=(params$hasDiv && !params$single), fig.width=params$widthL, fig.height=params$heightL}
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = ".*_top10Clonotypes\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+> Clonotype distributions are scaled to top 10
+
+
+### Number of overlapping and non-overlapping clonotypes
+
+```{r abseq_clone_venn, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = ".*_cdr3_clonotypeIntersection\\.png")
+if (!is.na(fname)) {
+    img <- readPNG(fname)
+    grid.raster(img)
+} else {
+    ggplot(data.frame()) +
+        xlim(0, 10) +
+        ylim(0, 10) +
+        annotate("text", x = 5, y = 5, label = "Can't find clonotype venn diagram, you probably have > 5 samples")
+}
+```
+
+> Counts show number of clonotypes
+
+
+Row
+-----------------------------------------------------------------------
+
+### Pearson correlation
+
+```{r abseq_pearson_correlation, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = "pearson\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+
+### Spearman correlation
+
+```{r abseq_spearman_correlation, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = "spearman\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    if (params$interactive) {
+        ggplotly(plot)
+    } else {
+        plot
+    }
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+
+Row
+-----------------------------------------------------------------------
+
+<!-- There are issues with ggplotly and ggdendro, ignore the interactiveness
+for now. -->
+
+### Morisita Horn
+
+```{r abseq_morisita_horn_similarity, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = "morisita_horn\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    plot
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+### Bray Curtis
+
+```{r abseq_bray_curtis_similarity, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = "bray_curtis\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    plot
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+### Jaccard
+
+```{r abseq_jaccard_similarity, eval=(params$hasDiv && !params$single), fig.width=params$width, fig.height=params$height}
+fname <- .getFile(path = file.path(params$rootDir, "clonotype_analysis"), pattern = "jaccard\\.Rdata")
+if (!is.na(fname)) {
+    load(fname)
+    plot
+} else {
+    ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "Plot unavailable")
+}
+```
+
+
+`r if(!params$hasDiv || params$single) {"\\end{comment}"}`
+

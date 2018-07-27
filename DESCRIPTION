@@ -1,12 +1,10 @@
-Package: AbSeq
+Package: abseqR
 Type: Package
 Title: High throughput antibody library quality control pipeline
 Version: 0.99.0
 Author: Jia Hong Fong
 Maintainer: Jia Hong Fong <jfong361@gmail.com>
-Description: Visualizes data generated from python package AbSeq.
-    Provides additional visualization for explicit
-    sample versus sample comparison.
+Description: Visualizes data generated from python package abseqPy.
 License: MIT
 Encoding: UTF-8
 LazyData: true
@@ -24,10 +22,16 @@ Imports:
     grid,
     gridExtra,
     rmarkdown,
-    knitr
+    knitr,
+    vegan,
+    ggcorrplot,
+    ggdendro,
+    plotly,
+    BiocStyle
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 
+    'AbSeqCRep.R'
     'util.R'
     'distributions.R'
     'upstreamAnalysis.R'
@@ -37,7 +41,8 @@ Collate:
     'annotationAnalysis.R'
     'abundanceAnalysis.R'
     'plotter.R'
-    'compositeRepertoire.R'
-    'repertoire.R'
-    'abSeqPlot.R'
+    'AbSeqRep.R'
+    'abseqReport.R'
+    'statistics.R'
+    'pairwise.R'
 SystemRequirements: pandoc

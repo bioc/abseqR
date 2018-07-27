@@ -1,0 +1,8 @@
+This file describes the use of inst/extdata/index.Rmd
+
+index.Rmd is used as a template Rmarkdown to generate parameterized reports.
+It collates all the output of template.Rmd into a table of contents, and acts
+as a 'landing page'.
+
+Users should not concern themselves with index.Rmd and is taken care of automatically
+by abseqR.
