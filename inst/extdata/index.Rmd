@@ -82,9 +82,12 @@ singleTableInfo <- lapply(seq_along(samples), function(i) {
     filts <- gsub(",", "<br>", filters[i], fixed = T)
     knitr::knit_expand(text = sprintf("[%s](%s) | %s | %s | %s | %s | %s | %s", samples[i], links[i], chains[i], reads, annots, filtered, prods, filts))
 })
+
+singleTableInfo <- c("sample | chain | # reads | annotated reads | filtered(kept) reads | productive reads | filters applied",
+                     "-------|-------|---------|-----------------|----------------------|------------------|---------------",
+                     singleTableInfo)
 ```
-sample | chain | # reads | annotated reads | filtered(kept) reads | productive reads | filters applied
--------|-------|---------|-----------------|----------------------|------------------|---------------
+
 `r paste(knitr::knit(text = paste(singleTableInfo, collapse = '\n')))`
 
 ## Comparative reports
