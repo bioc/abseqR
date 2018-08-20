@@ -67,8 +67,9 @@ sequencing analysis pipelines are scarce.
 implemented in `R`(visualizations and statistics) and `Python`(backend algorithm)
 meant to be used together to provide insight to antibody repertoires.
 Under the umbrella of `r sabseq()` is `r sabseqPy()` which processes paired-end
-or single ended _FASTA/FASTQ_ files from Illumina MiSeq [@Illumina] into
-csv files and HDF [@hdf] dataframes. The other is `r sabseqR()`, an R package that
+or single ended _FASTA/FASTQ_ files from Illumina MiSeq into
+csv files and [HDFs](https://portal.hdfgroup.org/display/support).
+The other is `r sabseqR()`, an R package that
 visualizes the output of `r sabseqPy()` and presents the plots in a self-contained
 HTML report. Furthermore, `r sabseqR()` provides an additional feature to
 explicitly compare multiple samples against each other.
@@ -180,7 +181,7 @@ restructure and aggregate dataframes. To install it, type `install.packages("res
 * `r CRANpkg("rmarkdown")` converts R Markdown
 documents into a variety of formats. To install it, type `install.packages("rmarkdown")`
 
-* `r CRANpkg("vegan")` [@vegan] provides a suite of functions
+* `r CRANpkg("vegan")` provides a suite of functions
 to calculate diversity and distance statistics between repertoires. To install it,
 type `install.packages("vegan")`
 
@@ -627,7 +628,7 @@ recombination process of V and J germlines.
 Figure \@ref(fig:vjassoc) summarizes the associations between V
 and J family germlines in a plot generated using `r CRANpkg("circlize")`.
 
-```{r vjassoc, fig.cap="V-J family germline association in PCR1. Segment size represents germline proportion while the thickness of the arcs shows the proportion of associations between V and J germline families. This plot was heavily inspired by [VDJTools](https://github.com/mikessh/vdjtools/)[@vdjtools])", echo=FALSE, out.width="100%"}
+```{r vjassoc, fig.cap="V-J family germline association in PCR1. Segment size represents germline proportion while the thickness of the arcs shows the proportion of associations between V and J germline families. This plot was heavily inspired by [VDJTools](https://github.com/mikessh/vdjtools/))", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "abundance", "PCR1_vjassoc.png"))
 ```
 
@@ -831,7 +832,7 @@ The scatter plot:
 read_png(file.path(mdir, "clonotype_analysis", "PCR1_vs_PCR2_clone_scatter.png"))
 ```
 
-This plot is heavily inspired by [VDJTools](https://github.com/mikessh/vdjtools/)[@vdjtools].
+This plot is heavily inspired by [VDJTools](https://github.com/mikessh/vdjtools/).
 
 ### Top 10 clones
 

@@ -28,10 +28,11 @@ clean:
 
 .PHONY:
 help:
-	@echo "all      ... builds, checks, BiocCheck"
-	@echo "build    ... builds"
-	@echo "check    ... checks"
-	@echo "bccheck  ... BiocCheck"
-	@echo "install  ... installs"
-	@echo "vignette ... builds vignette"
-	@echo "clean    ... removes vignette artefacts"
+	@echo -e "Available commands:"
+	@echo -e "\tall      ... build, check, bccheck"
+	@echo -e "\tbuild    ... builds"
+	@echo -e "\tcheck    ... checks"
+	@echo -e "\tbccheck  ... BiocCheck"
+	@echo -e "\tinstall  ... installs"
+	@echo -e "\tvignette ... builds vignette"
+	@echo -e "\tclean    ... removes vignette artefacts"
