@@ -90,11 +90,6 @@ explicitly compare multiple samples against each other.
   more.
   
 
-# Citation
-
-TODO
-
-
 # Installation
 
 `r sabseqR()` can be installed from [bioconductor.org](http://bioconductor.org/) or
@@ -102,18 +97,20 @@ its GitHub repository at https://github.com/malhamdoosh/abseqR.
 
 ## Bioconductor
 
-Install via `biocLite`:
+Install via `BiocManager`:
 ```r
-source("http://bioconductor.org/biocLite.R")
-biocLite("abseqR")
+if (!require("BiocManager"))
+    install.packages("BiocManager")
+BiocManager::install("abseqR")
 ```
 
 ## GitHub
 
 Install via `devtools`:
 ```r
-library(devtools)
-install_github("malhamdoosh/abseqR")
+if (!require("devtools"))
+    install.packages("devtools")
+devtools::install_github("malhamdoosh/abseqR")
 ```
 
 ## System prerequisites
