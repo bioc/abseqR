@@ -72,12 +72,18 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' # this class is (usually) not directly constructed by users, but as a return
+#' # this class is not directly constructed by users, but as a return
 #' # value from the abseqReport method.
-#' samples <- abseqReport("/path/to/output/directory/")
-#' samples[[1]]@name     # gives the name of the first repertoire object returned by abseqReport
-#' }
+#'
+#' # Use example data from abseqR as abseqPy's output, substitute this
+#' # with your own abseqPy output directory
+#' abseqPyOutput <- tempdir()
+#' file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
+#' samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
+#'
+#'
+#' # gives the name of the first repertoire object returned by abseqReport
+#' # samples[[1]]@name
 AbSeqRep <- setClass("AbSeqRep", slots = c(
     f1 = "character",
     f2 = "character",
@@ -161,18 +167,22 @@ AbSeqRep <- setClass("AbSeqRep", slots = c(
 #' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}s
 #'
 #' @examples
-#' \dontrun{
-#' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
-#' # also assumes there's a result/ directory in current working directory,
-#' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-#' samples <- abseqReport("results", report = 0)
+#' # Use example data from abseqR as abseqPy's output, substitute this
+#' # with your own abseqPy output directory
+#' abseqPyOutput <- tempdir()
+#' file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
+#' samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
 #'
-#' # assuming there are samples named "Sample1" and "Sample3"
-#' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
+#' # The provided example data has PCR1, PCR2, and PCR3 samples contained within
+#' # pcr1 and pcr2 are instances of AbSeqRep
+#' pcr1 <- samples[["PCR1"]]
+#' pcr2 <- samples[["PCR2"]]
 #'
-#' # generate plots and report for this new comparison
-#' report(S1S3, "s1_vs_s3")
-#' }
+#' # pcr12 is an instance of AbSeqCRep
+#' pcr12 <- pcr1 + pcr2
+#'
+#' # you can now call the report function on this object
+#' # report(pcr12)           # uncomment this line to execute report
 setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqRep"), function(e1, e2) {
     new("AbSeqCRep", repertoires = list(e1, e2))
 })
@@ -193,21 +203,23 @@ setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqRep"), function(e1, e2) {
 #' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}s
 #'
 #' @examples
-#' \dontrun{
-#' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
-#' # also assumes there's a result/ directory in current working directory,
-#' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-#' samples <- abseqReport("results", report = 0)
+#' # Use example data from abseqR as abseqPy's output, substitute this
+#' # with your own abseqPy output directory
+#' abseqPyOutput <- tempdir()
+#' file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
+#' samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
 #'
-#' # assuming there are samples named "Sample1", "Sample3", and "Sample4"
-#' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
-#' S4 <- samples[["Sample4"]]
+#' # The provided example data has PCR1, PCR2, and PCR3 samples contained within
+#' # pcr12 is an instance of AbSeqCRep
+#' pcr12 <- samples[["PCR1"]] + samples[["PCR2"]]
+#' # pcr3 is instance of AbSeqRep
+#' pcr3 <- samples[["PCR3"]]
 #'
-#' S1S3S4 <- S1S3 + S4
+#' # pcr123 is an instance of AbSeqCRep
+#' pcr123 <- pcr12 + pcr3
 #'
-#' # generate plots and report for this new comparison
-#' report(S1S3S4, "s1_vs_s3_vs_s4")
-#' }
+#' # you can now call the report function on this object
+#' # report(pcr123)           # uncomment this line to execute report
 setMethod("+", signature(e1 = "AbSeqCRep", e2 = "AbSeqRep"), function(e1, e2) {
     new("AbSeqCRep", repertoires = unique(c(e1@repertoires, e2)))
 })
@@ -228,21 +240,23 @@ setMethod("+", signature(e1 = "AbSeqCRep", e2 = "AbSeqRep"), function(e1, e2) {
 #' @seealso \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}s
 #'
 #' @examples
-#' \dontrun{
-#' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
-#' # also assumes there's a result/ directory in current working directory,
-#' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-#' samples <- abseqReport("results", report = 0)
+#' # Use example data from abseqR as abseqPy's output, substitute this
+#' # with your own abseqPy output directory
+#' abseqPyOutput <- tempdir()
+#' file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
+#' samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
 #'
-#' # assuming there are samples named "Sample1", "Sample3", and "Sample4"
-#' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
-#' S4 <- samples[["Sample4"]]
+#' # The provided example data has PCR1, PCR2, and PCR3 samples contained within
+#' # pcr1 is an instance of AbSeqRep
+#' pcr1 <- samples[["PCR1"]]
+#' # pcr23 is instance of AbSeqCRep
+#' pcr23 <- samples[["PCR2"]] + samples[["PCR3"]]
 #'
-#' S4S1S3 <- S4 + S1S3
+#' # pcr123 is an instance of AbSeqCRep
+#' pcr123 <- pcr1 + pcr23
 #'
-#' # generate plots and report for this new comparison
-#' report(S4S1S3, "s4_vs_s1_vs_s3")
-#' }
+#' # you can now call the report function on this object
+#' # report(pcr123)           # uncomment this line to execute report
 setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqCRep"), function(e1, e2) {
     new("AbSeqCRep", repertoires = unique(c(e1, e2@repertoires)))
 })
@@ -287,30 +301,27 @@ setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqCRep"), function(e1, e2) {
 #' @rdname report
 #'
 #' @examples
-#' \dontrun{
-#' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
-#' # also assumes there's a result/ directory in current working directory,
-#' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-#' samples <- abseqReport("results", report = 0)
+#' # Use example data from abseqR as abseqPy's output, substitute this
+#' # with your own abseqPy output directory
+#' abseqPyOutput <- tempdir()
+#' file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
+#' samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
 #'
-#' # assuming there are samples named "Sample1", "Sample2", "Sample3", and "Sample4"
-#' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
-#' S2S4 <- samples[["Sample2"]] + samples[["Sample4"]]
 #'
-#' all.S <- S1S3 + S2S4
+#' # The provided example data has PCR1, PCR2, and PCR3 samples contained within
+#' pcr12 <- samples[["PCR1"]] + samples[["PCR2"]]
 #'
 #' # generate plots and report for this new comparison
-#' report(all.S, "s1_vs_s2_vs_s3_vs_s4")
+#' # report(pcr12, "PCR1_vs_PCR2")
 #'
 #' # generate plots only
-#' report(all.S, "s1_vs_s2_vs_s3_vs_s4", report = 1)
+#' # report(pcr12, "PCR1_vs_PCR2", report = 1)
 #'
 #' # generate plots, and a non-interactive report
-#' report(all.S, "s1_vs_s2_vs_s3_vs_s4", report = 2)
+#' # report(pcr12, "PCR1_vs_PCR2", report = 2)
 #'
 #' # generate plots, and an interactive report
-#' report(all.S, "s1_vs_s2_vs_s3_vs_s4", report = 3)
-#' }
+#' # report(pcr12, "PCR1_vs_PCR2", report = 3)   # this is the default
 setGeneric(name = "report",
            def = function(object, outputDir, report = 3) {
                standardGeneric("report")

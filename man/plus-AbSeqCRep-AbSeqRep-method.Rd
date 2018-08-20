@@ -22,21 +22,23 @@ Combines a \linkS4class{AbSeqCRep} object with
 a \linkS4class{AbSeqRep} object together for comparison
 }
 \examples{
-\dontrun{
-# 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
-# also assumes there's a result/ directory in current working directory,
-# where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-samples <- abseqReport("results", report = 0)
+# Use example data from abseqR as abseqPy's output, substitute this
+# with your own abseqPy output directory
+abseqPyOutput <- tempdir()
+file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
+samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
 
-# assuming there are samples named "Sample1", "Sample3", and "Sample4"
-S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
-S4 <- samples[["Sample4"]]
+# The provided example data has PCR1, PCR2, and PCR3 samples contained within
+# pcr12 is an instance of AbSeqCRep
+pcr12 <- samples[["PCR1"]] + samples[["PCR2"]]
+# pcr3 is instance of AbSeqRep
+pcr3 <- samples[["PCR3"]]
 
-S1S3S4 <- S1S3 + S4
+# pcr123 is an instance of AbSeqCRep
+pcr123 <- pcr12 + pcr3
 
-# generate plots and report for this new comparison
-report(S1S3S4, "s1_vs_s3_vs_s4")
-}
+# you can now call the report function on this object
+# report(pcr123)           # uncomment this line to execute report
 }
 \seealso{
 \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}s

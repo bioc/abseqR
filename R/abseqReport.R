@@ -39,53 +39,65 @@
 #' an \linkS4class{AbSeqRep} or \linkS4class{AbSeqCRep} object instead.
 #'
 #' @examples
-#' \dontrun{
-#' # Assuming abseqPy has dumped its output in /path/to/output/directory/
-#' # (i.e. the argument to --outdir / -o in abseqPy)
+#' # Use example data from abseqR as abseqPy's output, substitute this
+#' # with your own abseqPy output directory
+#' abseqPyOutput <- tempdir()
+#' file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
 #'
 #' ### report parameter usage example:
 #'
 #' # report = 0; don't plot, don't collate a HTML report, don't show anything interactive
-#' samples <- abseqReport("/path/to/output/directory/", report = 0)
+#' samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
 #' # samples is now a named list of AbSeqRep objects
 #'
 #' # report = 1; just plot pngs; don't collate a HTML report; nothing interactive
-#' samples <- abseqReport("/path/to/output/directory/", report = 1)
+#' # samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 1)
 #' # samples is now a named list of AbSeqRep objects
 #'
 #' # report = 2; plot pngs; collate a HTML report; HTML report will NOT be interactive
-#' samples <- abseqReport("/path/to/output/directory/", report = 2)
+#' # samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 2)
 #' # samples is now a named list of AbSeqRep objects
 #'
 #' # report = 3 (default); plot pngs; collate a HTML report; HTML report will be interactive
-#' samples <- abseqReport("/path/to/output/directory/", report = 3)
+#' # samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 3)
 #' # samples is now a named list of AbSeqRep objects
 #'
 #' #### Bonus Section (what to do with the list "samples"?):
-#' # assume:
-#' # > names(samples)
-#' # [1] "Sample1" "Sample2" "Sample3" "Sample4"
 #'
-#' # we want to explicitly compare Sample1 with Sample3:
-#' new.combination <- samples[["Sample1"]] + samples[["Sample3"]]
+#' # NOTE, often, this is used to load multiple samples from different directories
+#' # using abseqReport (with report = 0), then the samples are added together
+#' # before calling the report function. This is most useful when the samples
+#' # live in different abseqPy output directory and yet they should be compared
+#' # together. For the sake of demonstration, we will only be using the samples
+#' # from within the same directory, but (hopefully) you get the idea ...
+#'
+#' # Note that the provided example data has PCR1, PCR2, and PCR3
+#' # samples contained within
+#' stopifnot(names(samples) == c("PCR1", "PCR2", "PCR3"))
+#'
+#' # as a hypothetical example, say we found something
+#' # interesting in PCR1 and PCR3, and we want to isolate them:
+#'
+#' # we want to explicitly compare PCR1 with PCR3
+#' pcr13 <- samples[["PCR1"]] + samples[["PCR3"]]
+#'
 #' # see abseqR::report for more information.
-#' abseqR::report(new.combination)
+#' # abseqR::report(pcr13)      # uncomment this line to run
 #'
 #' ### BPPARAM usage:
 #'
 #' # 4 core machine, use all cores -  use whatever value that suits you
 #' nproc <- 4
-#' samples <- abseqReport("/path/to/output/directory/",
-#'                        BPPARAM = BiocParallel::MulticoreParam(nproc))
+#' # samples <- abseqReport(file.path(abseqPyOutput, "ex"),
+#' #                       BPPARAM = BiocParallel::MulticoreParam(nproc))
 #'
 #'
 #' # run sequentially - no multiprocessing
-#' samples <- abseqReport("/path/to/output/directory/",
-#'                        BPPARAM = BiocParallel::SerialParam())
+#' # samples <- abseqReport(file.path(abseqPyOutput, "ex"),
+#' #                       BPPARAM = BiocParallel::SerialParam())
 #'
 #'# see https://bioconductor.org/packages/release/bioc/html/BiocParallel.html
 #'# for more information about how to use BPPARAM and BiocParallel in general.
-#' }
 abseqReport <- function(root, report, compare, BPPARAM) {
     #  ------ sanitize function arguments ---------
     root <- normalizePath(root)

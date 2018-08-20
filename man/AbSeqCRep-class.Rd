@@ -18,23 +18,19 @@ AbSeqCRep is a collection of \linkS4class{AbSeqRep} S4 objects
 }}
 
 \examples{
-\dontrun{
-# 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
-# also assumes there's a result/ directory in current working directory,
-# where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-samples <- abseqReport("results", report = 0)
+# Use example data from abseqR as abseqPy's output, substitute this
+# with your own abseqPy output directory
+abseqPyOutput <- tempdir()
+file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
+samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
 
-# assuming there are samples named "Sample1", "Sample2", "Sample3", and "Sample4"
+# The provided example data has PCR1, PCR2, and PCR3 samples contained within
+# pcr12 and pcr13 are instances of AbSeqCRep
+pcr12 <- samples[["PCR1"]] + samples[["PCR2"]]
+pcr13 <- samples[["PCR1"]] + samples[["PCR3"]]
 
-# S1S3 is an instance of AbSeqCRep
-S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
-
-# S2S4 is an instance of AbSeqCRep
-S2S4 <- samples[["Sample2"]] + samples[["Sample4"]]
-
-# all.S is an instance of AbSeqCRep
-all.S <- S1S3 + S2S4
-}
+# all_S is also an instance of AbSeqCRep
+all_S <- pcr12 + pcr13
 }
 \seealso{
 \linkS4class{AbSeqRep}

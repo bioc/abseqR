@@ -105,12 +105,18 @@ values are either \code{imgt} or \code{kabat}.}
 }}
 
 \examples{
-\dontrun{
-# this class is (usually) not directly constructed by users, but as a return
+# this class is not directly constructed by users, but as a return
 # value from the abseqReport method.
-samples <- abseqReport("/path/to/output/directory/")
-samples[[1]]@name     # gives the name of the first repertoire object returned by abseqReport
-}
+
+# Use example data from abseqR as abseqPy's output, substitute this
+# with your own abseqPy output directory
+abseqPyOutput <- tempdir()
+file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
+samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
+
+
+# gives the name of the first repertoire object returned by abseqReport
+# samples[[1]]@name
 }
 \seealso{
 \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}

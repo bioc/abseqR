@@ -44,30 +44,27 @@ The only difference is that this method accepts \linkS4class{AbSeqRep} or
 \code{outputDir} specifies where to store the result.
 }
 \examples{
-\dontrun{
-# 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
-# also assumes there's a result/ directory in current working directory,
-# where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-samples <- abseqReport("results", report = 0)
+# Use example data from abseqR as abseqPy's output, substitute this
+# with your own abseqPy output directory
+abseqPyOutput <- tempdir()
+file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
+samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
 
-# assuming there are samples named "Sample1", "Sample2", "Sample3", and "Sample4"
-S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
-S2S4 <- samples[["Sample2"]] + samples[["Sample4"]]
 
-all.S <- S1S3 + S2S4
+# The provided example data has PCR1, PCR2, and PCR3 samples contained within
+pcr12 <- samples[["PCR1"]] + samples[["PCR2"]]
 
 # generate plots and report for this new comparison
-report(all.S, "s1_vs_s2_vs_s3_vs_s4")
+# report(pcr12, "PCR1_vs_PCR2")
 
 # generate plots only
-report(all.S, "s1_vs_s2_vs_s3_vs_s4", report = 1)
+# report(pcr12, "PCR1_vs_PCR2", report = 1)
 
 # generate plots, and a non-interactive report
-report(all.S, "s1_vs_s2_vs_s3_vs_s4", report = 2)
+# report(pcr12, "PCR1_vs_PCR2", report = 2)
 
 # generate plots, and an interactive report
-report(all.S, "s1_vs_s2_vs_s3_vs_s4", report = 3)
-}
+# report(pcr12, "PCR1_vs_PCR2", report = 3)   # this is the default
 }
 \seealso{
 \code{\link{abseqReport}}. Analogus function, but takes input from
