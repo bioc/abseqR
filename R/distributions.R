@@ -23,9 +23,9 @@
 #' @param legendPos string type. Where to position legend (see ggplot's theme())
 #'
 #' @return ggplot2 object
-.plotDist <- function(dataframes, sampleNames, plotTitle, vert = T,
-                      xlabel = "", ylabel = "", perc = T, subs = "",
-                      sorted = T, cutoff = 15, legendPos = "right") {
+.plotDist <- function(dataframes, sampleNames, plotTitle, vert = TRUE,
+                      xlabel = "", ylabel = "", perc = TRUE, subs = "",
+                      sorted = TRUE, cutoff = 15, legendPos = "right") {
     frames <- length(dataframes)
     # sanity check
     if (length(sampleNames) != frames) {
@@ -209,7 +209,7 @@
 .plotSpectratype <- function(dataframes, sampleNames, region,
                              title = "Spectratype", subtitle = "",
                              xlabel = "Length(AA)",
-                             ylabel = "Distribution", showLabel = F) {
+                             ylabel = "Distribution", showLabel = FALSE) {
     nsample <- length(dataframes)
     if (nsample != length(sampleNames)) {
         stop(paste("Expected equal number of sample names and dataframes, got",
@@ -301,10 +301,10 @@
     if (frames == 1) {
         g <- ggplot(df.union,
                     aes(x = x, y = y)) +
-            geom_boxplot(varwidth = T, fill = BLUEHEX)
+            geom_boxplot(varwidth = TRUE, fill = BLUEHEX)
     } else {
         g <- ggplot(df.union, aes(x = sample, y = y)) +
-            geom_boxplot(varwidth = T, fill = BLUEHEX) +
+            geom_boxplot(varwidth = TRUE, fill = BLUEHEX) +
             facet_grid(~x) +
             theme(axis.text.x = element_text(angle = 75, hjust = 1))
     }

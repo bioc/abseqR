@@ -5,7 +5,7 @@
 \title{Title Diversity analysis}
 \usage{
 .diversityAnalysis(diversityDirectories, diversityOut, sampleNames,
-  mashedNames, .save = T)
+  mashedNames, .save = TRUE)
 }
 \arguments{
 \item{diversityDirectories}{list type. List of directories to diversity dir}

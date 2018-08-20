@@ -5,7 +5,7 @@
 \title{Comprehensive clonotype analyses}
 \usage{
 .clonotypeAnalysis(diversityDirectories, clonotypeOut, sampleNames,
-  mashedNames, .save = T)
+  mashedNames, .save = TRUE)
 }
 \arguments{
 \item{diversityDirectories}{list type. List of directories to diversity dir}

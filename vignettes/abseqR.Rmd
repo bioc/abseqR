@@ -1,9 +1,4 @@
 ---
-params:
-    # set to TRUE to render the "release" version of this vignette
-    # NOTE: before you can run this with FALSE, at it at least once with TRUE to
-    #       get all the files you require for release = FALSE
-    release: TRUE
 title: "abseqR"
 author: "Jia Hong Fong"
 package: "abseqR"
@@ -26,21 +21,8 @@ library(gridExtra)
 knitr::opts_chunk$set(message = FALSE)
 ```
 
-```{r environment_setup_no_release, include=FALSE, eval=(!params$release)}
-
-# loads the necessary variables for this Rmd
-# the reason for this is because we want the return values,
-# but not the execution time (only executes when in 'debug' mode)
-
-sandboxDirectory <- "."
-dataPath <- file.path(sandboxDirectory, "ex")
-if (!file.exists(dataPath)) {
-    stop(paste("You must run this vignette with release = TRUE at least",
-               "once before you run it with release = FALSE"))
-}
-```
-```{r environment_setup_release, include=FALSE, eval=params$release}
-# make sure that any existing copy of "abseqR_exmple" has been removed before
+```{r environment_setup_release, include=FALSE}
+# make sure that any existing copy of "ex" has been removed before
 # we re-generate this vignette
 lapply(c("ex", "refined_comparison"), unlink, recursive = TRUE)
 ```
@@ -216,7 +198,7 @@ the output directory specified in `r sabseqPy()`'s `--outdir` was
 To obtain the dataset, the following R code demonstrates
 the steps needed to copy it to a _sandbox directory_:
 
-```{r abseqR_copy_data_files, eval=params$release, results=FALSE}
+```{r abseqR_copy_data_files, results=FALSE}
 # substitute with any directory that you have read/write access to
 sandboxDirectory <- "."
 if (!file.exists(sandboxDirectory)) {

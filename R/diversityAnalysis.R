@@ -353,7 +353,7 @@
 #' @return none
 .aminoAcidPlot <- function(compositionDirectory, outdir, sampleName,
                            regions = c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3", "FR4"),
-                           .save = T) {
+                           .save = TRUE) {
     for (region in regions) {
         # todo: change dirname such that compositionDirectory and outdir
         # is differentiated!
@@ -365,8 +365,8 @@
 
         summaryPlot <- file.path(dirName, paste0(sampleName, "_cumulative_logo.csv"))
         df <- read.csv(summaryPlot)
-        g1 <- .aminoAcidBar(df, scale = F, region)
-        g2 <- .aminoAcidBar(df, scale = T, region)
+        g1 <- .aminoAcidBar(df, scale = FALSE, region)
+        g2 <- .aminoAcidBar(df, scale = TRUE, region)
         fname1 <- file.path(outputPath, paste0(sampleName, "_cumulative_logo.png"))
         fname2 <- file.path(outputPath, paste0(sampleName, "_cumulative_logo_scaled.png"))
         ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
@@ -378,14 +378,14 @@
             list.files(path = dirName,
                        pattern = paste0(sampleName,
                                         "_.+_cumulative_logo\\.csv(\\.gz)?$"),
-                       full.names = T)
+                       full.names = TRUE)
 
         lapply(germlineSpecific, function(gLogoFile) {
             germName <- sub("_cumulative_logo\\.csv(\\.gz)?$", "",
                             stringr::str_extract(gLogoFile, "IG[HKL][VDJ].*"))
             df <- read.csv(gLogoFile)
-            g1 <- .aminoAcidBar(df, scale = F, region, germ = germName)
-            g2 <- .aminoAcidBar(df, scale = T, region, germ = germName)
+            g1 <- .aminoAcidBar(df, scale = FALSE, region, germ = germName)
+            g2 <- .aminoAcidBar(df, scale = TRUE, region, germ = germName)
             fname1 <- file.path(outputPath, paste0(sampleName, "_", germName, "_cumulative_logo.png"))
             fname2 <- file.path(outputPath, paste0(sampleName, "_", germName, "_cumulative_logo_scaled.png"))
             ggsave(fname1, plot = g1, width = V_WIDTH, height = V_HEIGHT)
@@ -487,7 +487,7 @@
         labs(title = paste0(germ, " ", region, " (", total, ")"),
              subtitle = subs, x = "amino acid", y = "proportion") +
         scale_x_continuous(breaks = df.agg$position, labels = xlabels) +
-        scale_fill_manual(values = group.colors, drop = F) +
+        scale_fill_manual(values = group.colors, drop = FALSE) +
         theme(legend.title = element_blank(),
               legend.text = element_text(size = 5))
     return(g)
@@ -600,7 +600,7 @@
 #'
 #' @return None
 .diversityAnalysis <- function(diversityDirectories, diversityOut,
-                              sampleNames, mashedNames, .save = T) {
+                              sampleNames, mashedNames, .save = TRUE) {
     message(paste("Starting diversity analysis on samples",
             paste(sampleNames, collapse = ", ")))
 
@@ -777,7 +777,7 @@
         # dataframes is in vegan input format, the clonotypes are now column headers
         # instead of column values
         dataframes <- lapply(cdr3ClonesFile, function(fname) {
-            df <- read.csv(fname, stringsAsFactors = F)
+            df <- read.csv(fname, stringsAsFactors = FALSE)
             d.trans <- as.data.frame(t(df[, "Count"]))
             #names(d.trans) <- df$Clonotype
             return(d.trans)
@@ -790,13 +790,13 @@
             message(paste("Calculating unseen species lower bound estimates for",
                           sampleNames[1]))
             df.lbe <- .reportLBE(dataframes[[1]])
-            write.table(df.lbe, file = lbeOut, sep = "\t", quote = F, row.names = F)
+            write.table(df.lbe, file = lbeOut, sep = "\t", quote = FALSE, row.names = FALSE)
 
             ##### Diversity indices
             message(paste("Calculating standard diversity indices for",
                           sampleNames[1]))
             df.ind <- .calculateDInd(dataframes[[1]])
-            write.table(df.ind, file = indOut, sep = "\t", quote = F, row.names = F)
+            write.table(df.ind, file = indOut, sep = "\t", quote = FALSE, row.names = FALSE)
 
         } else {
             ##### Lower bound estimates of unseen species
@@ -820,8 +820,8 @@
                     write.table(df.lbes[[i]],
                                 file = file.path(diversityDirectories[[i]], lb.fname),
                                 sep = "\t",
-                                quote = F,
-                                row.names = F)
+                                quote = FALSE,
+                                row.names = FALSE)
                 })
             } else {
                 # expect 1-1 relationship
@@ -831,14 +831,14 @@
                 lbesFiles <- .listFilesInOrder(path = diversityDirectories,
                                                pattern = paste0(lb.fname, "\\.tsv(\\.gz)?$"))
                 stopifnot(length(lbesFiles) == length(sampleNames))
-                df.lbes <- lapply(lbesFiles, read.table, header = T)
+                df.lbes <- lapply(lbesFiles, read.table, header = TRUE)
             }
             dfs <- do.call("rbind", lapply(seq_along(df.lbes), function(i) {
                 df <- df.lbes[[i]]
                 df$sample <- sampleNames[i]
                 return(df)
             }))
-            write.table(dfs, file = lbeOut, sep = "\t", quote = F, row.names = F)
+            write.table(dfs, file = lbeOut, sep = "\t", quote = FALSE, row.names = FALSE)
 
             ##### Diversity indices
             # same logic as above
@@ -860,8 +860,8 @@
                                 file = file.path(diversityDirectories[[i]],
                                                  ind.fname),
                                 sep = "\t",
-                                quote = F,
-                                row.names = F)
+                                quote = FALSE,
+                                row.names = FALSE)
                 })
             } else {
                 message(paste("Loading precomputed diversity indices from",
@@ -870,14 +870,14 @@
                 indFiles <- .listFilesInOrder(path = diversityDirectories,
                                               pattern = paste0(ind.fname, "\\.tsv(\\.gz)?$"))
                 stopifnot(length(indFiles) == length(sampleNames))
-                df.inds <- lapply(indFiles, read.table, header = T)
+                df.inds <- lapply(indFiles, read.table, header = TRUE)
             }
             dfs <- do.call("rbind", lapply(seq_along(df.inds), function(i) {
                 df <- df.inds[[i]]
                 df$sample <- sampleNames[i]
                 return(df)
             }))
-            write.table(dfs, file = indOut, sep = "\t", quote = F, row.names = F)
+            write.table(dfs, file = indOut, sep = "\t", quote = FALSE, row.names = FALSE)
         }
 
     } else {

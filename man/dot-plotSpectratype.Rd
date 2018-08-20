@@ -6,7 +6,7 @@
 \usage{
 .plotSpectratype(dataframes, sampleNames, region, title = "Spectratype",
   subtitle = "", xlabel = "Length(AA)", ylabel = "Distribution",
-  showLabel = F)
+  showLabel = FALSE)
 }
 \arguments{
 \item{dataframes}{list type. List of dataframes.}

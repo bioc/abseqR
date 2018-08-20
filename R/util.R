@@ -166,7 +166,7 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
     lines <- c("solid", "twodash", "dotted", "dotdash", "longdash", "dashed")
 
     factorRegions <- factor(regions, levels = lvls)
-    return(lines[order(factorRegions, decreasing = T)])
+    return(lines[order(factorRegions, decreasing = TRUE)])
 }
 
 
@@ -211,7 +211,7 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
     lines <- readLines(con)
     close(con)
     for (line in lines) {
-        if (grepl(key, line, fixed = T)) {
+        if (grepl(key, line, fixed = TRUE)) {
             return(strsplit(line, ":")[[1]][2])
         }
     }
@@ -227,7 +227,7 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
 #' @param fixed logical type
 #'
 #' @return None
-.substituteStringInFile <- function(filename, key, value, fixed = F) {
+.substituteStringInFile <- function(filename, key, value, fixed = FALSE) {
     con <- file(filename, "r")
     lines <- readLines(con)
     close(con)

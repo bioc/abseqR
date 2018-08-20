@@ -27,7 +27,7 @@
             title = "Sequence lengths",
             xlabel = "Sequence Length (bp)",
             ylabel = "Proportion",
-            showLabel = F
+            showLabel = FALSE
         )
         fname <- file.path(annotOut,
                            paste0(mashedNames, "_all_clones_len_dist.png"))
@@ -51,7 +51,7 @@
             title = "Sequence lengths",
             xlabel = "Sequence Length (bp)",
             ylabel = "Proportion",
-            showLabel = F
+            showLabel = FALSE
         )
         fname <- file.path(annotOut,
                            paste0(mashedNames,

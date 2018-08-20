@@ -1,5 +1,5 @@
 .PHONY:
-all: bccheck install vignette
+all: full_check
 
 .PHONY:
 build: clean
@@ -10,8 +10,11 @@ check: clean
 	Rscript -e "devtools::check()"
 
 .PHONY:
-bccheck: check
+bccheck:
 	Rscript -e "BiocCheck::BiocCheck('.')"
+
+.PHONY:
+full_check: check bccheck
 
 .PHONY:
 install:

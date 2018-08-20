@@ -1,4 +1,0 @@
-This file describes the abseqR_example directory
-
-abseqR_example is a toy example for the vignette and users to play around with.
-The samples PCR1, PCR2, PCR3, PCR4, and PCR5 are generated using synthethic datasets.

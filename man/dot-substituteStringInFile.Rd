@@ -4,7 +4,7 @@
 \alias{.substituteStringInFile}
 \title{Substitutes the first occurance of `key` with `value` in `filename`}
 \usage{
-.substituteStringInFile(filename, key, value, fixed = F)
+.substituteStringInFile(filename, key, value, fixed = FALSE)
 }
 \arguments{
 \item{filename}{character type}

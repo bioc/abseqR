@@ -6,7 +6,6 @@
 #' @include util.R
 #' @include AbSeqRep.R
 #' @import BiocParallel
-#' @import rmarkdown
 #'
 #' @param root string type. Root directory as specified in
 #' \code{-o} or \code{--outdir} in abseqPy. This tells AbSeq where to look for
@@ -254,16 +253,19 @@ abseqReport <- function(root, report, compare, BPPARAM) {
 }
 
 
-# Collate all reports into a single directory and cretate an entry
-# \code{index.html} file that redirects to all other HTML files
-#
-# @import rmarkdown
-#
-# @param reports list/vector type. Collection of strings that are path(s)
-# to <sample>_report.html
-# @param individualSamples list type. list of AbSeqRep objects. Used to
-# extract filtering information and % read counts.
-# @param outputDirectory string type. Where should the report be placed.
+#' Collate all reports into a single directory and cretate an entry
+#' \code{index.html} file that redirects to all other HTML files
+#'
+#' @import flexdashboard png knitr BiocStyle
+#' @importFrom rmarkdown render pandoc_available
+#'
+#' @param reports list/vector type. Collection of strings that are path(s)
+#' to <sample>_report.html
+#' @param individualSamples list type. list of AbSeqRep objects. Used to
+#' extract filtering information and \% read counts.
+#' @param outputDirectory string type. Where should the report be placed.
+#'
+#' @return Nothing
 .collateReports <- function(reports, individualSamples, outputDirectory) {
     message("Collating report into index.html")
 

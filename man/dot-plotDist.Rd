@@ -4,9 +4,9 @@
 \alias{.plotDist}
 \title{Histogram plotter}
 \usage{
-.plotDist(dataframes, sampleNames, plotTitle, vert = T, xlabel = "",
-  ylabel = "", perc = T, subs = "", sorted = T, cutoff = 15,
-  legendPos = "right")
+.plotDist(dataframes, sampleNames, plotTitle, vert = TRUE, xlabel = "",
+  ylabel = "", perc = TRUE, subs = "", sorted = TRUE,
+  cutoff = 15, legendPos = "right")
 }
 \arguments{
 \item{dataframes}{list type. List of dataframes}

@@ -163,8 +163,8 @@
     xmin <- min(df.union$prop.x)
     ymin <- min(df.union$prop.y)
 
-    sample1.margin <- .cloneDistMarginal(df1, intersectingClones, xmin, flip = F)
-    sample2.margin <- .cloneDistMarginal(df2, intersectingClones, ymin, flip = T)
+    sample1.margin <- .cloneDistMarginal(df1, intersectingClones, xmin, flip = FALSE)
+    sample2.margin <- .cloneDistMarginal(df2, intersectingClones, ymin, flip = TRUE)
 
     g <- ggplot(df.union, aes(x = prop.x, y = prop.y)) +
         theme_bw() +
@@ -445,8 +445,8 @@
             df.union <- merge(dataframes[[i]],
                               dataframes[[j]],
                               by = "Clonotype",
-                              all.y = T,
-                              all.x = T)
+                              all.y = TRUE,
+                              all.x = TRUE)
 
             # --- clonotype scatter plot ---
             saveName <- file.path(outputPath,
@@ -558,14 +558,14 @@
 #' @return Nothing
 .clonotypeAnalysis <- function(diversityDirectories,
                               clonotypeOut, sampleNames,
-                              mashedNames, .save = T) {
+                              mashedNames, .save = TRUE) {
     message(paste("Starting clonotype analysis on samples",
                   paste(sampleNames, collapse = ",")))
     cdr3ClonesFile <- .listFilesInOrder(path = diversityDirectories,
                                         pattern = ".*_cdr3_clonotypes_.*_over\\.csv(\\.gz)?$")
     if (length(cdr3ClonesFile) > 1) {
         dataframes <- lapply(cdr3ClonesFile, function(fname) {
-            df <- read.csv(fname, stringsAsFactors = F)
+            df <- read.csv(fname, stringsAsFactors = FALSE)
             df$prop <- df$Count / sum(df$Count)
             return(df[, c("Count", "Clonotype", "prop")])
         })

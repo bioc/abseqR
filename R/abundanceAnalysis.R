@@ -78,7 +78,7 @@
         outputFileName <- file.path(outputdir, gsub(".csv",
                                                     ".png",
                                                     basename(filename),
-                                                    fixed = T))
+                                                    fixed = TRUE))
 
         png(outputFileName, width = V_WIDTH, height = V_HEIGHT,
             units = "in", res = 1200, pointsize = 10)
@@ -155,8 +155,8 @@
                          type = "bar", orientation = "h",
                          color = I("DarkBlue")),
                  nrows = 2, heights = c(0.2, 0.8),
-                 widths = c(0.8, 0.2), margin = 0, shareX = T,
-                 shareY = T, titleX = F, titleY = F
+                 widths = c(0.8, 0.2), margin = 0, shareX = TRUE,
+                 shareY = TRUE, titleX = FALSE, titleY = FALSE
     ))
 
     static <- ggplot(melt(m), aes(x = Var2, y = Var1)) +
@@ -197,7 +197,7 @@
     lapply(qualityMeasure, function(qual) {
         heatmapFile <- file.path(abundanceDirectory, paste0(sampleName, "_igv_align_quality_", qual, "_hm.tsv"))
         if (file.exists(heatmapFile)) {
-            mat <- as.matrix(read.table(heatmapFile, skip = 1, check.names = F))
+            mat <- as.matrix(read.table(heatmapFile, skip = 1, check.names = FALSE))
             xlabel <- "Alignment Length"
             if (qual == "identity") {
                 qual <- "%Identity"
