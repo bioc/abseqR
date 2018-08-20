@@ -12,6 +12,16 @@ provided by `abseqPy` by letting users define sample comparisons.
 
 # Installation
 
+## System requisites
+
+[pandoc](http://pandoc.org/installing.html) is highly
+recommended. If `abseqR` fails to detect `pandoc` on your
+system's `PATH`, it will not collate the results/plots and present
+them in a neat HTML document.
+
+> Make sure `pandoc` is at least version 1.19.2.1
+
+
 ## Using BioConductor
 
 `abseqR` is part of the [Bioconductor](http://bioconductor.org/) project
