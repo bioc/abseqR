@@ -57,6 +57,9 @@ each representing \bold{H}eavy, \bold{L}ambda and \bold{K}appa respectively.}
 only relevant in \code{-t all} or \code{-t diversity} where clonotypes
 are exported into \code{<outdir>/<name>/diversity/clonotypes}}
 
+\item{\code{detailedComposition}}{logical. Plots composition logo by IGHV families if
+set to true, otherwise, plots logos by FR/CDRs.}
+
 \item{\code{log}}{character. Path to log file.}
 
 \item{\code{merger}}{character. Merger used to merge paired-end reads.}

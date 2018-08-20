@@ -107,18 +107,18 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
 #' Summary of dataframe
 #'
 #' @description Gives count, mean, standard deviation,
-#' standard error of the mean, and confidence interval (default 95%).
+#' standard error of the mean, and confidence interval (default 95\%).
 #'
 #' adapted from http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/#Helper functions
-#'
-#' @import plyr
 #'
 #' @param data a data frame.
 #' @param measurevar the name of a column that contains the variable to be summariezed
 #' @param groupvars a vector containing names of columns that contain grouping variables
 #' @param na.rm a boolean that indicates whether to ignore NA's
-#' @param conf.interval the percent range of the confidence interval (default is 95%)
-#' @param .drop NA
+#' @param conf.interval the percent range of the confidence interval (default is 95\%)
+#' @param .drop logical.
+#'
+#' @import plyr stats
 #'
 #' @return dataframe
 .summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
@@ -290,8 +290,8 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
 #' @return a symmetric matrix with rownames(mat) == colnames(mat)
 #' The diagonal values are filled with diag if the dataframe itself doesn't have
 #' diagonal data
-.loadMatrixFromDF <- function(dataframe, value.var, diag, unidirecional = TRUE) {
-    if (unidirecional) {
+.loadMatrixFromDF <- function(dataframe, value.var, diag, unidirectional = TRUE) {
+    if (unidirectional) {
         # swap the columns "from" and "to", while the others remain the same
         df.r <- dataframe[, c(2, 1, tail(seq_along(names(dataframe)), -2))]
         # rename the columns (after swapping, it's to - from, need it to be from - to)

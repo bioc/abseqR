@@ -14,7 +14,6 @@ vignette: >
     %\VignetteIndexEntry{Introduction to abseqR}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
-bibliography: bibliography.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -34,7 +33,7 @@ knitr::opts_chunk$set(message = FALSE)
 # but not the execution time (only executes when in 'debug' mode)
 
 sandboxDirectory <- "."
-dataPath <- file.path(sandboxDirectory, "abseqR_example")
+dataPath <- file.path(sandboxDirectory, "ex")
 if (!file.exists(dataPath)) {
     stop(paste("You must run this vignette with release = TRUE at least",
                "once before you run it with release = FALSE"))
@@ -43,7 +42,7 @@ if (!file.exists(dataPath)) {
 ```{r environment_setup_release, include=FALSE, eval=params$release}
 # make sure that any existing copy of "abseqR_exmple" has been removed before
 # we re-generate this vignette
-lapply(c("abseqR_example", "refined_comparison"), unlink, recursive = TRUE)
+lapply(c("ex", "refined_comparison"), unlink, recursive = TRUE)
 ```
 
 ```{r abseqR_vignette_helper_functions, include=FALSE}
@@ -200,8 +199,6 @@ To leverage all the functionalities provided by `r sabseqR()`, the main
 functions to note are `abseqR::abseqReport`, `abseqR::report`, and `+`.
 This section will use a small dataset to walk through the use cases of each function.
 
-TODO: show class diagram here
-
 ## Dataset
 
 The example dataset comes installed with `r sabseqR()`.
@@ -212,7 +209,7 @@ Briefly, the dataset contains 3 samples generated using
 _in silico_ simulation, named PCR1, PCR2, and PCR3.
 `r sabseqPy()` was then used to analyze the dataset and
 the output directory specified in `r sabseqPy()`'s `--outdir` was
-`"abseqR_example"`.
+`"ex"`.
 
 ### Obtaining the dataset {#obtain-dataset}
 
@@ -227,7 +224,7 @@ if (!file.exists(sandboxDirectory)) {
 }
 
 # path to provided data (comes installed with abseqR)
-exdata <- system.file("extdata", "abseqR_example", package = "abseqR")
+exdata <- system.file("extdata", "ex", package = "abseqR")
 # copy the provided data to sandboxDirectory
 file.copy(exdata, sandboxDirectory, recursive = TRUE)
 ```
@@ -238,7 +235,7 @@ To verify that the 3 `PCR`s are present:
 
 ```{r abseqR_data_contents}
 # dataPath now holds the path to a local copy of the data
-dataPath <- file.path(sandboxDirectory, "abseqR_example")
+dataPath <- file.path(sandboxDirectory, "ex")
 # the sample names can be found inside the auxiliary directory
 list.files(path = file.path(dataPath, "auxiliary"))
 ```
@@ -943,7 +940,7 @@ defaults:
     bitscore: 300
     sstart: 1-3
     alignlen: 250
-    outdir: abseqR_example
+    outdir: ex
     task: all
     threads: 1
 ---
@@ -972,8 +969,3 @@ sessionInfo()
 [BiocParallel](https://bioconductor.org/packages/release/bioc/html/BiocParallel.html) may differ across OSes
 [^compare-ws]: Trailing and leading whitespace between sample names are trimmed. That is, "PCR1,PCR2" is identical to
 "PCR1 , PCR2"
-
-
-# References
-<!-- automatically inserted -->
-

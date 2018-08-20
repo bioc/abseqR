@@ -24,7 +24,7 @@ Combines 2 \linkS4class{AbSeqRep} objects together for comparison
 # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
 # also assumes there's a result/ directory in current working directory,
 # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-samples <- abseqReport("results")
+samples <- abseqReport("results", report = 0)
 
 # assuming there are samples named "Sample1" and "Sample3"
 S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]

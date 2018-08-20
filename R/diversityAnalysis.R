@@ -396,6 +396,16 @@
     }
 }
 
+#' Plots amino acid composition logo
+#'
+#' @import ggplot2 stats
+#'
+#' @param df dataframe
+#' @param scale logical. scale to proportion?
+#' @param region string. which region is this
+#' @param germ string. V germline family
+#'
+#' @return ggplot2 object
 .aminoAcidBar <- function(df, scale, region, germ = "") {
     group.colors <-
         c(

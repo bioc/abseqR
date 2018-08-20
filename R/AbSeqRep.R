@@ -1,5 +1,7 @@
 #' AbSeq analysis object.
 #'
+#' @import methods
+#'
 #' @description The AbSeqRep object contains all metadata associated with the AbSeq (python backend)
 #' run conducted on it. For further information, refer to AbSeq's python help.
 #'
@@ -35,6 +37,8 @@
 #' @slot clonelimit numeric. Number of clones to export into csv file. This is
 #' only relevant in \code{-t all} or \code{-t diversity} where clonotypes
 #' are exported into \code{<outdir>/<name>/diversity/clonotypes}
+#' @slot detailedComposition logical. Plots composition logo by IGHV families if
+#' set to true, otherwise, plots logos by FR/CDRs.
 #' @slot log character. Path to log file.
 #' @slot merger character. Merger used to merge paired-end reads.
 #' @slot fmt character. File format of \code{file1} and (if present) \code{file2}.
@@ -161,7 +165,7 @@ AbSeqRep <- setClass("AbSeqRep", slots = c(
 #' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
 #' # also assumes there's a result/ directory in current working directory,
 #' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-#' samples <- abseqReport("results")
+#' samples <- abseqReport("results", report = 0)
 #'
 #' # assuming there are samples named "Sample1" and "Sample3"
 #' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
@@ -193,7 +197,7 @@ setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqRep"), function(e1, e2) {
 #' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
 #' # also assumes there's a result/ directory in current working directory,
 #' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-#' samples <- abseqReport("results")
+#' samples <- abseqReport("results", report = 0)
 #'
 #' # assuming there are samples named "Sample1", "Sample3", and "Sample4"
 #' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
@@ -228,7 +232,7 @@ setMethod("+", signature(e1 = "AbSeqCRep", e2 = "AbSeqRep"), function(e1, e2) {
 #' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
 #' # also assumes there's a result/ directory in current working directory,
 #' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-#' samples <- abseqReport("results")
+#' samples <- abseqReport("results", report = 0)
 #'
 #' # assuming there are samples named "Sample1", "Sample3", and "Sample4"
 #' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
@@ -282,12 +286,14 @@ setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqCRep"), function(e1, e2) {
 #' @seealso \linkS4class{AbSeqRep}
 #' @seealso \linkS4class{AbSeqCRep}
 #'
+#' @rdname report
+#'
 #' @examples
 #' \dontrun{
 #' # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
 #' # also assumes there's a result/ directory in current working directory,
 #' # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-#' samples <- abseqReport("results")
+#' samples <- abseqReport("results", report = 0)
 #'
 #' # assuming there are samples named "Sample1", "Sample2", "Sample3", and "Sample4"
 #' S1S3 <- samples[["Sample1"]] + samples[["Sample3"]]
@@ -314,6 +320,7 @@ setGeneric(name = "report",
 
 
 
+#' @rdname report
 setMethod(f = "report",
           signature = "AbSeqRep",
           definition = function(object, outputDir, report = 3) {
@@ -363,6 +370,7 @@ setMethod(f = "report",
               return(lst)
           })
 
+#' @rdname report
 setMethod(f = "report",
           signature = "AbSeqCRep",
           definition = function(object, outputDir, report = 3) {

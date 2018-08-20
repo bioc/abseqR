@@ -1,5 +1,7 @@
 #' Conducts pearson and spearman correlation analysis on dataframe
 #'
+#' @import stats
+#'
 #' @param df dataframe with at least the following 2 columns:
 #' +-----------------+
 #' | prop.x | prop.y |

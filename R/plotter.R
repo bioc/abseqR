@@ -40,7 +40,6 @@
              primer3Files,
              upstreamRanges,
              skipDgene = FALSE) {
-
         if (!dir.exists(outputDir)) {
             dir.create(outputDir)
         }

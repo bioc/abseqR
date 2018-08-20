@@ -2,6 +2,7 @@
 #'
 #' @import ggplot2
 #' @import RColorBrewer
+#' @import grDevices
 #'
 #' @param dataframes list type. List of dataframes.
 #' @param sampleNames vector type. vector of strings representing sample
@@ -111,8 +112,8 @@
 
 #' Creates a complex scatter plot
 #'
-#' @import ggplot2
-#' @import gridExtra grid
+#' @import ggplot2 gridExtra grid stats
+#'
 #' @include util.R
 #'
 #' @param df.union a 'lossless' dataframe created by intersecting sample1 and
@@ -194,10 +195,10 @@
 #' @import ggplot2
 #' @include util.R
 #'
-#' @param df.original
-#' @param otherClones
-#' @param lim.min
-#' @param flip
+#' @param df.original dataframe with all clones
+#' @param otherClones clones from the other dataframe
+#' @param lim.min x-axis minimum limit
+#' @param flip logical type
 #'
 #' @return ggplot2 object
 .cloneDistMarginal <- function(df.original, otherClones, lim.min, flip) {
@@ -235,10 +236,10 @@
 #' @import ggplot2
 #' @include util.R
 #'
-#' @param df.original
-#' @param df.filtered
-#' @param lim.min
-#' @param flip
+#' @param df.original dataframe with all clones
+#' @param otherClones clones from the other dataframe
+#' @param lim.min x-axis minimum limit
+#' @param flip logical type
 #'
 #' @return ggplot2 object
 .cloneDistHist <- function(df.original, otherClones, lim.min, flip) {
@@ -265,7 +266,7 @@
 
 #' Title Creates Venndiagram for clonotype intersection
 #'
-#' @import VennDiagram
+#' @import VennDiagram grDevices
 #'
 #' @param dataframes list type. List of sample dataframes. Only accepts 2 - 5
 #' samples. Warning message will be generated for anything outside of the range
@@ -287,7 +288,7 @@
         # output
         message(paste("Creating Venn diagram for samples",
                       paste(sampleNames, collapse = ", ")))
-        png(file = outFile, width = 8, height = 7, units = "in", res = 300)
+        png(filename = outFile, width = 8, height = 7, units = "in", res = 300)
 
         # Get the top N clonotypes if specified, and only use the 2 columns
         # specified below
@@ -425,11 +426,13 @@
 #' @import BiocParallel
 #' @import ggcorrplot
 #' @import reshape2
+#' @import stats
+#' @import grDevices
 #'
-#' @param dataframes
-#' @param sampleNames
-#' @param outputPath
-#' @param .save
+#' @param dataframes list of dataframes
+#' @param sampleNames 1-1 vector corresponding to dataframes
+#' @param outputPath string
+#' @param .save logical
 #'
 #' @return nothing
 .pairwiseComparison <- function(dataframes, sampleNames, outputPath, .save = TRUE) {
@@ -512,7 +515,7 @@
                         title = paste(.capitalize(method), "correlation"),
                         hc.order = TRUE,
                         type = "lower",
-                        outline.col = "white",
+                        outline.color = "white",
                         colors = c("#053061", "#F7F7F7", "#67001F") # see brewer.pal(11, "RdBu")
                         )
         saveName <- file.path(outputPath, paste0(method, ".png"))

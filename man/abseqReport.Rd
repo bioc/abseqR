@@ -84,7 +84,7 @@ samples <- abseqReport("/path/to/output/directory/",
 samples <- abseqReport("/path/to/output/directory/",
                        BPPARAM = BiocParallel::SerialParam())
 
-# see https://www.bioconductor.org/packages/devel/bioc/vignettes/BiocParallel/inst/doc/Introduction_To_BiocParallel.pdf
+# see https://bioconductor.org/packages/release/bioc/html/BiocParallel.html
 # for more information about how to use BPPARAM and BiocParallel in general.
 }
 }

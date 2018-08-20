@@ -1,6 +1,6 @@
 #' Abundance distribution
 #'
-#' @import ggplot2
+#' @import ggplot2 utils
 #' @include util.R
 #' @include distributions.R
 #'
@@ -57,6 +57,9 @@
 #'
 #' @import circlize
 #' @import RColorBrewer
+#' @import stats
+#' @import grDevices
+#' @importFrom graphics title
 #'
 #' @param sampleName string type
 #' @param path string type. Path to _vjassoc.csv
@@ -186,6 +189,7 @@
 #' @param sampleName character type. sample name
 #'
 #' @include util.R
+#' @import utils
 #'
 #' @return list of ggplotly heatmaps
 .alignQualityHeatMaps <- function(abundanceDirectory, sampleName) {
@@ -221,7 +225,7 @@
 
 #' Conducts abundance analysis
 #'
-#' @import ggplot2
+#' @import ggplot2 utils
 #' @include util.R
 #' @include distributions.R
 #'

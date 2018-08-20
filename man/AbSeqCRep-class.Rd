@@ -22,7 +22,7 @@ AbSeqCRep is a collection of \linkS4class{AbSeqRep} S4 objects
 # 'load' AbSeqRep objects using abseqReport (ignoring plots, report, etc..)
 # also assumes there's a result/ directory in current working directory,
 # where result/ is the same argument passed to abseqPy's -o or --outdir parameter
-samples <- abseqReport("results")
+samples <- abseqReport("results", report = 0)
 
 # assuming there are samples named "Sample1", "Sample2", "Sample3", and "Sample4"
 

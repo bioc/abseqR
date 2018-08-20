@@ -6,8 +6,8 @@ build: clean
 	R CMD build .
 
 .PHONY:
-check: build
-	R CMD check .
+check: clean
+	Rscript -e "devtools::check()"
 
 .PHONY:
 bccheck: check
