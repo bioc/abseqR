@@ -9,8 +9,9 @@
 AbSeqRep
 }
 \description{
-The AbSeqRep object contains all metadata associated with the AbSeq (python backend)
-run conducted on it. For further information, refer to AbSeq's python help.
+The AbSeqRep object contains all metadata associated with
+the AbSeq (python backend) #' run conducted on it.
+For further information, refer to AbSeq's python help.
 }
 \section{Slots}{
 

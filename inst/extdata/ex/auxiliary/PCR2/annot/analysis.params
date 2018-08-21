@@ -1,0 +1,38 @@
+AbSeqPy version: 1.1.15
+IMGT version - IMGT database directory last modified time : 2017-08-10 15:11:41
+IgBLAST version: 1.7.0
+pandas version: 0.23.1
+numpy version: 1.14.5
+biopy version: 1.72
+FastQC version: 0.11.6
+Clustalo version: 1.2.3
+Executed AbSeqPy with the following parameters:
+Parameter: f1               	Value: dummy_v/PCR2.fasta
+Parameter: f2               	Value:                 None
+Parameter: chain            	Value:                   hv
+Parameter: clonelimit       	Value:                  inf
+Parameter: qstart           	Value:             [1, inf]
+Parameter: sstart           	Value:           [1.0, 3.0]
+Parameter: bitscore         	Value:         [300.0, inf]
+Parameter: yaml             	Value:                 None
+Parameter: merger           	Value:                 None
+Parameter: fmt              	Value:                fasta
+Parameter: sites            	Value:                 None
+Parameter: primer3end       	Value:                 None
+Parameter: trim3            	Value:                    0
+Parameter: domainSystem     	Value:                 imgt
+Parameter: trim5            	Value:                    0
+Parameter: primer5endoffset 	Value:                    0
+Parameter: threads          	Value:                    1
+Parameter: log              	Value: dummy_value/auxiliary/PCR2/PCR2.log
+Parameter: upstream         	Value:                 None
+Parameter: seqtype          	Value:                  dna
+Parameter: primer5end       	Value:                 None
+Parameter: outdir           	Value: dummy_value/
+Parameter: task             	Value:                  all
+Parameter: name             	Value:                 PCR2
+Parameter: database         	Value:           $IGBLASTDB
+Parameter: actualqstart     	Value:                   -1
+Parameter: fr4cut           	Value:                 True
+Parameter: detailedComposition	Value:                False
+Parameter: alignlen         	Value:         [250.0, inf]

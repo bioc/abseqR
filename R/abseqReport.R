@@ -102,9 +102,18 @@ abseqReport <- function(root, report, compare, BPPARAM) {
     #  ------ sanitize function arguments ---------
     root <- normalizePath(root)
     if (!(all(c(RESULT_DIR, AUX_DIR) %in% list.files(root)))) {
-        stop(paste("Expected to find", RESULT_DIR, "and", AUX_DIR, "in", root,
-                   "but they are missing. This directory should be the output",
-                   "directory as specified in abseqPy. Aborting."))
+        stop(
+            paste(
+                "Expected to find",
+                RESULT_DIR,
+                "and",
+                AUX_DIR,
+                "in",
+                root,
+                "but they are missing. This directory should be the output",
+                "directory as specified in abseqPy. Aborting."
+            )
+        )
     }
     if (missing(report)) {
         report <- 3
@@ -118,20 +127,35 @@ abseqReport <- function(root, report, compare, BPPARAM) {
         compare <- .findRepertoires(file.path(root, RESULT_DIR))
     } else {
         # make sure samples in "compare" actually exists
-        availSamples <- .findRepertoires(file.path(root, RESULT_DIR))
+        availSamples <-
+            .findRepertoires(file.path(root, RESULT_DIR))
         lapply(compare, function(s) {
             user.sample.name <- unlist(lapply(strsplit(s, ","), trimws))
             if (length(user.sample.name) > 1) {
                 lapply(user.sample.name, function(si) {
                     if (!(si %in% availSamples)) {
-                        stop(paste("Sample", si, "in 'compare' argument cannot",
-                                   "be found in", file.path(root, RESULT_DIR)))
+                        stop(
+                            paste(
+                                "Sample",
+                                si,
+                                "in 'compare' argument cannot",
+                                "be found in",
+                                file.path(root, RESULT_DIR)
+                            )
+                        )
                     }
                 })
             } else {
                 if (!(s %in% availSamples)) {
-                    stop(paste("Sample", s, "in 'compare' argument cannot",
-                               "be found in", file.path(root, RESULT_DIR)))
+                    stop(
+                        paste(
+                            "Sample",
+                            s,
+                            "in 'compare' argument cannot",
+                            "be found in",
+                            file.path(root, RESULT_DIR)
+                        )
+                    )
                 }
             }
         })
@@ -167,25 +191,48 @@ abseqReport <- function(root, report, compare, BPPARAM) {
             # is either a <sample>_vs_<sample> format or just <sample> meanwhile,
             # samples will either be a AbSeqCRep or just AbSeqRep.
             if (length(sampleNames) > 1) {
-                outputDir <- file.path(root, RESULT_DIR, paste(sampleNames, collapse = "_vs_"))
-                samples <- Reduce("+", lapply(sampleNames, function(sampleName) {
-                    sample_ <- .loadAbSeqRepFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
-                    # sample@outdir should be the same as root
-                    if (normalizePath(sample_@outdir) != root) {
-                        warning(paste("Sample output directory", sample_@outdir,
-                                      "is different from provided path", root,
-                                      "assuming directory was moved"))
-                        sample_@outdir <- root
-                    }
-                    return(sample_)
-                }))
+                outputDir <-
+                    file.path(root,
+                              RESULT_DIR,
+                              paste(sampleNames, collapse = "_vs_"))
+                samples <-
+                    Reduce("+", lapply(sampleNames, function(sampleName) {
+                        sample_ <-
+                            .loadAbSeqRepFromParams(file.path(
+                                root,
+                                RESULT_DIR,
+                                sampleName,
+                                ANALYSIS_PARAMS
+                            ))
+                        # sample@outdir should be the same as root
+                        if (normalizePath(sample_@outdir) != root) {
+                            warning(
+                                paste(
+                                    "Sample output directory",
+                                    sample_@outdir,
+                                    "is different from provided path",
+                                    root,
+                                    "assuming directory was moved"
+                                )
+                            )
+                            sample_@outdir <- root
+                        }
+                        return(sample_)
+                    }))
             } else {
                 outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
-                samples <- .loadAbSeqRepFromParams(file.path(outputDir, ANALYSIS_PARAMS))
+                samples <-
+                    .loadAbSeqRepFromParams(file.path(outputDir, ANALYSIS_PARAMS))
                 if (normalizePath(samples@outdir) != root) {
-                    warning(paste("Sample output directory", samples@outdir,
-                                  "is different from provided path", root,
-                                  "assuming directory was moved"))
+                    warning(
+                        paste(
+                            "Sample output directory",
+                            samples@outdir,
+                            "is different from provided path",
+                            root,
+                            "assuming directory was moved"
+                        )
+                    )
                     samples@outdir <- root
                 }
             }
@@ -196,7 +243,7 @@ abseqReport <- function(root, report, compare, BPPARAM) {
                            outputDir,
                            report = 1)   # always plot, but DO NOT GENERATE REPORT!
 
-        #})
+            #})
         }, BPPARAM = BPPARAM)
     }
 
@@ -227,19 +274,30 @@ abseqReport <- function(root, report, compare, BPPARAM) {
         sampleNames <- unlist(lapply(strsplit(pair, ","), trimws))
         if (length(sampleNames) == 1) {
             outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
-            samples <- .loadAbSeqRepFromParams(file.path(outputDir, ANALYSIS_PARAMS))
+            samples <-
+                .loadAbSeqRepFromParams(file.path(outputDir, ANALYSIS_PARAMS))
             if (normalizePath(samples@outdir) != root) {
-                warning(paste("Sample output directory", samples@outdir,
-                              "is different from provided path", root,
-                              "assuming directory was moved"))
+                warning(
+                    paste(
+                        "Sample output directory",
+                        samples@outdir,
+                        "is different from provided path",
+                        root,
+                        "assuming directory was moved"
+                    )
+                )
                 samples@outdir <- root
             }
             individualSamples[[samples@name]] <- samples
         } else {
-            outputDir <- file.path(root, RESULT_DIR, paste(sampleNames, collapse = "_vs_"))
+            outputDir <-
+                file.path(root,
+                          RESULT_DIR,
+                          paste(sampleNames, collapse = "_vs_"))
             samples <- Reduce("+",
                               lapply(sampleNames, function(sampleName) {
-                                  tmpsample <- .loadAbSeqRepFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
+                                  tmpsample <-
+                                      .loadAbSeqRepFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
                                   if (normalizePath(tmpsample@outdir) != root) {
                                       tmpsample@outdir <- root
                                   }
@@ -247,10 +305,13 @@ abseqReport <- function(root, report, compare, BPPARAM) {
                               }))
         }
         if (report) {
-            pth <- .generateReport(samples, root = outputDir,
-                                   outputDir = file.path(root, ABSEQ_HTML_DIR, ABSEQ_NESTED_HTML_DIR),
-                                   interactivePlot = interactivePlot,
-                                   .indexHTML = file.path("..", "index.html"))
+            pth <- .generateReport(
+                samples,
+                root = outputDir,
+                outputDir = file.path(root, ABSEQ_HTML_DIR, ABSEQ_NESTED_HTML_DIR),
+                interactivePlot = interactivePlot,
+                .indexHTML = file.path("..", "index.html")
+            )
             if (!is.na(pth)) {
                 individualReports[paste(sampleNames, collapse = "_vs_")] <- pth
             }
@@ -258,8 +319,11 @@ abseqReport <- function(root, report, compare, BPPARAM) {
     }
 
     if (length(individualReports)) {
-        .collateReports(individualReports, individualSamples,
-                        outputDirectory = file.path(root, ABSEQ_HTML_DIR))
+        .collateReports(
+            individualReports,
+            individualSamples,
+            outputDirectory = file.path(root, ABSEQ_HTML_DIR)
+        )
     }
     return(individualSamples)
 }
@@ -278,66 +342,82 @@ abseqReport <- function(root, report, compare, BPPARAM) {
 #' @param outputDirectory string type. Where should the report be placed.
 #'
 #' @return Nothing
-.collateReports <- function(reports, individualSamples, outputDirectory) {
-    message("Collating report into index.html")
+.collateReports <-
+    function(reports,
+             individualSamples,
+             outputDirectory) {
+        message("Collating report into index.html")
 
-    # get relative links for HTML report (instead of absolute paths)
-    relLinks <- lapply(reports, function(pth) {
-        return(file.path(ABSEQ_NESTED_HTML_DIR, basename(pth)))
-    })
+        # get relative links for HTML report (instead of absolute paths)
+        relLinks <- lapply(reports, function(pth) {
+            return(file.path(ABSEQ_NESTED_HTML_DIR, basename(pth)))
+        })
 
-    # define a mask to filter reports based on comparative or single report
-    multiSampleMask <- grepl(".*_vs_.*", names(reports))
+        # define a mask to filter reports based on comparative or single report
+        multiSampleMask <- grepl(".*_vs_.*", names(reports))
 
-    # define rmarkdown params
-    chains <- paste(lapply(individualSamples, function(x) {
-        return(x@chain)
-    }), collapse = ",")
+        # define rmarkdown params
+        chains <- paste(lapply(individualSamples, function(x) {
+            return(x@chain)
+        }), collapse = ",")
 
-    rawReads <- paste(lapply(individualSamples, function(x) {
-        .readSummary(file.path(x@outdir, RESULT_DIR, x@name), ABSEQ_RAW_READ_COUNT_KEY)
-    }), collapse = ",")
+        rawReads <- paste(lapply(individualSamples, function(x) {
+            .readSummary(file.path(x@outdir, RESULT_DIR, x@name),
+                         ABSEQ_RAW_READ_COUNT_KEY)
+        }), collapse = ",")
 
-    annotReads <- paste(lapply(individualSamples, function(x) {
-        .readSummary(file.path(x@outdir, RESULT_DIR, x@name), ABSEQ_ANNOT_READ_COUNT_KEY)
-    }), collapse = ",")
+        annotReads <- paste(lapply(individualSamples, function(x) {
+            .readSummary(file.path(x@outdir, RESULT_DIR, x@name),
+                         ABSEQ_ANNOT_READ_COUNT_KEY)
+        }), collapse = ",")
 
-    filtReads <- paste(lapply(individualSamples, function(x) {
-        .readSummary(file.path(x@outdir, RESULT_DIR, x@name), ABSEQ_FILT_READ_COUNT_KEY)
-    }), collapse = ",")
+        filtReads <- paste(lapply(individualSamples, function(x) {
+            .readSummary(file.path(x@outdir, RESULT_DIR, x@name),
+                         ABSEQ_FILT_READ_COUNT_KEY)
+        }), collapse = ",")
 
-    prodReads <- paste(lapply(individualSamples, function(x) {
-        .readSummary(file.path(x@outdir, RESULT_DIR, x@name), ABSEQ_PROD_READ_COUNT_KEY)
-    }), collapse = ",")
+        prodReads <- paste(lapply(individualSamples, function(x) {
+            .readSummary(file.path(x@outdir, RESULT_DIR, x@name),
+                         ABSEQ_PROD_READ_COUNT_KEY)
+        }), collapse = ",")
 
-    filterSplitter <- "?"
-    filters <- paste(lapply(individualSamples, function(x) {
-        paste(paste0("Bitscore: ", paste(x@bitscore, collapse = " - ")),
-              paste0("V alignment length: ", paste(x@alignlen, collapse = " - ")),
-              paste0("Query start: ", paste(x@qstart, collapse = " - ")),
-              paste0("Subject start: ", paste(x@sstart, collapse = " - ")),
-              sep = ",")
-    }), collapse = filterSplitter)
+        filterSplitter <- "?"
+        filters <- paste(lapply(individualSamples, function(x) {
+            paste(
+                paste0("Bitscore: ", paste(x@bitscore, collapse = " - ")),
+                paste0("V alignment length: ", paste(x@alignlen, collapse = " - ")),
+                paste0("Query start: ", paste(x@qstart, collapse = " - ")),
+                paste0("Subject start: ", paste(x@sstart, collapse = " - ")),
+                sep = ","
+            )
+        }), collapse = filterSplitter)
 
-    templateFile <- system.file("extdata", "index.Rmd", package = "abseqR")
-    renderParams <- list(
-        singleSamples = paste(names(reports)[!multiSampleMask], collapse = ","),
-        multiSamples = paste(names(reports)[multiSampleMask], collapse = ","),
-        singleSampleLinks = paste(relLinks[!multiSampleMask], collapse = ","),
-        multiSampleLinks = paste(relLinks[multiSampleMask], collapse = ","),
-        chains = chains,
-        rawReads = rawReads,
-        filtReads = filtReads,
-        annotReads = annotReads,
-        prodReads = prodReads,
-        filters = filters,
-        filterSplitter = filterSplitter,
-        analysisParams = file.path(individualSamples[[1]]@outdir, RESULT_DIR, individualSamples[[1]]@name, ANALYSIS_PARAMS)
-    )
-    if (rmarkdown::pandoc_available()) {
-        rmarkdown::render(templateFile, output_dir = outputDirectory,
-                          params = renderParams)
-    } else {
-        warning("Pandoc not found in system, will not create index.html")
+        templateFile <-
+            system.file("extdata", "index.Rmd", package = "abseqR")
+        renderParams <- list(
+            singleSamples = paste(names(reports)[!multiSampleMask], collapse = ","),
+            multiSamples = paste(names(reports)[multiSampleMask], collapse = ","),
+            singleSampleLinks = paste(relLinks[!multiSampleMask], collapse = ","),
+            multiSampleLinks = paste(relLinks[multiSampleMask], collapse = ","),
+            chains = chains,
+            rawReads = rawReads,
+            filtReads = filtReads,
+            annotReads = annotReads,
+            prodReads = prodReads,
+            filters = filters,
+            filterSplitter = filterSplitter,
+            analysisParams = file.path(
+                individualSamples[[1]]@outdir,
+                RESULT_DIR,
+                individualSamples[[1]]@name,
+                ANALYSIS_PARAMS
+            )
+        )
+        if (rmarkdown::pandoc_available()) {
+            rmarkdown::render(templateFile,
+                              output_dir = outputDirectory,
+                              params = renderParams)
+        } else {
+            warning("Pandoc not found in system, will not create index.html")
+        }
     }
-}

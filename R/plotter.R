@@ -55,8 +55,9 @@
             if (!file.exists(annotOut)) {
                 dir.create(annotOut)
             }
-            annotDirectories <- sapply(directories, file.path, ABSEQ_DIR_ANNOT,
-                                       USE.NAMES = FALSE)
+            annotDirectories <-
+                sapply(directories, file.path, ABSEQ_DIR_ANNOT,
+                       USE.NAMES = FALSE)
             .annotAnalysis(annotDirectories, annotOut, sampleNames, mashedNames)
         }
 
@@ -73,11 +74,14 @@
             abundanceDirectories <-
                 sapply(directories, file.path, ABSEQ_DIR_ABUN,
                        USE.NAMES = FALSE)
-            .abundanceAnalysis(abundanceDirectories,
-                               abunOut,
-                               sampleNames,
-                               combinedNames,
-                               mashedNames, skipDgene = skipDgene)
+            .abundanceAnalysis(
+                abundanceDirectories,
+                abunOut,
+                sampleNames,
+                combinedNames,
+                mashedNames,
+                skipDgene = skipDgene
+            )
         }
 
         ##################################################
@@ -90,8 +94,9 @@
             if (!file.exists(prodOut)) {
                 dir.create(prodOut)
             }
-            productivityDirectories <- sapply(directories, file.path,
-                                              ABSEQ_DIR_PROD, USE.NAMES = FALSE)
+            productivityDirectories <-
+                sapply(directories, file.path,
+                       ABSEQ_DIR_PROD, USE.NAMES = FALSE)
             .productivityAnalysis(productivityDirectories,
                                   prodOut,
                                   sampleNames,
@@ -124,14 +129,17 @@
         ##################################################
         # pairwise clonotype comparison analyses only occurs when there's
         # > 1 sample
-        if (length(sampleNames) > 1 && ABSEQ_DIR_DIV %in% analysis) {
+        if (length(sampleNames) > 1 &&
+            ABSEQ_DIR_DIV %in% analysis) {
             pairwiseOut <- file.path(outputDir, ABSEQ_DIR_PAIR)
             if (!file.exists(pairwiseOut)) {
                 dir.create(pairwiseOut)
             }
             diversityDirectories <- sapply(directories, file.path,
                                            ABSEQ_DIR_DIV, USE.NAMES = FALSE)
-            .clonotypeAnalysis(diversityDirectories, pairwiseOut, sampleNames,
+            .clonotypeAnalysis(diversityDirectories,
+                               pairwiseOut,
+                               sampleNames,
                                mashedNames)
         }
 
@@ -170,10 +178,17 @@
             if (!file.exists(utr5Out)) {
                 dir.create(utr5Out)
             }
-            utr5Directories <- sapply(directories, file.path, ABSEQ_DIR_5UTR,
-                                      USE.NAMES = FALSE)
-            .UTR5Analysis(utr5Directories, utr5Out, sampleNames, combinedNames,
-                          mashedNames, upstreamRanges)
+            utr5Directories <-
+                sapply(directories, file.path, ABSEQ_DIR_5UTR,
+                       USE.NAMES = FALSE)
+            .UTR5Analysis(
+                utr5Directories,
+                utr5Out,
+                sampleNames,
+                combinedNames,
+                mashedNames,
+                upstreamRanges
+            )
         }
 
         ##################################################
@@ -189,7 +204,13 @@
             secDirectories <-
                 sapply(directories, file.path, ABSEQ_DIR_SEC,
                        USE.NAMES = FALSE)
-            .secretionSignalAnalysis(secDirectories, secOut, sampleNames,
-                                     combinedNames, mashedNames, upstreamRanges)
+            .secretionSignalAnalysis(
+                secDirectories,
+                secOut,
+                sampleNames,
+                combinedNames,
+                mashedNames,
+                upstreamRanges
+            )
         }
     }

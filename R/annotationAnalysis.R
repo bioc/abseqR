@@ -11,9 +11,11 @@
 #' @param .save logical type. Saves ggplot object
 #'
 #' @return none
-.annotAnalysis <- function(annotDirectories, annotOut,
-                          sampleNames, mashedNames, .save = TRUE) {
-
+.annotAnalysis <- function(annotDirectories,
+                           annotOut,
+                           sampleNames,
+                           mashedNames,
+                           .save = TRUE) {
     # with outliers
     searchFiles <-
         .listFilesInOrder(path = annotDirectories,
@@ -31,11 +33,16 @@
         )
         fname <- file.path(annotOut,
                            paste0(mashedNames, "_all_clones_len_dist.png"))
-        ggsave(fname, plot = g, width = V_WIDTH, height = V_HEIGHT)
+        ggsave(fname,
+               plot = g,
+               width = V_WIDTH,
+               height = V_HEIGHT)
         .saveAs(.save, fname, g)
     } else {
-        warning(paste("Cannot find clone length distribution file from samples",
-                      paste(sampleNames, collapse = ", ")))
+        warning(paste(
+            "Cannot find clone length distribution file from samples",
+            paste(sampleNames, collapse = ", ")
+        ))
     }
 
     # without outliers
@@ -56,13 +63,18 @@
         fname <- file.path(annotOut,
                            paste0(mashedNames,
                                   "_all_clones_len_dist_no_outliers.png"))
-        ggsave(fname, plot = g, width = V_WIDTH, height = V_HEIGHT)
+        ggsave(fname,
+               plot = g,
+               width = V_WIDTH,
+               height = V_HEIGHT)
         .saveAs(.save, fname, g)
     } else {
-        warning(paste(
-            "Cannot find clone length (no outliers)",
-            "distribution file from samples",
-            paste(sampleNames, collapse = ", ")
-        ))
+        warning(
+            paste(
+                "Cannot find clone length (no outliers)",
+                "distribution file from samples",
+                paste(sampleNames, collapse = ", ")
+            )
+        )
     }
 }

@@ -16,11 +16,18 @@
 #' False if it's for 5UTR
 #'
 #' @return None
-.upstreamAnalysis <- function(upstreamDirectories, upstreamOut,
-                             expectedLength, upstreamLengthRange, sampleNames,
-                             combinedNames, mashedNames, secsig) {
-
-    fname <-  if (secsig) "secsig" else "5utr"
+.upstreamAnalysis <- function(upstreamDirectories,
+                              upstreamOut,
+                              expectedLength,
+                              upstreamLengthRange,
+                              sampleNames,
+                              combinedNames,
+                              mashedNames,
+                              secsig) {
+    fname <-  if (secsig)
+        "secsig"
+    else
+        "5utr"
 
     message(paste("Starting upstream analysis on", combinedNames))
 
@@ -30,12 +37,20 @@
             statuses <- c("valid", "faulty", "no_atg")
             for (status in statuses) {
                 requestedFiles <-
-                    .listFilesInOrder(path = upstreamDirectories,
-                                      pattern = paste0(".*_", fname, "_",
-                                                       upstreamLengthRange, "_",
-                                                       status,"_", lvl,
-                                                       '\\.csv(\\.gz)?$')
-                )
+                    .listFilesInOrder(
+                        path = upstreamDirectories,
+                        pattern = paste0(
+                            ".*_",
+                            fname,
+                            "_",
+                            upstreamLengthRange,
+                            "_",
+                            status,
+                            "_",
+                            lvl,
+                            '\\.csv(\\.gz)?$'
+                        )
+                    )
                 if (length(requestedFiles) > 0) {
                     if (status == "valid") {
                         if (secsig) {
@@ -50,29 +65,54 @@
                     }
 
                     subtitle <- paste("Total is ",
-                                      paste(lapply(requestedFiles, function(x) {
-                                          as.integer(.getTotal(x))
-                                      }), collapse = ", "))
+                                      paste(
+                                          lapply(requestedFiles, function(x) {
+                                              as.integer(.getTotal(x))
+                                          }),
+                                          collapse = ", "
+                                      ))
 
                     plotVert <- .checkVert(requestedFiles[[1]])
 
-                    g <- .plotDist(lapply(requestedFiles, read.csv, skip = 1),
-                                   sampleNames, title, vert = plotVert,
-                                   subs = subtitle)
+                    g <-
+                        .plotDist(
+                            lapply(requestedFiles, read.csv, skip = 1),
+                            sampleNames,
+                            title,
+                            vert = plotVert,
+                            subs = subtitle
+                        )
                     if (plotVert) {
-                        width <- V_WIDTH;
-                        height <- V_HEIGHT;
+                        width <- V_WIDTH
+
+                        height <- V_HEIGHT
+
                     } else {
-                        width <- H_WIDTH;
-                        height <- H_WIDTH;
+                        width <- H_WIDTH
+
+                        height <- H_WIDTH
+
                     }
-                    ggsave(file.path(upstreamOut,
-                                     paste0(mashedNames, "_", fname, "_",
-                                            upstreamLengthRange, "_", status,
-                                            "_", lvl, ".png")),
-                           plot = g,
-                           width = width,
-                           height = height)
+                    ggsave(
+                        file.path(
+                            upstreamOut,
+                            paste0(
+                                mashedNames,
+                                "_",
+                                fname,
+                                "_",
+                                upstreamLengthRange,
+                                "_",
+                                status,
+                                "_",
+                                lvl,
+                                ".png"
+                            )
+                        ),
+                        plot = g,
+                        width = width,
+                        height = height
+                    )
                 }
             }
         }
@@ -99,91 +139,192 @@
 #' False if it's for 5UTR
 #'
 #' @return None
-.upstreamDist <- function(upstreamDirectories, upstreamOut, expectedLength,
-                         upstreamLengthRange, sampleNames, combinedNames,
-                         mashedNames, secsig) {
+.upstreamDist <-
+    function(upstreamDirectories,
+             upstreamOut,
+             expectedLength,
+             upstreamLengthRange,
+             sampleNames,
+             combinedNames,
+             mashedNames,
+             secsig) {
+        message(paste("Plotting upstream distributions for", combinedNames))
 
-    message(paste("Plotting upstream distributions for", combinedNames))
-
-    fname <-  if (secsig) "secsig" else "5utr"
-    # full lengthed upstream sequences and upstream seqs
-    # that are shorter than the expected length
-    if (!is.infinite(expectedLength)) {
-        lengths <- c("", "_short")
-    } else {
-        # Expected length is Inf
-        lengths <- c("")
-    }
-
-    for (len in lengths) {
-        seqLengthFiles <- .listFilesInOrder(path = upstreamDirectories,
-                                            pattern = paste0(".*_", fname, "_",
-                                                             upstreamLengthRange,
-                                                             "_dist", len,
-                                                             "\\.csv(\\.gz)?$"))
-        if (length(seqLengthFiles) > 0) {
-            g <- .plotSpectratype(lapply(seqLengthFiles, read.csv),
-                                 sampleNames,
-                                 title = "Sequence lengths",
-                                 xlabel = "Sequence Length(bp)",
-                                 ylabel = "Distribution")
-            ggsave(file.path(upstreamOut,
-                             paste0(mashedNames,  "_", fname, "_",
-                                    upstreamLengthRange, "_dist",  len, ".png")),
-                   plot = g, width = V_WIDTH, height = V_HEIGHT)
+        fname <-  if (secsig)
+            "secsig"
+        else
+            "5utr"
+        # full lengthed upstream sequences and upstream seqs
+        # that are shorter than the expected length
+        if (!is.infinite(expectedLength)) {
+            lengths <- c("", "_short")
+        } else {
+            # Expected length is Inf
+            lengths <- c("")
         }
 
-        # class level
-        seqClassLengthFiles <-
-            .listFilesInOrder(path = upstreamDirectories,
-                              pattern = paste0(".*_", fname,
-                                               "_", upstreamLengthRange,
-                                               "_dist", len,
-                                               "_class", "\\.csv(\\.gz)?$"))
-        if (length(seqClassLengthFiles) > 0) {
-            subtitle <- paste("Total is ", paste(lapply(seqClassLengthFiles,
-                                                        function(x) {
-                                                            as.integer(.getTotal(x))
-                                                        }), collapse = ", "))
+        for (len in lengths) {
+            seqLengthFiles <- .listFilesInOrder(
+                path = upstreamDirectories,
+                pattern = paste0(
+                    ".*_",
+                    fname,
+                    "_",
+                    upstreamLengthRange,
+                    "_dist",
+                    len,
+                    "\\.csv(\\.gz)?$"
+                )
+            )
+            if (length(seqLengthFiles) > 0) {
+                g <- .plotSpectratype(
+                    lapply(seqLengthFiles, read.csv),
+                    sampleNames,
+                    title = "Sequence lengths",
+                    xlabel = "Sequence Length(bp)",
+                    ylabel = "Distribution"
+                )
+                ggsave(
+                    file.path(
+                        upstreamOut,
+                        paste0(
+                            mashedNames,
+                            "_",
+                            fname,
+                            "_",
+                            upstreamLengthRange,
+                            "_dist",
+                            len,
+                            ".png"
+                        )
+                    ),
+                    plot = g,
+                    width = V_WIDTH,
+                    height = V_HEIGHT
+                )
+            }
 
-            plotVert <- .checkVert(seqClassLengthFiles[[1]])
+            # class level
+            seqClassLengthFiles <-
+                .listFilesInOrder(
+                    path = upstreamDirectories,
+                    pattern = paste0(
+                        ".*_",
+                        fname,
+                        "_",
+                        upstreamLengthRange,
+                        "_dist",
+                        len,
+                        "_class",
+                        "\\.csv(\\.gz)?$"
+                    )
+                )
+            if (length(seqClassLengthFiles) > 0) {
+                subtitle <- paste("Total is ", paste(
+                    lapply(seqClassLengthFiles,
+                           function(x) {
+                               as.integer(.getTotal(x))
+                           }),
+                    collapse = ", "
+                ))
 
-            g <- .plotDist(lapply(seqClassLengthFiles, read.csv, skip = 1),
-                          sampleNames,
-                          paste("IGV Abundance in Sample", combinedNames),
-                          plotVert,
-                          subs = subtitle)
+                plotVert <- .checkVert(seqClassLengthFiles[[1]])
 
-            if (plotVert) {
-                ggsave(file.path(upstreamOut, paste0(mashedNames , "_", fname, "_", upstreamLengthRange, "_dist", len, "_class",".png")),
-                       plot = g,
-                       width = V_WIDTH, height = V_HEIGHT)
-            } else {
-                ggsave(file.path(upstreamOut,
-                              paste0(mashedNames,"_", fname, "_",
-                                     upstreamLengthRange,
-                                     "_dist", len, "_class", ".png")),
-                       plot = g, width = H_WIDTH, height = H_HEIGHT)
+                g <-
+                    .plotDist(
+                        lapply(seqClassLengthFiles, read.csv, skip = 1),
+                        sampleNames,
+                        paste("IGV Abundance in Sample", combinedNames),
+                        plotVert,
+                        subs = subtitle
+                    )
+
+                if (plotVert) {
+                    ggsave(
+                        file.path(
+                            upstreamOut,
+                            paste0(
+                                mashedNames ,
+                                "_",
+                                fname,
+                                "_",
+                                upstreamLengthRange,
+                                "_dist",
+                                len,
+                                "_class",
+                                ".png"
+                            )
+                        ),
+                        plot = g,
+                        width = V_WIDTH,
+                        height = V_HEIGHT
+                    )
+                } else {
+                    ggsave(
+                        file.path(
+                            upstreamOut,
+                            paste0(
+                                mashedNames,
+                                "_",
+                                fname,
+                                "_",
+                                upstreamLengthRange,
+                                "_dist",
+                                len,
+                                "_class",
+                                ".png"
+                            )
+                        ),
+                        plot = g,
+                        width = H_WIDTH,
+                        height = H_HEIGHT
+                    )
+                }
+            }
+
+            # box plot for class level
+            seqClassLengthBoxFiles <-
+                .listFilesInOrder(
+                    path = upstreamDirectories,
+                    pattern = paste0(
+                        ".*_",
+                        fname,
+                        "_",
+                        upstreamLengthRange,
+                        "_dist",
+                        len,
+                        "_class",
+                        "_box\\.csv(\\.gz)?$"
+                    )
+                )
+            if (length(seqClassLengthBoxFiles) > 0) {
+                g <- .boxPlot(
+                    lapply(seqClassLengthBoxFiles, read.csv),
+                    sampleNames,
+                    paste("Sequence Lengths in", combinedNames)
+                )
+                ggsave(
+                    file.path(
+                        upstreamOut,
+                        paste0(
+                            mashedNames,
+                            "_",
+                            fname,
+                            "_",
+                            upstreamLengthRange,
+                            "_dist",
+                            len,
+                            "_class",
+                            "_box.png"
+                        )
+                    ),
+                    plot = g,
+                    width = V_WIDTH,
+                    height = V_HEIGHT
+                )
             }
         }
-
-        # box plot for class level
-        seqClassLengthBoxFiles <-
-            .listFilesInOrder(path = upstreamDirectories,
-                              pattern = paste0(".*_", fname, "_",
-                                               upstreamLengthRange, "_dist",
-                                               len, "_class", "_box\\.csv(\\.gz)?$"))
-        if (length(seqClassLengthBoxFiles) > 0) {
-            g <- .boxPlot(lapply(seqClassLengthBoxFiles, read.csv),
-                          sampleNames, paste("Sequence Lengths in", combinedNames))
-            ggsave(file.path(upstreamOut,
-                          paste0(mashedNames,"_", fname, "_",
-                                 upstreamLengthRange, "_dist",
-                                 len, "_class", "_box.png")),
-                   plot = g, width = V_WIDTH, height = V_HEIGHT)
-        }
     }
-}
 
 
 
@@ -199,19 +340,30 @@
 #' upstream ranges that are present in ALL samples. (i.e the intersection)
 #'
 #' @return none
-.UTR5Analysis <- function(utr5Directories, utr5Out, sampleNames,
-                          combinedNames, mashedNames, upstreamRanges) {
+.UTR5Analysis <- function(utr5Directories,
+                          utr5Out,
+                          sampleNames,
+                          combinedNames,
+                          mashedNames,
+                          upstreamRanges) {
     message(paste("Starting 5'UTR analysis on samples", combinedNames))
     upstreamRange <- unique(upstreamRanges)
-    if (length(upstreamRange) == 1 && is.numeric(upstreamRange[[1]])) {
+    if (length(upstreamRange) == 1 &&
+        is.numeric(upstreamRange[[1]])) {
         upRange <- upstreamRange[[1]]
         START <- 1
         END <- 2
         if (length(upRange) != 2) {
-            stop(paste("Expected range to only have start and stop values, but got",
-                       upRange, "instead"))
+            stop(
+                paste(
+                    "Expected range to only have start and stop values, but got",
+                    upRange,
+                    "instead"
+                )
+            )
         }
-        expectedLength <- as.numeric(upRange[END]) - as.numeric(upRange[START]) + 1
+        expectedLength <-
+            as.numeric(upRange[END]) - as.numeric(upRange[START]) + 1
         if (is.infinite(expectedLength)) {
             upRangeString <- paste0(upRange[START], "_", "inf")
         } else {
@@ -239,9 +391,15 @@
             FALSE
         )
     } else if (length(upstreamRange) > 1) {
-        warning(paste("Found multiple different upstream ranges for samples",
-                      combinedNames, ":", upstreamRange,
-                      "Will not plot comparisons."))
+        warning(
+            paste(
+                "Found multiple different upstream ranges for samples",
+                combinedNames,
+                ":",
+                upstreamRange,
+                "Will not plot comparisons."
+            )
+        )
     } else {
         warning(paste("UpstreamRange is not numeric for sample", combinedNames))
     }
@@ -262,64 +420,83 @@
 #' upstream ranges that are present in ALL samples. (i.e. the intersection)
 #'
 #' @return none
-.secretionSignalAnalysis <- function(secDirectories, secOut, sampleNames,
-                                     combinedNames, mashedNames,
-                                     upstreamRanges) {
-    message(paste("Starting secretion signal analysis on samples",
-                  combinedNames))
-    upstreamRange <- unique(upstreamRanges)
-    if (length(upstreamRange) == 1 && is.numeric(upstreamRange[[1]])) {
-        upRange <- upstreamRange[[1]]
-        START <- 1
-        END <- 2
-        if (length(upRange) != 2) {
-            stop(paste("Expected range to only have start and stop values, but got",
-                       upRange, "instead"))
-        }
-        expectedLength <- as.numeric(upRange[END]) - as.numeric(upRange[START]) + 1
-        if (is.infinite(expectedLength)) {
-            upRangeString <- paste0(upRange[START], "_", "inf")
-        } else {
-            upRangeString <- paste0(expectedLength, "_", expectedLength)
-            upRangeTrimmedString <- paste0("1_", expectedLength - 1)
-        }
-        .upstreamDist(
-            secDirectories,
-            secOut,
-            expectedLength,
-            paste0(upRange[START], "_", upRange[END]),
-            sampleNames,
-            combinedNames,
-            mashedNames,
-            TRUE
-        )
-        .upstreamAnalysis(
-            secDirectories,
-            secOut,
-            expectedLength,
-            upRangeString,
-            sampleNames,
-            combinedNames,
-            mashedNames,
-            TRUE
-        )
-        if (!is.infinite(expectedLength)) {
-            .upstreamAnalysis(
+.secretionSignalAnalysis <-
+    function(secDirectories,
+             secOut,
+             sampleNames,
+             combinedNames,
+             mashedNames,
+             upstreamRanges) {
+        message(paste(
+            "Starting secretion signal analysis on samples",
+            combinedNames
+        ))
+        upstreamRange <- unique(upstreamRanges)
+        if (length(upstreamRange) == 1 &&
+            is.numeric(upstreamRange[[1]])) {
+            upRange <- upstreamRange[[1]]
+            START <- 1
+            END <- 2
+            if (length(upRange) != 2) {
+                stop(
+                    paste(
+                        "Expected range to only have start and stop values, but got",
+                        upRange,
+                        "instead"
+                    )
+                )
+            }
+            expectedLength <-
+                as.numeric(upRange[END]) - as.numeric(upRange[START]) + 1
+            if (is.infinite(expectedLength)) {
+                upRangeString <- paste0(upRange[START], "_", "inf")
+            } else {
+                upRangeString <- paste0(expectedLength, "_", expectedLength)
+                upRangeTrimmedString <- paste0("1_", expectedLength - 1)
+            }
+            .upstreamDist(
                 secDirectories,
                 secOut,
                 expectedLength,
-                upRangeTrimmedString,
+                paste0(upRange[START], "_", upRange[END]),
                 sampleNames,
                 combinedNames,
                 mashedNames,
                 TRUE
             )
+            .upstreamAnalysis(
+                secDirectories,
+                secOut,
+                expectedLength,
+                upRangeString,
+                sampleNames,
+                combinedNames,
+                mashedNames,
+                TRUE
+            )
+            if (!is.infinite(expectedLength)) {
+                .upstreamAnalysis(
+                    secDirectories,
+                    secOut,
+                    expectedLength,
+                    upRangeTrimmedString,
+                    sampleNames,
+                    combinedNames,
+                    mashedNames,
+                    TRUE
+                )
+            }
+        } else if (length(upstreamRange) > 1) {
+            warning(
+                paste(
+                    "Found multiple different upstream ranges for samples",
+                    combinedNames,
+                    ":",
+                    upstreamRange,
+                    "Will not plot comparisons."
+                )
+            )
+        } else {
+            warning(paste("UpstreamRange is not numeric for sample", combinedNames))
         }
-    } else if (length(upstreamRange) > 1) {
-        warning(paste("Found multiple different upstream ranges for samples",
-                      combinedNames, ":", upstreamRange,
-                      "Will not plot comparisons."))
-    } else {
-        warning(paste("UpstreamRange is not numeric for sample", combinedNames))
     }
-}

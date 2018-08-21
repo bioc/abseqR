@@ -1,0 +1,4 @@
+RawReads:700
+AnnotatedReads:700
+FilteredReads:700
+ProductiveReads:316

@@ -29,10 +29,6 @@ ABSEQ_NESTED_HTML_DIR <- "html_files"
 # parameter file from AbSeq's run
 ANALYSIS_PARAMS <- "analysis.params"
 
-# sample comparison configuration file - only used in AbSeqR (to know what
-# samples must be compared against each other when abseqReport() is called)
-ABSEQ_CFG <- "abseq.cfg"
-
 # AbSeq's summary file about the repertoire - raw/annot/prod counts
 ABSEQ_SUMMARY <- "summary.txt"
 
@@ -76,14 +72,25 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
     # Returns: ordered vector of files (according to provided path's ordering)
     orderedFiles <- c()
     for (p in path) {
-        retval <- list.files(path = p, pattern = pattern,
-                             full.names = TRUE, recursive = TRUE)
+        retval <- list.files(
+            path = p,
+            pattern = pattern,
+            full.names = TRUE,
+            recursive = TRUE
+        )
         if (length(retval) == 0) {
             return(c())
         }
         if (!(length(retval) %in% expectedRet)) {
-            stop(paste("Expected either", paste(expectedRet, collapse = ", ")),
-                 "files to be found, but only", length(retval), "were found.")
+            stop(
+                paste(
+                    "Expected either",
+                    paste(expectedRet, collapse = ", ")
+                ),
+                "files to be found, but only",
+                length(retval),
+                "were found."
+            )
         }
         orderedFiles <- c(orderedFiles,  retval)
     }
@@ -121,39 +128,51 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
 #' @import plyr stats
 #'
 #' @return dataframe
-.summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
-                      conf.interval=.95, .drop=TRUE) {
-    # New version of length which can handle NA's: if na.rm==T, don't count them
-    length2 <- function (x, na.rm = FALSE) {
-        if (na.rm) sum(!is.na(x))
-        else       length(x)
+.summarySE <-
+    function(data = NULL,
+             measurevar,
+             groupvars = NULL,
+             na.rm = FALSE,
+             conf.interval = .95,
+             .drop = TRUE) {
+        # New version of length which can handle NA's: if na.rm==T, don't count them
+        length2 <- function (x, na.rm = FALSE) {
+            if (na.rm)
+                sum(!is.na(x))
+            else
+                length(x)
+        }
+
+        # This does the summary. For each group's data frame, return a vector with
+        # N, mean, and sd
+        datac <- ddply(
+            data,
+            groupvars,
+            .drop = .drop,
+            .fun = function(xx, col) {
+                c(
+                    N    = length2(xx[[col]], na.rm = na.rm),
+                    mean = mean   (xx[[col]], na.rm = na.rm),
+                    sd   = sd     (xx[[col]], na.rm = na.rm)
+                )
+            },
+            measurevar
+        )
+
+        # Rename the "mean" column
+        datac <- rename(datac, c("mean" = measurevar))
+
+        datac$se <-
+            datac$sd / sqrt(datac$N)  # Calculate standard error of the mean
+
+        # Confidence interval multiplier for standard error
+        # Calculate t-statistic for confidence interval:
+        # e.g., if conf.interval is .95, use .975 (above/below), and use df=N-1
+        ciMult <- qt(conf.interval / 2 + .5, datac$N - 1)
+        datac$ci <- datac$se * ciMult
+
+        return(datac)
     }
-
-    # This does the summary. For each group's data frame, return a vector with
-    # N, mean, and sd
-    datac <- ddply(data, groupvars, .drop=.drop,
-                   .fun = function(xx, col) {
-                       c(N    = length2(xx[[col]], na.rm=na.rm),
-                         mean = mean   (xx[[col]], na.rm=na.rm),
-                         sd   = sd     (xx[[col]], na.rm=na.rm)
-                       )
-                   },
-                   measurevar
-    )
-
-    # Rename the "mean" column
-    datac <- rename(datac, c("mean" = measurevar))
-
-    datac$se <- datac$sd / sqrt(datac$N)  # Calculate standard error of the mean
-
-    # Confidence interval multiplier for standard error
-    # Calculate t-statistic for confidence interval:
-    # e.g., if conf.interval is .95, use .975 (above/below), and use df=N-1
-    ciMult <- qt(conf.interval/2 + .5, datac$N-1)
-    datac$ci <- datac$se * ciMult
-
-    return(datac)
-}
 
 .getLineTypes <- function(regions) {
     if (length(regions) > 6) {
@@ -161,9 +180,16 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
     }
     regions <- unlist(lapply(regions, toupper))
     # order of importance: min -> max
-    lvls <- c("FR4", "FR1", "FR2", "FR3", "CDR1", "CDR2", "CDR3", "V")
+    lvls <-
+        c("FR4", "FR1", "FR2", "FR3", "CDR1", "CDR2", "CDR3", "V")
     # order of importance: max -> min
-    lines <- c("solid", "twodash", "dotted", "dotdash", "longdash", "dashed")
+    lines <-
+        c("solid",
+          "twodash",
+          "dotted",
+          "dotdash",
+          "longdash",
+          "dashed")
 
     factorRegions <- factor(regions, levels = lvls)
     return(lines[order(factorRegions, decreasing = TRUE)])
@@ -227,15 +253,16 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
 #' @param fixed logical type
 #'
 #' @return None
-.substituteStringInFile <- function(filename, key, value, fixed = FALSE) {
-    con <- file(filename, "r")
-    lines <- readLines(con)
-    close(con)
-    lines <- sub(key, value, lines, fixed = fixed)
-    con <- file(filename, "w")
-    cat(lines, file = con, sep = "\n")
-    close(con)
-}
+.substituteStringInFile <-
+    function(filename, key, value, fixed = FALSE) {
+        con <- file(filename, "r")
+        lines <- readLines(con)
+        close(con)
+        lines <- sub(key, value, lines, fixed = fixed)
+        con <- file(filename, "w")
+        cat(lines, file = con, sep = "\n")
+        close(con)
+    }
 
 
 #' Creates and returns an empty plot
@@ -290,24 +317,30 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
 #' @return a symmetric matrix with rownames(mat) == colnames(mat)
 #' The diagonal values are filled with diag if the dataframe itself doesn't have
 #' diagonal data
-.loadMatrixFromDF <- function(dataframe, value.var, diag, unidirectional = TRUE) {
-    if (unidirectional) {
-        # swap the columns "from" and "to", while the others remain the same
-        df.r <- dataframe[, c(2, 1, tail(seq_along(names(dataframe)), -2))]
-        # rename the columns (after swapping, it's to - from, need it to be from - to)
-        names(df.r) <- names(dataframe)
-        # rowbind the dataframes into one
-        df.f <- rbind(dataframe, df.r)
-    } else {
-        # bidirectional dataframe doesn't require mirror-ing
-        df.f <- dataframe
+.loadMatrixFromDF <-
+    function(dataframe,
+             value.var,
+             diag,
+             unidirectional = TRUE) {
+        if (unidirectional) {
+            # swap the columns "from" and "to", while the others remain the same
+            df.r <-
+                dataframe[, c(2, 1, tail(seq_along(names(dataframe)), -2))]
+            # rename the columns (after swapping, it's to - from, need it to be from - to)
+            names(df.r) <- names(dataframe)
+            # rowbind the dataframes into one
+            df.f <- rbind(dataframe, df.r)
+        } else {
+            # bidirectional dataframe doesn't require mirror-ing
+            df.f <- dataframe
+        }
+        mat <-
+            reshape2::acast(df.f, from ~ to, value.var = value.var, fill = diag)
+        # make sure the matrix is symmetric
+        mat <- mat[, rownames(mat)]
+        stopifnot(isSymmetric(mat))
+        mat
     }
-    mat <- reshape2::acast(df.f, from ~ to, value.var = value.var, fill = diag)
-    # make sure the matrix is symmetric
-    mat <- mat[, rownames(mat)]
-    stopifnot(isSymmetric(mat))
-    mat
-}
 
 
 #' Given a directory = <abseqPy_outputdir>/RESULT_DIR/, returns the directories (repositories) in
@@ -326,8 +359,10 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
     # given a directory (d), return True if d is a repository
     .isRepo <- function(d) {
         hasLog <- length(list.files(pattern = ".*\\.log$", path = d)) == 1
-        return(all(c("analysis.params", "summary.txt") %in% list.files(d))
-               && hasLog)
+        return(all(
+            c("analysis.params", "summary.txt") %in% list.files(d)
+        )
+        && hasLog)
     }
     sapply(Filter(.isRepo, repos), basename, USE.NAMES = FALSE)
 }

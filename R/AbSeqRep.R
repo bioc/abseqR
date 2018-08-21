@@ -2,8 +2,9 @@
 #'
 #' @import methods
 #'
-#' @description The AbSeqRep object contains all metadata associated with the AbSeq (python backend)
-#' run conducted on it. For further information, refer to AbSeq's python help.
+#' @description The AbSeqRep object contains all metadata associated with
+#' the AbSeq (python backend) #' run conducted on it.
+#' For further information, refer to AbSeq's python help.
 #'
 #' @slot f1 character. Path to FASTA/FASTQ file 1.
 #' @slot f2 character. Path to FASTA/FASTQ file 2.
@@ -84,36 +85,39 @@
 #'
 #' # gives the name of the first repertoire object returned by abseqReport
 #' # samples[[1]]@name
-AbSeqRep <- setClass("AbSeqRep", slots = c(
-    f1 = "character",
-    f2 = "character",
-    chain = "character",
-    task = "character",
-    name = "character",
-    bitscore = "numeric",
-    qstart = "numeric",
-    sstart = "numeric",
-    alignlen = "numeric",
-    clonelimit = "numeric",
-    detailedComposition = "logical",
-    log = "character",
-    merger = "character",
-    fmt = "character",
-    sites = "character",
-    primer5end = "ANY",
-    primer3end = "ANY",
-    trim5 = "numeric",
-    trim3 = "numeric",
-    outdir = "character",
-    primer5endoffset = "numeric",
-    threads = "numeric",
-    upstream = "ANY",
-    seqtype = "character",
-    database = "character",
-    actualqstart = "numeric",
-    fr4cut = "logical",
-    domainSystem = "character"
-))
+AbSeqRep <- setClass(
+    "AbSeqRep",
+    slots = c(
+        f1 = "character",
+        f2 = "character",
+        chain = "character",
+        task = "character",
+        name = "character",
+        bitscore = "numeric",
+        qstart = "numeric",
+        sstart = "numeric",
+        alignlen = "numeric",
+        clonelimit = "numeric",
+        detailedComposition = "logical",
+        log = "character",
+        merger = "character",
+        fmt = "character",
+        sites = "character",
+        primer5end = "ANY",
+        primer3end = "ANY",
+        trim5 = "numeric",
+        trim3 = "numeric",
+        outdir = "character",
+        primer5endoffset = "numeric",
+        threads = "numeric",
+        upstream = "ANY",
+        seqtype = "character",
+        database = "character",
+        actualqstart = "numeric",
+        fr4cut = "logical",
+        domainSystem = "character"
+    )
+)
 
 
 .loadAbSeqRepFromParams <- function(analysisParams) {
@@ -141,7 +145,8 @@ AbSeqRep <- setClass("AbSeqRep", slots = c(
                     # value = [start, end]
                     newValue <- gsub("\\[|\\]", "", value)
                     # to -> c(start, end)
-                    params[[parameter]] <- as.numeric(unlist(strsplit(newValue, ",")))
+                    params[[parameter]] <-
+                        as.numeric(unlist(strsplit(newValue, ",")))
                 } else {
                     params[[parameter]] <- value
                 }
@@ -322,134 +327,170 @@ setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqCRep"), function(e1, e2) {
 #'
 #' # generate plots, and an interactive report
 #' # report(pcr12, "PCR1_vs_PCR2", report = 3)   # this is the default
-setGeneric(name = "report",
-           def = function(object, outputDir, report = 3) {
-               standardGeneric("report")
-           })
+setGeneric(
+    name = "report",
+    def = function(object, outputDir, report = 3) {
+        standardGeneric("report")
+    }
+)
 
 
 
 #' @rdname report
-setMethod(f = "report",
-          signature = "AbSeqRep",
-          definition = function(object, outputDir, report = 3) {
-              skip <- FALSE
-              stopifnot(report %in% c(0, 1, 2, 3))
-              if (report == 0) {
-                  report <- FALSE
-                  interactivePlot <- FALSE
-                  skip <- TRUE
-              } else if (report == 1) {
-                  report <- FALSE
-                  interactivePlot <- FALSE
-              } else if (report == 2) {
-                  report <- TRUE
-                  interactivePlot <- FALSE
-              } else {
-                  report <- TRUE
-                  interactivePlot <- TRUE
-              }
+setMethod(
+    f = "report",
+    signature = "AbSeqRep",
+    definition = function(object, outputDir, report = 3) {
+        skip <- FALSE
+        stopifnot(report %in% c(0, 1, 2, 3))
+        if (report == 0) {
+            report <- FALSE
+            interactivePlot <- FALSE
+            skip <- TRUE
+        } else if (report == 1) {
+            report <- FALSE
+            interactivePlot <- FALSE
+        } else if (report == 2) {
+            report <- TRUE
+            interactivePlot <- FALSE
+        } else {
+            report <- TRUE
+            interactivePlot <- TRUE
+        }
 
-              if (!skip) {
-                  analysisDirectories = c(file.path(object@outdir,
-                                                    RESULT_DIR, object@name))
-                  # get analysis that were conducted by looking at the directory
-                  # structure - is this the best way?
-                  analyses <- unlist(.inferAnalyzed(analysisDirectories[1]))
-                  sampleNames <- c(object@name)
-                  primer5Files <- list(object@primer5end)
-                  primer3Files <- list(object@primer3end)
-                  upstreamRanges <- list(object@upstream)
+        if (!skip) {
+            analysisDirectories = c(file.path(object@outdir,
+                                              RESULT_DIR, object@name))
+            # get analysis that were conducted by looking at the directory
+            # structure - is this the best way?
+            analyses <-
+                unlist(.inferAnalyzed(analysisDirectories[1]))
+            sampleNames <- c(object@name)
+            primer5Files <- list(object@primer5end)
+            primer3Files <- list(object@primer3end)
+            upstreamRanges <- list(object@upstream)
 
-                  .plotSamples(sampleNames, analysisDirectories, analyses, outputDir,
-                               primer5Files, primer3Files, upstreamRanges,
-                               skipDgene = (object@chain != "hv"))
+            .plotSamples(
+                sampleNames,
+                analysisDirectories,
+                analyses,
+                outputDir,
+                primer5Files,
+                primer3Files,
+                upstreamRanges,
+                skipDgene = (object@chain != "hv")
+            )
 
-                  if (report) {
-                      .generateReport(object, root = outputDir,
-                                      outputDir = outputDir,
-                                      interactivePlot = interactivePlot)
-                  }
-              }
+            if (report) {
+                .generateReport(
+                    object,
+                    root = outputDir,
+                    outputDir = outputDir,
+                    interactivePlot = interactivePlot
+                )
+            }
+        }
 
-              # this is dumb, but at least it's consistent with the
-              # API behaviour of abseqR::abseqReport()
-              lst <- list()
-              lst[[object@name]] <- object
-              return(lst)
-          })
+        # this is dumb, but at least it's consistent with the
+        # API behaviour of abseqR::abseqReport()
+        lst <- list()
+        lst[[object@name]] <- object
+        return(lst)
+    }
+)
 
 #' @rdname report
-setMethod(f = "report",
-          signature = "AbSeqCRep",
-          definition = function(object, outputDir, report = 3) {
-              stopifnot(report %in% c(0, 1, 2, 3))
-              skip <- FALSE
-              if (report == 0) {
-                  report <- FALSE
-                  interactivePlot <- FALSE
-                  skip <- TRUE
-              } else if (report == 1) {
-                  report <- FALSE
-                  interactivePlot <- FALSE
-              } else if (report == 2) {
-                  report <- TRUE
-                  interactivePlot <- FALSE
-              } else {
-                  report <- TRUE
-                  interactivePlot <- TRUE
-              }
+setMethod(
+    f = "report",
+    signature = "AbSeqCRep",
+    definition = function(object, outputDir, report = 3) {
+        stopifnot(report %in% c(0, 1, 2, 3))
+        skip <- FALSE
+        if (report == 0) {
+            report <- FALSE
+            interactivePlot <- FALSE
+            skip <- TRUE
+        } else if (report == 1) {
+            report <- FALSE
+            interactivePlot <- FALSE
+        } else if (report == 2) {
+            report <- TRUE
+            interactivePlot <- FALSE
+        } else {
+            report <- TRUE
+            interactivePlot <- TRUE
+        }
 
-              sampleNames <- unlist(lapply(object@repertoires, function(x) {
-                  x@name
-              }))
+        sampleNames <-
+            unlist(lapply(object@repertoires, function(x) {
+                x@name
+            }))
 
-              if (!skip) {
-                  analysisDirectories = unlist(lapply(object@repertoires, function(x) {
-                      # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
-                      file.path(x@outdir, RESULT_DIR, x@name)
-                  }))
+        if (!skip) {
+            analysisDirectories = unlist(lapply(object@repertoires, function(x) {
+                # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
+                file.path(x@outdir, RESULT_DIR, x@name)
+            }))
 
-                  # get all analyses conducted by each repertoire by looking
-                  # at the directory structure created by abseqPy
-                  analysesConducted <- lapply(analysisDirectories, .inferAnalyzed)
+            # get all analyses conducted by each repertoire by looking
+            # at the directory structure created by abseqPy
+            analysesConducted <-
+                lapply(analysisDirectories, .inferAnalyzed)
 
-                  # find the intersection of all analysis, because it makes no
-                  # sense to compare samples if they don't have the same analysis
-                  similarAnalyses <- unlist(Reduce(intersect, analysesConducted))
+            # find the intersection of all analysis, because it makes no
+            # sense to compare samples if they don't have the same analysis
+            similarAnalyses <-
+                unlist(Reduce(intersect, analysesConducted))
 
 
-                  primer5Files <- unlist(lapply(object@repertoires, function(x) {
-                      x@primer5end
-                  }))
-                  primer3Files <- unlist(lapply(object@repertoires, function(x) {
-                      x@primer3end
-                  }))
+            primer5Files <-
+                unlist(lapply(object@repertoires, function(x) {
+                    x@primer5end
+                }))
+            primer3Files <-
+                unlist(lapply(object@repertoires, function(x) {
+                    x@primer3end
+                }))
 
-                  upstreamRanges <- lapply(object@repertoires,
-                                           function(x) {
-                                               x@upstream
-                                           })
+            upstreamRanges <- lapply(object@repertoires,
+                                     function(x) {
+                                         x@upstream
+                                     })
 
-                  allChains <- lapply(object@repertoires, function(x) { x@chain })
-                  # only include D gene plots if all chains only contain "hv"
-                  skipD <- (("kv" %in% allChains) || ("lv" %in% allChains))
+            allChains <-
+                lapply(object@repertoires, function(x) {
+                    x@chain
+                })
+            # only include D gene plots if all chains only contain "hv"
+            skipD <-
+                (("kv" %in% allChains) || ("lv" %in% allChains))
 
-                  .plotSamples(sampleNames, analysisDirectories, similarAnalyses,
-                               outputDir, primer5Files, primer3Files, upstreamRanges,
-                               skipDgene = skipD)
+            .plotSamples(
+                sampleNames,
+                analysisDirectories,
+                similarAnalyses,
+                outputDir,
+                primer5Files,
+                primer3Files,
+                upstreamRanges,
+                skipDgene = skipD
+            )
 
-                  if (report) {
-                      .generateReport(object, root = outputDir,
-                                      outputDir = outputDir,
-                                      interactivePlot = interactivePlot)
-                  }
-              }
+            if (report) {
+                .generateReport(
+                    object,
+                    root = outputDir,
+                    outputDir = outputDir,
+                    interactivePlot = interactivePlot
+                )
+            }
+        }
 
-              lst <- object@repertoires
-              names(lst) <- sampleNames
-              return(lst)
-          })
+        lst <- object@repertoires
+        names(lst) <- sampleNames
+        return(lst)
+    }
+)
 
 
 #' Title
@@ -465,162 +506,217 @@ setMethod(f = "report",
 #' This is typically used to redirect users back to index.html page
 #'
 #' @return path (including HTML name) where the report (HTML file) was saved to
-setGeneric(name = ".generateReport",
-           def = function(object, root, outputDir, interactivePlot = TRUE, .indexHTML = "#") {
-               standardGeneric(".generateReport")
-           })
+setGeneric(
+    name = ".generateReport",
+    def = function(object,
+                   root,
+                   outputDir,
+                   interactivePlot = TRUE,
+                   .indexHTML = "#") {
+        standardGeneric(".generateReport")
+    }
+)
 
-setMethod(f = ".generateReport",
-          signature = "AbSeqCRep",
-          definition = function(object, root, outputDir, interactivePlot = TRUE, .indexHTML = "#") {
-              if (rmarkdown::pandoc_available()) {
-                  analysisDirectories = unlist(lapply(object@repertoires, function(x) {
-                      # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
-                      file.path(x@outdir, RESULT_DIR, x@name)
-                  }))
-                  sampleNames <- unlist(lapply(object@repertoires, function(x) {
-                      x@name
-                  }))
-                  message(paste("Generating HTML report for", paste(sampleNames, collapse = "_vs_")))
+setMethod(
+    f = ".generateReport",
+    signature = "AbSeqCRep",
+    definition = function(object,
+                          root,
+                          outputDir,
+                          interactivePlot = TRUE,
+                          .indexHTML = "#") {
+        if (rmarkdown::pandoc_available()) {
+            analysisDirectories = unlist(lapply(object@repertoires, function(x) {
+                # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
+                file.path(x@outdir, RESULT_DIR, x@name)
+            }))
+            sampleNames <-
+                unlist(lapply(object@repertoires, function(x) {
+                    x@name
+                }))
+            message(paste(
+                "Generating HTML report for",
+                paste(sampleNames, collapse = "_vs_")
+            ))
 
-                  # get all analyses conducted by each repertoire by looking
-                  # at the directory structure created by abseqPy
-                  analysesConducted <- lapply(analysisDirectories, .inferAnalyzed)
+            # get all analyses conducted by each repertoire by looking
+            # at the directory structure created by abseqPy
+            analysesConducted <-
+                lapply(analysisDirectories, .inferAnalyzed)
 
-                  # find the intersection of all analysis, because it makes no
-                  # sense to compare samples if they don't have the same analysis
-                  similarAnalyses <- unlist(Reduce(intersect, analysesConducted))
+            # find the intersection of all analysis, because it makes no
+            # sense to compare samples if they don't have the same analysis
+            similarAnalyses <-
+                unlist(Reduce(intersect, analysesConducted))
 
-                  # define variables for template.Rmd's param list
-                  allChains <- lapply(object@repertoires, function(x) {
-                      x@chain
-                  })
-                  # only include D gene plots if all chains only contain "hv"
-                  includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
-
-
-                  # template.Rmd param list
-                  bitFilters <- lapply(object@repertoires, function(x) {
-                      paste(x@bitscore, collapse = " - ")
-                  })
-                  alFilters <- lapply(object@repertoires, function(x) {
-                      paste(x@alignlen, collapse = " - ")
-                  })
-                  ssFilters <- lapply(object@repertoires, function(x) {
-                      paste(x@sstart, collapse = " - ")
-                  })
-                  qsFilters <- lapply(object@repertoires, function(x) {
-                      paste(x@qstart, collapse = " - ")
-                  })
-                  rawReadCounts <- lapply(analysisDirectories, function(pth) {
-                      .readSummary(pth, ABSEQ_RAW_READ_COUNT_KEY)
-                  })
-                  annotReadCounts <- lapply(analysisDirectories, function(pth) {
-                      .readSummary(pth, ABSEQ_ANNOT_READ_COUNT_KEY)
-                  })
-                  filteredReadCounts <- lapply(analysisDirectories, function(pth) {
-                      .readSummary(pth, ABSEQ_FILT_READ_COUNT_KEY)
-                  })
-                  productiveReadCounts <- lapply(analysisDirectories, function(pth) {
-                      .readSummary(pth, ABSEQ_PROD_READ_COUNT_KEY)
-                  })
-
-                  renderParams <- list(
-                      rootDir = normalizePath(root),
-                      single = FALSE,
-                      interactive = interactivePlot,
-                      inclD = includeD,
-                      hasAnnot = (ABSEQ_DIR_ANNOT %in% similarAnalyses),
-                      hasAbun = (ABSEQ_DIR_ABUN %in% similarAnalyses),
-                      hasProd = (ABSEQ_DIR_PROD %in% similarAnalyses),
-                      hasDiv = (ABSEQ_DIR_DIV %in% similarAnalyses),
-                      name = paste(sampleNames, collapse = "_vs_"),
-                      bitfilters = paste(bitFilters, collapse = ","),
-                      alignfilters = paste(alFilters, collapse = ","),
-                      sstartfilters = paste(ssFilters, collapse = ","),
-                      qstartfilters = paste(qsFilters, collapse = ","),
-                      rawReads = paste(rawReadCounts, collapse = ","),
-                      annotReads = paste(annotReadCounts, collapse = ","),
-                      filteredReads = paste(filteredReadCounts, collapse = ","),
-                      productiveReads = paste(productiveReadCounts, collapse = ",")
-                  )
-
-                  # https://github.com/rstudio/rmarkdown/issues/861#issuecomment-326637323
-                  # paraphrased: just don't use output_file or output_dir
-                  # instead, copy to output_dir and remove it if you want to
-                  # as a safety measure, rename the template.Rmd file to
-                  # sample name so that the cache will not clash with other
-                  # samples it it wasn't cleared in time
-                  tmpTemplate <- file.path(outputDir, paste0(paste(sampleNames, collapse = "_vs_"), ".Rmd"))
-                  file.copy(system.file("extdata", "template.Rmd", package = "abseqR"), tmpTemplate, overwrite = TRUE)
-                  .substituteStringInFile(tmpTemplate, "href: \"#\"", paste0("href: \"", .indexHTML, "\""), fixed = TRUE)
-                  rmarkdown::render(tmpTemplate, params = renderParams)
-                  file.remove(tmpTemplate)
-                  return(sub(".Rmd", ".html", tmpTemplate))
-              } else {
-                  warning("Pandoc cannot be detected on system, skipping HTML report")
-                  return(NA)
-              }
-
-          })
+            # define variables for template.Rmd's param list
+            allChains <-
+                lapply(object@repertoires, function(x) {
+                    x@chain
+                })
+            # only include D gene plots if all chains only contain "hv"
+            includeD <-
+                !(("kv" %in% allChains) || ("lv" %in% allChains))
 
 
-setMethod(f = ".generateReport",
-          signature = "AbSeqRep",
-          definition = function(object, root, outputDir, interactivePlot = TRUE, .indexHTML = "#") {
-              if (rmarkdown::pandoc_available()) {
-                  message(paste("Generating HTML report for", object@name))
-                  analysisDirectory = file.path(object@outdir, RESULT_DIR, object@name)
-                  analyses <- unlist(.inferAnalyzed(analysisDirectory))
+            # template.Rmd param list
+            bitFilters <-
+                lapply(object@repertoires, function(x) {
+                    paste(x@bitscore, collapse = " - ")
+                })
+            alFilters <-
+                lapply(object@repertoires, function(x) {
+                    paste(x@alignlen, collapse = " - ")
+                })
+            ssFilters <-
+                lapply(object@repertoires, function(x) {
+                    paste(x@sstart, collapse = " - ")
+                })
+            qsFilters <-
+                lapply(object@repertoires, function(x) {
+                    paste(x@qstart, collapse = " - ")
+                })
+            rawReadCounts <-
+                lapply(analysisDirectories, function(pth) {
+                    .readSummary(pth, ABSEQ_RAW_READ_COUNT_KEY)
+                })
+            annotReadCounts <-
+                lapply(analysisDirectories, function(pth) {
+                    .readSummary(pth, ABSEQ_ANNOT_READ_COUNT_KEY)
+                })
+            filteredReadCounts <-
+                lapply(analysisDirectories, function(pth) {
+                    .readSummary(pth, ABSEQ_FILT_READ_COUNT_KEY)
+                })
+            productiveReadCounts <-
+                lapply(analysisDirectories, function(pth) {
+                    .readSummary(pth, ABSEQ_PROD_READ_COUNT_KEY)
+                })
 
-                  # define parameters for template.Rmd's param list
-                  bitFilter <- paste(object@bitscore, collapse = " - ")
-                  qsFilter <- paste(object@qstart, collapse = " - ")
-                  ssFilter <- paste(object@sstart, collapse = " - ")
-                  alFilter <- paste(object@alignlen, collapse = " - ")
-                  rawReadCount <- .readSummary(analysisDirectory,
-                                               ABSEQ_RAW_READ_COUNT_KEY)
-                  annotReadCount <- .readSummary(analysisDirectory,
-                                                 ABSEQ_ANNOT_READ_COUNT_KEY)
-                  filteredReadCount <- .readSummary(analysisDirectory,
-                                                    ABSEQ_FILT_READ_COUNT_KEY)
-                  productiveReadCount <- .readSummary(analysisDirectory,
-                                                      ABSEQ_PROD_READ_COUNT_KEY)
+            renderParams <- list(
+                rootDir = normalizePath(root),
+                single = FALSE,
+                interactive = interactivePlot,
+                inclD = includeD,
+                hasAnnot = (ABSEQ_DIR_ANNOT %in% similarAnalyses),
+                hasAbun = (ABSEQ_DIR_ABUN %in% similarAnalyses),
+                hasProd = (ABSEQ_DIR_PROD %in% similarAnalyses),
+                hasDiv = (ABSEQ_DIR_DIV %in% similarAnalyses),
+                name = paste(sampleNames, collapse = "_vs_"),
+                bitfilters = paste(bitFilters, collapse = ","),
+                alignfilters = paste(alFilters, collapse = ","),
+                sstartfilters = paste(ssFilters, collapse = ","),
+                qstartfilters = paste(qsFilters, collapse = ","),
+                rawReads = paste(rawReadCounts, collapse = ","),
+                annotReads = paste(annotReadCounts, collapse = ","),
+                filteredReads = paste(filteredReadCounts, collapse = ","),
+                productiveReads = paste(productiveReadCounts, collapse = ",")
+            )
 
-                  renderParams <- list(
-                      rootDir = normalizePath(root),
-                      single = TRUE,
-                      interactive = interactivePlot,
-                      inclD = (object@chain == "hv"),
-                      hasAnnot = (ABSEQ_DIR_ANNOT %in% analyses),
-                      hasAbun = (ABSEQ_DIR_ABUN %in% analyses),
-                      hasProd = (ABSEQ_DIR_PROD %in% analyses),
-                      hasDiv = (ABSEQ_DIR_DIV %in% analyses),
-                      name = object@name,
-                      bitfilters = bitFilter,
-                      qstartfilters = qsFilter,
-                      sstartfilters = ssFilter,
-                      alignfilters = alFilter,
-                      rawReads = rawReadCount,
-                      annotReads = annotReadCount,
-                      filteredReads = filteredReadCount,
-                      productiveReads = productiveReadCount
-                  )
+            # https://github.com/rstudio/rmarkdown/issues/861#issuecomment-326637323
+            # paraphrased: just don't use output_file or output_dir
+            # instead, copy to output_dir and remove it if you want to
+            # as a safety measure, rename the template.Rmd file to
+            # sample name so that the cache will not clash with other
+            # samples it it wasn't cleared in time
+            tmpTemplate <-
+                file.path(outputDir, paste0(paste(sampleNames, collapse = "_vs_"), ".Rmd"))
+            file.copy(
+                system.file("extdata", "template.Rmd", package = "abseqR"),
+                tmpTemplate,
+                overwrite = TRUE
+            )
+            .substituteStringInFile(tmpTemplate,
+                                    "href: \"#\"",
+                                    paste0("href: \"", .indexHTML, "\""),
+                                    fixed = TRUE)
+            rmarkdown::render(tmpTemplate, params = renderParams)
+            file.remove(tmpTemplate)
+            return(sub(".Rmd", ".html", tmpTemplate))
+        } else {
+            warning("Pandoc cannot be detected on system, skipping HTML report")
+            return(NA)
+        }
 
-                  # https://github.com/rstudio/rmarkdown/issues/861#issuecomment-326637323
-                  # paraphrased: just don't use output_file or output_dir
-                  # instead, copy to output_dir and remove it if you want to
-                  # as a safety measure, rename the template.Rmd file to
-                  # sample name so that the cache will not clash with other
-                  # samples it it wasn't cleared in time
-                  tmpTemplate <- file.path(outputDir, paste0(object@name, ".Rmd"))
-                  file.copy(system.file("extdata", "template.Rmd", package = "abseqR"), tmpTemplate, overwrite = TRUE)
-                  .substituteStringInFile(tmpTemplate, "href: \"#\"", paste0("href: \"", .indexHTML, "\""), fixed = TRUE)
-                  rmarkdown::render(tmpTemplate, params = renderParams)
-                  file.remove(tmpTemplate)
-                  return(sub(".Rmd", ".html", tmpTemplate))
-              } else {
-                  warning("Pandoc cannot be detected on system, skipping HTML report")
-                  return(NA)
-              }
-         })
+    }
+)
+
+
+setMethod(
+    f = ".generateReport",
+    signature = "AbSeqRep",
+    definition = function(object,
+                          root,
+                          outputDir,
+                          interactivePlot = TRUE,
+                          .indexHTML = "#") {
+        if (rmarkdown::pandoc_available()) {
+            message(paste("Generating HTML report for", object@name))
+            analysisDirectory = file.path(object@outdir, RESULT_DIR, object@name)
+            analyses <-
+                unlist(.inferAnalyzed(analysisDirectory))
+
+            # define parameters for template.Rmd's param list
+            bitFilter <-
+                paste(object@bitscore, collapse = " - ")
+            qsFilter <- paste(object@qstart, collapse = " - ")
+            ssFilter <- paste(object@sstart, collapse = " - ")
+            alFilter <-
+                paste(object@alignlen, collapse = " - ")
+            rawReadCount <- .readSummary(analysisDirectory,
+                                         ABSEQ_RAW_READ_COUNT_KEY)
+            annotReadCount <- .readSummary(analysisDirectory,
+                                           ABSEQ_ANNOT_READ_COUNT_KEY)
+            filteredReadCount <-
+                .readSummary(analysisDirectory,
+                             ABSEQ_FILT_READ_COUNT_KEY)
+            productiveReadCount <-
+                .readSummary(analysisDirectory,
+                             ABSEQ_PROD_READ_COUNT_KEY)
+
+            renderParams <- list(
+                rootDir = normalizePath(root),
+                single = TRUE,
+                interactive = interactivePlot,
+                inclD = (object@chain == "hv"),
+                hasAnnot = (ABSEQ_DIR_ANNOT %in% analyses),
+                hasAbun = (ABSEQ_DIR_ABUN %in% analyses),
+                hasProd = (ABSEQ_DIR_PROD %in% analyses),
+                hasDiv = (ABSEQ_DIR_DIV %in% analyses),
+                name = object@name,
+                bitfilters = bitFilter,
+                qstartfilters = qsFilter,
+                sstartfilters = ssFilter,
+                alignfilters = alFilter,
+                rawReads = rawReadCount,
+                annotReads = annotReadCount,
+                filteredReads = filteredReadCount,
+                productiveReads = productiveReadCount
+            )
+
+            # https://github.com/rstudio/rmarkdown/issues/861#issuecomment-326637323
+            # paraphrased: just don't use output_file or output_dir
+            # instead, copy to output_dir and remove it if you want to
+            # as a safety measure, rename the template.Rmd file to
+            # sample name so that the cache will not clash with other
+            # samples it it wasn't cleared in time
+            tmpTemplate <-
+                file.path(outputDir, paste0(object@name, ".Rmd"))
+            file.copy(
+                system.file("extdata", "template.Rmd", package = "abseqR"),
+                tmpTemplate,
+                overwrite = TRUE
+            )
+            .substituteStringInFile(tmpTemplate,
+                                    "href: \"#\"",
+                                    paste0("href: \"", .indexHTML, "\""),
+                                    fixed = TRUE)
+            rmarkdown::render(tmpTemplate, params = renderParams)
+            file.remove(tmpTemplate)
+            return(sub(".Rmd", ".html", tmpTemplate))
+        } else {
+            warning("Pandoc cannot be detected on system, skipping HTML report")
+            return(NA)
+        }
+    }
+)
