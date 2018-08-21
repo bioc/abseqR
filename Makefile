@@ -27,7 +27,7 @@ vignette:
 
 .PHONY:
 clean:
-	rm -rf vignettes/abseqR_example/ vignettes/refined_comparison/
+	rm -rf vignettes/ex/ vignettes/refined_comparison/
 
 .PHONY:
 help:
