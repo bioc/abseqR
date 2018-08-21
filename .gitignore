@@ -12,5 +12,5 @@ abseqR.png
 abseqR.xml
 
 # ignore vignette generated folders
-vignettes/abseqR_example
+vignettes/ex
 vignettes/refined_comparison
