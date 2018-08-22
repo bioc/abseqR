@@ -23,11 +23,11 @@ install:
 .PHONY:
 vignette:
 	Rscript -e "rmarkdown::render('vignettes/abseqR.Rmd', output_options = 'all')"
-	rm -rf vignettes/abseqR_example/ vignettes/refined_comparison/
+	rm -rf vignettes/ex/ vignettes/refined_comparison/
 
 .PHONY:
 clean:
-	rm -rf vignettes/ex/ vignettes/refined_comparison/
+	rm -rf vignettes/ex/ vignettes/refined_comparison/ vignettes/abseqR.html
 
 .PHONY:
 help:

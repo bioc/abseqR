@@ -170,9 +170,9 @@ type `install.packages("vegan")`
 a package from [Bioconductor](https://bioconductor.org) used to parallelize
 operations in this package. To install it, type
 ```r
-## try http:// if https:// URLs are not supported
-        source("https://bioconductor.org/biocLite.R")
-        biocLite("BiocParallel")
+if (!require("BiocManager"))
+    install.packages("BiocManager")
+BiocManager::install("BiocParallel")
 ```
 
 # Quick start
