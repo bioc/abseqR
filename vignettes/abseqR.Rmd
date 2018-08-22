@@ -1,6 +1,8 @@
 ---
 title: "abseqR"
-author: "Jia Hong Fong"
+author:
+- "Monther Alhamdoosh"
+- "Jia Hong Fong"
 package: "abseqR"
 output:
     BiocStyle::html_document: default
