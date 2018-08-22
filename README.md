@@ -1,6 +1,6 @@
 # abseqR
 
-`abseqR` is part of the `AbSeq` pipeline --- a comprehensive bioinformatic pipeline that
+`abseqR` is part of the `AbSeq` pipeline - a comprehensive bioinformatic pipeline that
 validates the quality of antibody libraries using next-generation sequencing technologies.
 
 
