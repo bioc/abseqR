@@ -66,18 +66,17 @@ to whet your appetite:
 <br/>
 <br/>
 
-|
-:-------------------------:|:-------------------------:
-![](images/PCR1_igv_dist_family_level.png) | ![](images/PCR1_cdr_duplication.png)
-__V-(D)-J germline abundance__ | __Diversity estimation__
+__V-(D)-J germline abundance__                                   | __Diversity estimation__
+:---------------------------------------------------------------:|:--------------------------------------------------:
+![VDJ Germline abundance](images/PCR1_igv_dist_family_level.png) | ![CDR duplication](images/PCR1_cdr_duplication.png)
 
 <br/>
 <br/>
 
-|
-:-------------------------:|:-------------------------:
-![](images/PCR1_productivity.png) | <img src="images/PCR1_vs_PCR2_clone_scatter.png" width="2000"/>
-__Productivity analysis__ | __Clonotype analysis__
+__Productivity analysis__                             | __Clonotype analysis__
+:----------------------------------------------------:|:---------------------------------------------------------------:
+![Productivity summary](images/PCR1_productivity.png) | <img src="images/PCR1_vs_PCR2_clone_scatter.png" width="2000" alt="clonotype_scatterplot"/>
+
 
 <br/>
 <br/>
