@@ -62,4 +62,5 @@ BugReports: https://github.com/malhamdoosh/abseqR/issues
 biocViews: Sequencing,
     Visualization,
     ReportWriting,
-    QualityControl
+    QualityControl,
+    MultipleComparison

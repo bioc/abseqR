@@ -2,16 +2,16 @@
 % Please edit documentation in R/abseqReport.R
 \name{abseqReport}
 \alias{abseqReport}
-\title{Visualize all analysis conducted by AbSePy}
+\title{Visualize all analysis conducted by abseqPy}
 \usage{
-abseqReport(root, report, compare, BPPARAM)
+abseqReport(directory, report, compare, BPPARAM)
 }
 \arguments{
-\item{root}{string type. Root directory as specified in
+\item{directory}{string type. directory as specified in
 \code{-o} or \code{--outdir} in abseqPy. This tells AbSeq where to look for
 abseqPy's output.}
 
-\item{report}{integer type. The possible values are:
+\item{report}{(optional) integer type. The possible values are:
 \itemize{
   \item{0 - does nothing (returns named list of \linkS4class{AbSeqRep} objects)}
   \item{1 - generates plots for csv files}
@@ -22,22 +22,33 @@ each higher value also does what the previous values do. For example, \code{repo
 will return a named list of \linkS4class{AbSeqRep} objects, plot csv files,
 and generate a (non-interactive)HTML report that collates all the plots together.}
 
-\item{compare}{vector of strings. From the samples in \code{root}, samples can be
-selected and compared against each other. For example, to compare "sample1" with "sample2" and
-"sample3" with "sample4", \code{compare} should be c("sample1,sample2", "sample3,sample4").}
+\item{compare}{(optional) vector of strings. From the samples in found in \code{directory}
+directory, they can be selected and compared against each other. For example,
+ to compare "sample1" with "sample2" and "sample3" with "sample4",
+ \code{compare} should be c("sample1,sample2", "sample3,sample4"). An error
+ will be thrown if the samples specified in this parameter are not found in
+ \code{directory}.}
 
-\item{BPPARAM}{BiocParallel backend. Configures the parallel implementation.
+\item{BPPARAM}{(optional) BiocParallel backend. Configures the parallel implementation.
 Refer to \href{https://bioconductor.org/packages/release/bioc/html/BiocParallel.html}{BiocParallel}
-for more information.}
+for more information. By default, use all available cores.}
 }
 \value{
 named list. List of \linkS4class{AbSeqRep} objects. The names of
-the list are taken directly from the repertoire object itself. This return
-value is consistent with the return value of \code{\link{report}}
+the list elements are taken directly from the repertoire object itself.
+This return value is consistent with the return value of \code{\link{report}}.
 }
 \description{
 Plots all samples in the output directory supplied to abseqPy's
-\code{--outdir} or \code{-o} argument.
+\code{--outdir} or \code{-o} argument. Users can optionally specify
+which samples in \code{directory} should be compared. Doing so generates
+additional plots for clonotype comparison and the usual plots will also
+conveniently include these samples using additional \code{aes}thetics.
+
+Calling this function with a valid \code{directory} will always return a
+named \code{list} of objects; these individual objects can be
+combined using the \code{+} operator to form a new comparison, in which the
+\link{report} function accepts as its first parameter.
 }
 \examples{
 # Use example data from abseqR as abseqPy's output, substitute this
@@ -45,7 +56,7 @@ Plots all samples in the output directory supplied to abseqPy's
 abseqPyOutput <- tempdir()
 file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
 
-### report parameter usage example:
+### 1. The `report` parameter usage example:
 
 # report = 0; don't plot, don't collate a HTML report, don't show anything interactive
 samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
@@ -63,22 +74,19 @@ samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
 # samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 3)
 # samples is now a named list of AbSeqRep objects
 
-#### Bonus Section (what to do with the list "samples"?):
+### 2. Using the return value of abseqReport:
 
 # NOTE, often, this is used to load multiple samples from different directories
 # using abseqReport (with report = 0), then the samples are added together
 # before calling the report function. This is most useful when the samples
-# live in different abseqPy output directory and yet they should be compared
-# together. For the sake of demonstration, we will only be using the samples
-# from within the same directory, but (hopefully) you get the idea ...
+# live in different abseqPy output directory.
 
 # Note that the provided example data has PCR1, PCR2, and PCR3
-# samples contained within
+# samples contained within the directory
 stopifnot(names(samples) == c("PCR1", "PCR2", "PCR3"))
 
 # as a hypothetical example, say we found something
 # interesting in PCR1 and PCR3, and we want to isolate them:
-
 # we want to explicitly compare PCR1 with PCR3
 pcr13 <- samples[["PCR1"]] + samples[["PCR3"]]
 
@@ -90,12 +98,12 @@ pcr13 <- samples[["PCR1"]] + samples[["PCR3"]]
 # 4 core machine, use all cores -  use whatever value that suits you
 nproc <- 4
 # samples <- abseqReport(file.path(abseqPyOutput, "ex"),
-#                       BPPARAM = BiocParallel::MulticoreParam(nproc))
+#                        BPPARAM = BiocParallel::MulticoreParam(nproc))
 
 
 # run sequentially - no multiprocessing
 # samples <- abseqReport(file.path(abseqPyOutput, "ex"),
-#                       BPPARAM = BiocParallel::SerialParam())
+#                        BPPARAM = BiocParallel::SerialParam())
 
 # see https://bioconductor.org/packages/release/bioc/html/BiocParallel.html
 # for more information about how to use BPPARAM and BiocParallel in general.

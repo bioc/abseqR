@@ -4,17 +4,29 @@
 \name{AbSeqCRep-class}
 \alias{AbSeqCRep-class}
 \alias{AbSeqCRep}
-\title{AbSeqCompositeRepertoire}
+\title{S4 class - AbSeqCompositeRepertoire analysis object}
 \value{
 AbSeqCRep
 }
 \description{
-AbSeqCRep is a collection of \linkS4class{AbSeqRep} S4 objects
+AbSeqCRep is a collection of \linkS4class{AbSeqRep} S4 objects.
+This S4 class contains multiple samples(repertoires) and it can be
+"combined" with other samples by using the \code{+} operator to
+create an extended \linkS4class{AbSeqCRep} object.
+This value, in turn, can be used as the first argument to
+\link{report} which generates a comparison between all samples included
+in the \code{+} operation.
+
+Users do not manually construct this class, but rather indirectly obtain
+this class object as a return value from the \code{+} operation between two
+\linkS4class{AbSeqRep} objects, which are in turn, obtained indirectly from
+\link{abseqReport} and \link{report} functions. It is also possible to
+obtain this class object by \code{+} (adding) \linkS4class{AbSeqCRep} objects.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{repertoires}}{list.}
+\item{\code{repertoires}}{list of \linkS4class{AbSeqRep} objects.}
 }}
 
 \examples{

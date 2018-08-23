@@ -4,14 +4,22 @@
 \name{AbSeqRep-class}
 \alias{AbSeqRep-class}
 \alias{AbSeqRep}
-\title{AbSeq analysis object.}
+\title{S4 class - AbSeqRepertoire analysis object}
 \value{
 AbSeqRep
 }
 \description{
 The AbSeqRep object contains all metadata associated with
-the AbSeq (python backend) #' run conducted on it.
-For further information, refer to AbSeq's python help.
+the AbSeq (python backend) run conducted on it. This S4 class represents
+a single sample(repertoire) and it can be "combined" with other samples
+by using the \code{+} operator to create an \linkS4class{AbSeqCRep} object.
+This value, in turn, can be used as the first argument to
+\link{report} which generates a comparison between all samples included
+in the \code{+} operation.
+
+Users do not manually construct this class, but rather indirectly
+obtain this class object as a return value
+from the \link{abseqReport} and \link{report} functions.
 }
 \section{Slots}{
 

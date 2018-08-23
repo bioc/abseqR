@@ -15,18 +15,16 @@ report(object, outputDir, report = 3)
 \S4method{report}{AbSeqCRep}(object, outputDir, report = 3)
 }
 \arguments{
-\item{object}{AbSeqRep or AbSeqCRep object to plot}
+\item{object}{AbSeqRep or AbSeqCRep object to plot.}
 
-\item{outputDir}{string type. where to save the files to}
+\item{outputDir}{string type. Directory where analysis will be saved to.}
 
-\item{report}{integer type. The possible values are:
+\item{report}{(optional) integer type. The possible values are:
 \itemize{
-  \item{0 - does nothing (returns named list of \linkS4class{AbSeqRep} object
-  , taken from the first parameter). This option isn't useful, but is
-  preserved here for the sake of consistency with \code{\link{abseqReport}}}
+  \item{0 - does nothing (returns named list of \linkS4class{AbSeqRep} objects)}
   \item{1 - generates plots for csv files}
   \item{2 - generates a report that collates all plots}
-  \item{3 - generates interactive plots in report}
+  \item{3 - generates interactive plots in report} (default)
 }
 each value also does what the previous values do. For example, \code{report = 2}
 will return a named list of \linkS4class{AbSeqRep} objects, plot csv files,
@@ -34,10 +32,18 @@ and generate a (non-interactive)HTML report that collates all the plots together
 }
 \value{
 named list. List of \linkS4class{AbSeqRep} objects. The names of
-the list are taken directly from the repertoire object itself. This return
-value is consistent with the return value of \code{\link{abseqReport}}
+the list elements are taken directly from the repertoire object itself.
+This return value is consistent with the return value of \code{\link{abseqReport}}.
 }
 \description{
+Plots all samples in the \code{object} argument
+and saves the analysis in \code{outputDir}.
+Users can optionally specify which samples
+in \code{object} should be compared. Doing so generates
+additional plots for clonotype comparison and
+the usual plots will also conveniently include these samples
+using additional \code{aes}thetics.
+
 This method is analogous to \code{\link{abseqReport}}.
 The only difference is that this method accepts \linkS4class{AbSeqRep} or
 \linkS4class{AbSeqCRep} objects as its first parameter, and the
@@ -52,6 +58,8 @@ samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
 
 
 # The provided example data has PCR1, PCR2, and PCR3 samples contained within
+# We can use the + operator to combine samples, thus requesting the
+# report function to compare them:
 pcr12 <- samples[["PCR1"]] + samples[["PCR2"]]
 
 # generate plots and report for this new comparison
@@ -68,7 +76,8 @@ pcr12 <- samples[["PCR1"]] + samples[["PCR2"]]
 }
 \seealso{
 \code{\link{abseqReport}}. Analogus function, but takes input from
-a string that signifies the output directory (similar to the argument supplied to abseqPy).
+a string that signifies the output directory of abseqPy as the first
+arugment instead.
 
 \linkS4class{AbSeqRep}
 

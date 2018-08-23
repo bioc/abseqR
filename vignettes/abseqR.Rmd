@@ -71,7 +71,8 @@ explicitly compare multiple samples against each other.
   different samples against each other, the `+` operator can be used to
   specify the desired combinations. The "sample comparison" includes additional
   plots, for example, sample similarity clustering, overlapping clonotypes and
-  more.
+  more. The usual plots will also include all the compared samples by adding
+  an extra layer of `aes`thetic.
   
 
 # Installation

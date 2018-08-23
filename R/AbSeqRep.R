@@ -1,10 +1,18 @@
-#' AbSeq analysis object.
+#' S4 class - AbSeqRepertoire analysis object
 #'
 #' @import methods
 #'
 #' @description The AbSeqRep object contains all metadata associated with
-#' the AbSeq (python backend) #' run conducted on it.
-#' For further information, refer to AbSeq's python help.
+#' the AbSeq (python backend) run conducted on it. This S4 class represents
+#' a single sample(repertoire) and it can be "combined" with other samples
+#' by using the \code{+} operator to create an \linkS4class{AbSeqCRep} object.
+#' This value, in turn, can be used as the first argument to
+#' \link{report} which generates a comparison between all samples included
+#' in the \code{+} operation.
+#'
+#' Users do not manually construct this class, but rather indirectly
+#' obtain this class object as a return value
+#' from the \link{abseqReport} and \link{report} functions.
 #'
 #' @slot f1 character. Path to FASTA/FASTQ file 1.
 #' @slot f2 character. Path to FASTA/FASTQ file 2.
@@ -269,37 +277,46 @@ setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqCRep"), function(e1, e2) {
 #' Plots \linkS4class{AbSeqRep} or
 #' \linkS4class{AbSeqCRep} object to the specfied directory
 #'
-#' @description This method is analogous to \code{\link{abseqReport}}.
+#' @description Plots all samples in the \code{object} argument
+#' and saves the analysis in \code{outputDir}.
+#' Users can optionally specify which samples
+#' in \code{object} should be compared. Doing so generates
+#' additional plots for clonotype comparison and
+#' the usual plots will also conveniently include these samples
+#' using additional \code{aes}thetics.
+#'
+#' This method is analogous to \code{\link{abseqReport}}.
 #' The only difference is that this method accepts \linkS4class{AbSeqRep} or
 #' \linkS4class{AbSeqCRep} objects as its first parameter, and the
 #' \code{outputDir} specifies where to store the result.
+#'
 #'
 #' @include util.R
 #' @include plotter.R
 #' @include AbSeqCRep.R
 #'
-#' @param object AbSeqRep or AbSeqCRep object to plot
-#' @param outputDir string type. where to save the files to
-#' @param report integer type. The possible values are:
+#' @param object AbSeqRep or AbSeqCRep object to plot.
+#' @param outputDir string type. Directory where analysis will be saved to.
+#' @param report (optional) integer type. The possible values are:
 #' \itemize{
-#'   \item{0 - does nothing (returns named list of \linkS4class{AbSeqRep} object
-#'   , taken from the first parameter). This option isn't useful, but is
-#'   preserved here for the sake of consistency with \code{\link{abseqReport}}}
+#'   \item{0 - does nothing (returns named list of \linkS4class{AbSeqRep} objects)}
 #'   \item{1 - generates plots for csv files}
 #'   \item{2 - generates a report that collates all plots}
-#'   \item{3 - generates interactive plots in report}
+#'   \item{3 - generates interactive plots in report} (default)
 #' }
 #' each value also does what the previous values do. For example, \code{report = 2}
 #' will return a named list of \linkS4class{AbSeqRep} objects, plot csv files,
 #' and generate a (non-interactive)HTML report that collates all the plots together.
 #' @return named list. List of \linkS4class{AbSeqRep} objects. The names of
-#' the list are taken directly from the repertoire object itself. This return
-#' value is consistent with the return value of \code{\link{abseqReport}}
+#' the list elements are taken directly from the repertoire object itself.
+#' This return value is consistent with the return value of \code{\link{abseqReport}}.
 #'
 #' @export
 #'
 #' @seealso \code{\link{abseqReport}}. Analogus function, but takes input from
-#' a string that signifies the output directory (similar to the argument supplied to abseqPy).
+#' a string that signifies the output directory of abseqPy as the first
+#' arugment instead.
+#'
 #' @seealso \linkS4class{AbSeqRep}
 #' @seealso \linkS4class{AbSeqCRep}
 #'
@@ -314,6 +331,8 @@ setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqCRep"), function(e1, e2) {
 #'
 #'
 #' # The provided example data has PCR1, PCR2, and PCR3 samples contained within
+#' # We can use the + operator to combine samples, thus requesting the
+#' # report function to compare them:
 #' pcr12 <- samples[["PCR1"]] + samples[["PCR2"]]
 #'
 #' # generate plots and report for this new comparison
