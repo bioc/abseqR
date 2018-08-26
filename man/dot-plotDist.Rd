@@ -2,7 +2,7 @@
 % Please edit documentation in R/distributions.R
 \name{.plotDist}
 \alias{.plotDist}
-\title{Histogram plotter}
+\title{Bar plotter}
 \usage{
 .plotDist(dataframes, sampleNames, plotTitle, vert = TRUE, xlabel = "",
   ylabel = "", perc = TRUE, subs = "", sorted = TRUE,
@@ -26,7 +26,7 @@ proportion (instead of 0-1) only used if length(sampleNames) == 1}
 
 \item{subs}{string type}
 
-\item{sorted}{boolean type. True if histogram should be sorted in descending
+\item{sorted}{boolean type. True if bar plot should be sorted in descending
 order}
 
 \item{cutoff}{int type. Number of maximum ticks to show (x on vert plots,
@@ -38,7 +38,7 @@ y on hori plots).}
 ggplot2 object
 }
 \description{
-Plots histogram for all sample in dataframes.
+Plots barplot for all sample in dataframes.
 If length(sampleNames) == 1, then the bars will also have
 y-values (or x if horizontal plot) labels on them.
 Use 'perc' to control if the values are percentages.

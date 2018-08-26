@@ -39,7 +39,7 @@
         # only need top N, also take the columns we're interested in only
         df <- head(df[colNames], top)
         # append sample name to distinguish data when merged later on
-        df$sample <- rep(sampleNames[i], nrow(df))
+        df$sample <- sampleNames[i]
         # normalize percentage to top N
         df$normPerc <- df$Count / sum(df$Count)
         dataframes[[i]] <- df

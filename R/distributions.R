@@ -1,5 +1,5 @@
-#' Histogram plotter
-#' @description  Plots histogram for all sample in dataframes.
+#' Bar plotter
+#' @description  Plots barplot for all sample in dataframes.
 #' If length(sampleNames) == 1, then the bars will also have
 #' y-values (or x if horizontal plot) labels on them.
 #' Use 'perc' to control if the values are percentages.
@@ -16,7 +16,7 @@
 #' @param perc boolean type. True if data's axis is a percentage
 #' proportion (instead of 0-1) only used if length(sampleNames) == 1
 #' @param subs string type
-#' @param sorted boolean type. True if histogram should be sorted in descending
+#' @param sorted boolean type. True if bar plot should be sorted in descending
 #' order
 #' @param cutoff int type. Number of maximum ticks to show (x on vert plots,
 #' y on hori plots).
@@ -66,7 +66,7 @@
 
             # for each dataframe, append a new column 'sample'
             # to indicate where this df came from
-            df$sample <- rep(sampleNames[i], nrow(df))
+            df$sample <- sampleNames[i]
 
             # sort the values by descending order (strictly speaking,
             # not necessary because it's already sorted
@@ -112,27 +112,16 @@
         # 3. otherwise, do nothing
 
         if (frames > 1) {
-            if (vert) {
-                topNx <- unique(df.union$x)
-                for (x_ in topNx) {
-                    for (i in seq_len(frames)) {
-                        if (x_ %in% originals[[i]]$x
-                            && !(x_ %in% dataframes[[i]]$x)) {
-                            newRow <- originals[[i]][originals[[i]]$x == x_,]
-                            df.union <- rbind(df.union, newRow)
-                        }
-                    }
-                }
-            } else {
-                topNy <- unique(df.union$y)
-                for (y_ in topNy) {
-                    for (i in seq_len(frames)) {
-                        if (y_ %in% originals[[i]]$y
-                            && !(y_ %in% dataframes[[i]]$y)) {
-                            newRow <- originals[[i]][originals[[i]]$y == y_,]
-                            df.union <- rbind(df.union, newRow)
-                        }
-                    }
+            colName <- if (vert) 'x' else 'y'
+            topN <- unique(df.union[[colName]])
+            for (maybeMissing in topN) {
+                for (j in seq_len(frames)) {
+                    ori <- originals[[j]]
+                    if (maybeMissing %in% ori[[colName]]
+                        && !(maybeMissing %in% dataframes[[j]][[colName]])) {
+                        newRow <- ori[ori[[colName]] == maybeMissing, ]
+                        df.union <- rbind(df.union, newRow)
+                    } # else, do nothing
                 }
             }
         }
@@ -143,82 +132,52 @@
                 ylabel <- paste(ylabel, "(%)")
             }
         }
+
+        # start plotting --------------------------------
+
+        # abseqPy will flip the x and y values when the plot is "horizontal"
         if (!vert) {
-            if (sorted) {
-                g <- ggplot(df.union,
-                            aes(
-                                x = reorder(y, x),
-                                y = x,
-                                label = sprintf(placeholder, x)
-                            )) +
-                    coord_flip()
-            } else {
-                df.union$y <- factor(df.union$y, levels = unique(df.union$y))
-                g <- ggplot(df.union,
-                            aes(
-                                x = y,
-                                y = x,
-                                label = sprintf(placeholder, x)
-                            )) +
-                    coord_flip()
-            }
-
-            if (frames == 1) {
-                # single sample -> blue colour plot
-                g <- g + geom_text(
-                    hjust = 0.50,
-                    vjust = -0.5,
-                    size = 3,
-                    angle = -90
-                ) +
-                    geom_bar(
-                        stat = "identity",
-                        aes(fill = sample),
-                        position = "dodge",
-                        fill = BLUEHEX,
-                        show.legend = FALSE
-                    )
-            } else {
-                # multiple samples -> multi-coloured plot
-                g <- g + geom_bar(stat = "identity",
-                                  aes(fill = sample),
-                                  position = "dodge")
-            }
-
-        } else {
-            if (sorted) {
-                g <- ggplot(df.union,
-                            aes(
-                                x = reorder(x, -y),
-                                y = y,
-                                label = sprintf(placeholder, y)
-                            ))
-            } else {
-                df.union$x <- factor(df.union$x, levels = unique(df.union$x))
-                g <- ggplot(df.union, aes(
-                    x = x,
-                    y = y,
-                    label = sprintf(placeholder, y)
-                ))
-            }
-
-            if (frames == 1) {
-                # single sample -> blue colour plot
-                g <- g + geom_text(vjust = -0.5, size = 3) +
-                    geom_bar(
-                        stat = 'identity',
-                        aes(fill = sample),
-                        position = 'dodge',
-                        fill = BLUEHEX,
-                        show.legend = FALSE
-                    )
-            } else {
-                # multiple samples -> multi-coloured plot
-                g <- g + geom_bar(stat = 'identity',
-                                  aes(fill = sample),
-                                  position = 'dodge')
-            }
+            colnames(df.union)[colnames(df.union) == "x"] <- "xold"
+            colnames(df.union)[colnames(df.union) == "y"] <- "x"
+            colnames(df.union)[colnames(df.union) == "xold"] <- "y"
         }
+
+        if (sorted) {
+            # horizontal: decreasing order from top to bottom
+            # vertical: decreasing order from left to right
+            coeff <- if (vert) -1 else 1
+            g <- ggplot(df.union,
+                        aes(x = reorder(x, y * coeff),
+                            y = y,
+                            label = sprintf(placeholder, y)))
+        } else {
+            df.union$x <- factor(df.union$x, levels = unique(df.union$x))
+            g <- ggplot(df.union, aes(x, y, label = sprintf(placeholder, y)))
+        }
+
+        if (!vert) {
+            g <- g + coord_flip()
+        }
+
+        if (frames == 1) {
+            # only maually add fill colour and geom_text if it's a
+            # single sample
+            g <- g +  geom_bar(stat = 'identity',
+                               fill = BLUEHEX,
+                               show.legend = FALSE)
+            if (vert) {
+                g <- g + geom_text(vjust = -0.5, size = 3)
+            } else {
+                g <- g + geom_text(hjust = 0.50,
+                                   vjust = -0.5,
+                                   size = 3,
+                                   angle = -90)
+            }
+        } else {
+            g <- g + geom_bar(stat = 'identity', aes(fill = sample),
+                              position = 'dodge')
+        }
+
         g <- g + theme(text = element_text(size = 10),
                        legend.position = legendPos) +
             labs(
@@ -273,7 +232,7 @@
     # pre-processing
     for (i in seq_len(nsample)) {
         df <- dataframes[[i]]
-        df$sample <- rep(sampleNames[i], nrow(df))
+        df$sample <- sampleNames[i]
         df$percent <- df$count / sum(df$count)
         dataframes[[i]] <- df
     }
@@ -318,8 +277,6 @@
     if (nsample == 1) {
         g <- g + geom_bar(
             stat = "identity",
-            aes(fill = sample),
-            position = "dodge",
             show.legend = FALSE,
             fill = BLUEHEX
         )

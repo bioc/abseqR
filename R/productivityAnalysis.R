@@ -30,7 +30,7 @@
     # label each row with sample name and drop unused columns
     for (i in seq_len(nsamples)) {
         df <- dataframes[[i]]
-        df$sample <- rep(sampleNames[i], nrow(df))
+        df$sample <- sampleNames[i]
         dataframes[[i]] <- df[, !(names(df) %in% unusedCols)]
     }
     #   ---- done: clean & pre-processing ----

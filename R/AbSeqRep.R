@@ -362,6 +362,8 @@ setMethod(
     definition = function(object, outputDir, report = 3) {
         skip <- FALSE
         stopifnot(report %in% c(0, 1, 2, 3))
+
+        # give meaningful names to numerical values
         if (report == 0) {
             report <- FALSE
             interactivePlot <- FALSE
@@ -381,7 +383,7 @@ setMethod(
             analysisDirectories = c(file.path(object@outdir,
                                               RESULT_DIR, object@name))
             # get analysis that were conducted by looking at the directory
-            # structure - is this the best way?
+            # structure
             analyses <-
                 unlist(.inferAnalyzed(analysisDirectories[1]))
             sampleNames <- c(object@name)
@@ -410,8 +412,7 @@ setMethod(
             }
         }
 
-        # this is dumb, but at least it's consistent with the
-        # API behaviour of abseqR::abseqReport()
+        # to be consistent with the return value of abseqR::abseqReport()
         lst <- list()
         lst[[object@name]] <- object
         return(lst)
@@ -446,20 +447,18 @@ setMethod(
             }))
 
         if (!skip) {
-            analysisDirectories = unlist(lapply(object@repertoires, function(x) {
+            analysisDirectories <- unlist(lapply(object@repertoires, function(x) {
                 # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
                 file.path(x@outdir, RESULT_DIR, x@name)
             }))
 
             # get all analyses conducted by each repertoire by looking
             # at the directory structure created by abseqPy
-            analysesConducted <-
-                lapply(analysisDirectories, .inferAnalyzed)
+            analysesConducted <- lapply(analysisDirectories, .inferAnalyzed)
 
             # find the intersection of all analysis, because it makes no
             # sense to compare samples if they don't have the same analysis
-            similarAnalyses <-
-                unlist(Reduce(intersect, analysesConducted))
+            similarAnalyses <- unlist(Reduce(intersect, analysesConducted))
 
 
             primer5Files <-
@@ -481,8 +480,7 @@ setMethod(
                     x@chain
                 })
             # only include D gene plots if all chains only contain "hv"
-            skipD <-
-                (("kv" %in% allChains) || ("lv" %in% allChains))
+            skipD <- (("kv" %in% allChains) || ("lv" %in% allChains))
 
             .plotSamples(
                 sampleNames,
@@ -560,13 +558,11 @@ setMethod(
 
             # get all analyses conducted by each repertoire by looking
             # at the directory structure created by abseqPy
-            analysesConducted <-
-                lapply(analysisDirectories, .inferAnalyzed)
+            analysesConducted <- lapply(analysisDirectories, .inferAnalyzed)
 
             # find the intersection of all analysis, because it makes no
             # sense to compare samples if they don't have the same analysis
-            similarAnalyses <-
-                unlist(Reduce(intersect, analysesConducted))
+            similarAnalyses <- unlist(Reduce(intersect, analysesConducted))
 
             # define variables for template.Rmd's param list
             allChains <-
@@ -574,8 +570,7 @@ setMethod(
                     x@chain
                 })
             # only include D gene plots if all chains only contain "hv"
-            includeD <-
-                !(("kv" %in% allChains) || ("lv" %in% allChains))
+            includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
 
 
             # template.Rmd param list
@@ -595,23 +590,18 @@ setMethod(
                 lapply(object@repertoires, function(x) {
                     paste(x@qstart, collapse = " - ")
                 })
-            rawReadCounts <-
-                lapply(analysisDirectories, function(pth) {
-                    .readSummary(pth, ABSEQ_RAW_READ_COUNT_KEY)
-                })
-            annotReadCounts <-
-                lapply(analysisDirectories, function(pth) {
-                    .readSummary(pth, ABSEQ_ANNOT_READ_COUNT_KEY)
-                })
-            filteredReadCounts <-
-                lapply(analysisDirectories, function(pth) {
-                    .readSummary(pth, ABSEQ_FILT_READ_COUNT_KEY)
-                })
-            productiveReadCounts <-
-                lapply(analysisDirectories, function(pth) {
-                    .readSummary(pth, ABSEQ_PROD_READ_COUNT_KEY)
-                })
-
+            rawReadCounts <- lapply(X = analysisDirectories,
+                                    FUN = .readSummary,
+                                    ABSEQ_RAW_READ_COUNT_KEY)
+            annotReadCounts <- lapply(X = analysisDirectories,
+                                      FUN = .readSummary,
+                                      ABSEQ_ANNOT_READ_COUNT_KEY)
+            filteredReadCounts <- lapply(X = analysisDirectories,
+                                         FUN = .readSummary,
+                                         ABSEQ_FILT_READ_COUNT_KEY)
+            productiveReadCounts <- lapply(X = analysisDirectories,
+                                           FUN = .readSummary,
+                                           ABSEQ_PROD_READ_COUNT_KEY)
             renderParams <- list(
                 rootDir = normalizePath(root),
                 single = FALSE,
@@ -645,6 +635,9 @@ setMethod(
                 tmpTemplate,
                 overwrite = TRUE
             )
+            # substitute href to '#' to index.html: only when there's a landing
+            # page that we do this. Calling abseqR::report() will leave href
+            # as-is
             .substituteStringInFile(tmpTemplate,
                                     "href: \"#\"",
                                     paste0("href: \"", .indexHTML, "\""),

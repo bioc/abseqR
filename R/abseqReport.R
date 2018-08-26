@@ -172,6 +172,7 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
 
     # TODO: sanitize 'report' properly using constants/functions
     stopifnot(report %in% c(0, 1, 2, 3))
+    # convert number to meaningful variables
     if (report == 0) {
         report <- FALSE
         interactivePlot <- FALSE
@@ -196,144 +197,40 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
             sampleNames <- unlist(lapply(strsplit(pair, ","), trimws))
 
             # depending on the number of samples requested to plot, outputDir
-            # is either a <sample>_vs_<sample> format or just <sample> meanwhile,
-            # samples will either be a AbSeqCRep or just AbSeqRep.
-            if (length(sampleNames) > 1) {
-                outputDir <-
-                    file.path(root,
-                              RESULT_DIR,
-                              paste(sampleNames, collapse = "_vs_"))
-                samples <-
-                    Reduce("+", lapply(sampleNames, function(sampleName) {
-                        sample_ <-
-                            .loadAbSeqRepFromParams(file.path(
-                                root,
-                                RESULT_DIR,
-                                sampleName,
-                                ANALYSIS_PARAMS
-                            ))
-                        # sample@outdir should be the same as root
-                        if (normalizePath(sample_@outdir) != root) {
-                            warning(
-                                paste(
-                                    "Sample output directory",
-                                    sample_@outdir,
-                                    "is different from provided path",
-                                    root,
-                                    "assuming directory was moved"
-                                )
-                            )
-                            sample_@outdir <- root
-                        }
-                        return(sample_)
-                    }))
-            } else {
-                outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
-                samples <-
-                    .loadAbSeqRepFromParams(file.path(outputDir, ANALYSIS_PARAMS))
-                if (normalizePath(samples@outdir) != root) {
-                    warning(
-                        paste(
-                            "Sample output directory",
-                            samples@outdir,
-                            "is different from provided path",
-                            root,
-                            "assuming directory was moved"
-                        )
-                    )
-                    samples@outdir <- root
-                }
-            }
-            # due to the cache/shared user issue (see render() parallel github issue)
+            # is either a <sample>_vs_<sample> format or just <sample>
+            # meanwhile, samples will either be a AbSeqCRep or just AbSeqRep.
+            outputDir <- file.path(root, RESULT_DIR,
+                          paste(sampleNames, collapse = "_vs_"))
+            samples <- .loadSamplesFromString(sampleNames, root)
+            # due to the cache/shared user issue (see issue)
+            # https://github.com/rstudio/rmarkdown/issues/499
             # we delay the report generation until AFTER the multiprocessing part
-            # has completed
+            # has completed, that is, we will generate the report one by one
+            # TODO: improve this, this is taking way too long to render
             abseqR::report(samples,
                            outputDir,
                            report = 1)   # always plot, but DO NOT GENERATE REPORT!
-
             #})
         }, BPPARAM = BPPARAM)
     }
 
-    # before we start creating reports, create the report directory
+    # whether or not we generate the report, always return a list of all
+    # the samples found in "root"
     if (report) {
-        # create report directory
-        reportDir <- file.path(root, ABSEQ_HTML_DIR)
-        if (!dir.exists(reportDir)) {
-            dir.create(reportDir)
-        } else {
-            warning(paste(reportDir, "found, overriding contents."))
-        }
-
-        # create nested HTML directory for all html files except index.html
-        nestedHTMLdir <- file.path(reportDir, ABSEQ_NESTED_HTML_DIR)
-        if (!dir.exists(nestedHTMLdir)) {
-            dir.create(nestedHTMLdir)
-        } else {
-            warning(paste(nestedHTMLdir, "found, overriding contents."))
-        }
-    }
-
-    individualSamples <- list()
-    individualReports <- list()
-    # populate individualSample list with samples for user to browse and
-    # create report if asked to.
-    for (pair in compare) {
-        sampleNames <- unlist(lapply(strsplit(pair, ","), trimws))
-        if (length(sampleNames) == 1) {
-            outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
-            samples <-
-                .loadAbSeqRepFromParams(file.path(outputDir, ANALYSIS_PARAMS))
-            if (normalizePath(samples@outdir) != root) {
-                warning(
-                    paste(
-                        "Sample output directory",
-                        samples@outdir,
-                        "is different from provided path",
-                        root,
-                        "assuming directory was moved"
-                    )
-                )
-                samples@outdir <- root
-            }
-            individualSamples[[samples@name]] <- samples
-        } else {
-            outputDir <-
-                file.path(root,
-                          RESULT_DIR,
-                          paste(sampleNames, collapse = "_vs_"))
-            samples <- Reduce("+",
-                              lapply(sampleNames, function(sampleName) {
-                                  tmpsample <-
-                                      .loadAbSeqRepFromParams(file.path(root, RESULT_DIR, sampleName, ANALYSIS_PARAMS))
-                                  if (normalizePath(tmpsample@outdir) != root) {
-                                      tmpsample@outdir <- root
-                                  }
-                                  return(tmpsample)
-                              }))
-        }
-        if (report) {
-            pth <- .generateReport(
-                samples,
-                root = outputDir,
-                outputDir = file.path(root, ABSEQ_HTML_DIR, ABSEQ_NESTED_HTML_DIR),
-                interactivePlot = interactivePlot,
-                .indexHTML = file.path("..", "index.html")
-            )
-            if (!is.na(pth)) {
-                individualReports[paste(sampleNames, collapse = "_vs_")] <- pth
+        return(.generateDelayedReport(root, compare, interactivePlot))
+    } else {
+        listOfSamples <- list()
+        for (pair in compare) {
+            sampleNames <- unlist(lapply(strsplit(pair, ","), trimws))
+            if (length(sampleNames) == 1) {
+                outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
+                sample <- .loadSamplesFromString(sampleNames, root,
+                                                  warnMove = FALSE)
+                listOfSamples[[sample@name]] <- sample
             }
         }
+        return(listOfSamples)
     }
-
-    if (length(individualReports)) {
-        .collateReports(
-            individualReports,
-            individualSamples,
-            outputDirectory = file.path(root, ABSEQ_HTML_DIR)
-        )
-    }
-    return(individualSamples)
 }
 
 
@@ -429,3 +326,119 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
             warning("Pandoc not found in system, will not create index.html")
         }
     }
+
+#' Generates report for all samples in 'compare'
+#'
+#' @description This function is needed because we are delaying the generation
+#' of reports until after all threads/processes have joined. There's currently
+#' an issue with rmarkdown::render() in parallel execution, see:
+#' https://github.com/rstudio/rmarkdown/issues/499
+#'
+#' @include util.R
+#' @include AbSeqRep.R
+#'
+#' @param root string, project root directory.
+#' @param compare vector of strings, each string is a comparison defined
+#' by the user (assumes that this value has been checked).
+#' @param interactivePlot logical, whether or not to plot interactive plotly
+#' plots.
+#'
+#' @return a named list of samples, each an AbSeqRep object found in "root"
+.generateDelayedReport <- function(root, compare, interactivePlot) {
+    # before we start creating reports, create the report directory
+    reportDir <- file.path(root, ABSEQ_HTML_DIR)
+    if (!dir.exists(reportDir)) {
+        dir.create(reportDir)
+    } else {
+        warning(paste(reportDir, "found, overriding contents."))
+    }
+
+    # create nested HTML directory for all html files except index.html
+    nestedHTMLdir <- file.path(reportDir, ABSEQ_NESTED_HTML_DIR)
+    if (!dir.exists(nestedHTMLdir)) {
+        dir.create(nestedHTMLdir)
+    } else {
+        warning(paste(nestedHTMLdir, "found, overriding contents."))
+    }
+
+    individualSamples <- list()
+    individualReports <- list()
+    # populate individualSample list with samples for user to browse and
+    # create report if asked to.
+    for (pair in compare) {
+        sampleNames <- unlist(lapply(strsplit(pair, ","), trimws))
+        outputDir <- file.path(root, RESULT_DIR,
+                               paste(sampleNames, collapse = "_vs_"))
+        samples <- .loadSamplesFromString(sampleNames, root,
+                                          warnMove = FALSE)
+        if (length(sampleNames) == 1) {
+            individualSamples[[samples@name]] <- samples
+        }
+        pth <- .generateReport(
+            samples,
+            root = outputDir,
+            outputDir = file.path(root, ABSEQ_HTML_DIR, ABSEQ_NESTED_HTML_DIR),
+            interactivePlot = interactivePlot,
+            .indexHTML = file.path("..", "index.html")
+        )
+        if (!is.na(pth)) {
+            individualReports[paste(sampleNames, collapse = "_vs_")] <- pth
+        }
+    }
+
+    if (length(individualReports)) {
+        .collateReports(
+            individualReports,
+            individualSamples,
+            outputDirectory = file.path(root, ABSEQ_HTML_DIR)
+        )
+    }
+    return(individualSamples)
+}
+
+
+#' Loads AbSeqCRep or AbSeqRep objects from a list of sampleNames
+#'
+#' @include util.R
+#' @include AbSeqRep.R
+#'
+#' @param sampleNames vector, singleton or otherwise
+#' @param root string type. root directory
+#' @param warnMove logical type. Warning message if the directory has been
+#' moved?
+#'
+#' @return AbSeqRep or AbSeqCRep object depending on sampleNames
+.loadSamplesFromString <- function(sampleNames, root, warnMove = TRUE) {
+    if (length(sampleNames) == 1) {
+        outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
+        sample <- .loadAbSeqRepFromParams(file.path(outputDir, ANALYSIS_PARAMS))
+        if (normalizePath(sample@outdir) != root) {
+            if (warnMove) {
+                warning(paste("Sample output directory", sample@outdir,
+                              "is different from provided path",
+                              root, "assuming directory was moved"))
+            }
+            sample@outdir <- root
+        }
+        return(sample)
+    } else {
+        samples <-
+            Reduce("+", lapply(sampleNames, function(sname) {
+                tmpsample <-
+                    .loadAbSeqRepFromParams(file.path(root, RESULT_DIR,
+                                                      sname, ANALYSIS_PARAMS))
+                if (normalizePath(tmpsample@outdir) != root) {
+                    if (warnMove) {
+                        warning(paste("Sample output directory",
+                                      tmpsample@outdir,
+                                      "is different from provided path",
+                                      root,
+                                      "assuming directory was moved"))
+                    }
+                    tmpsample@outdir <- root
+                }
+                return(tmpsample)
+            }))
+        return(samples)
+    }
+}

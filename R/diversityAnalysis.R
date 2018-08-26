@@ -12,7 +12,6 @@
 #' @return ggplot2 object
 .plotDuplication <-
     function(files, sampleNames, regions = c("CDR3", "V")) {
-        theme_set(theme_bw())
         nsamples <- length(files)
 
         if (nsamples != length(sampleNames)) {
@@ -55,7 +54,7 @@
         # pre-processing & cleanup
         for (i in seq_len(nsamples)) {
             df <- dataframes[[i]]
-            df$sample  <- rep(sampleNames[[i]], nrow(df))
+            df$sample  <- sampleNames[[i]]
             dataframes[[i]] <- df[df$region %in% regions,]
         }
 
@@ -91,7 +90,7 @@
                 ),
                 x = "Duplication level",
                 y = "Proportion of duplicated sequences"
-            )
+            ) + theme_bw()
         return(g)
     }
 
@@ -112,8 +111,6 @@
 #' @return ggplot2 object
 .plotRarefaction <-
     function(files, sampleNames, regions = c("CDR3", "V")) {
-        theme_set(theme_bw())
-
         nsamples <- length(files)
         # sanity check
         if (length(sampleNames) != nsamples) {
@@ -164,7 +161,7 @@
         # pre-processing & cleaning
         for (i in seq_len(nsamples)) {
             df <- dataframes[[i]]
-            df$sample <- rep(sampleNames[[i]], nrow(df))
+            df$sample <- sampleNames[[i]]
             df <- df[df$region %in% regions,]
             dataframes[[i]] <- .summarySE(df,
                                           measurevar = 'y',
@@ -218,7 +215,7 @@
                 subtitle = "Mean number of deduplicated sequences with 95% confidence interval",
                 x = 'Sample size',
                 y = "Number of deduplicated sequences"
-            )
+            ) + theme_bw()
         return(g)
     }
 
@@ -238,7 +235,6 @@
 #' @return ggplot2 object
 .plotRecapture <-
     function(files, sampleNames, regions = c("CDR3", "V")) {
-        theme_set(theme_bw())
         nsamples <- length(files)
         # sanity check
         if (nsamples != length(sampleNames)) {
@@ -290,7 +286,7 @@
         for (i in seq_len(nsamples)) {
             df <- dataframes[[i]]
             # append sample name to a new column named sample
-            df$sample <- rep(sampleNames[[i]], nrow(df))
+            df$sample <- sampleNames[[i]]
             # only want selected regions - ignore others
             df <- df[df$region %in% regions, ]
             # get mean, sd, se, and ci
@@ -344,7 +340,7 @@
                 subtitle = "Mean number of recaptured sequences with 95% confidence interval",
                 x = "Sample size",
                 y = "Percent Recapture"
-            )
+            ) + theme_bw()
         return(p)
     }
 
