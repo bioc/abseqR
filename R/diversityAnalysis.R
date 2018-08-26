@@ -162,7 +162,7 @@
         dataframes <- lapply(files, read.csv, skip = 1)
 
         # pre-processing & cleaning
-        for (i in 1:nsamples) {
+        for (i in seq_len(nsamples)) {
             df <- dataframes[[i]]
             df$sample <- rep(sampleNames[[i]], nrow(df))
             df <- df[df$region %in% regions,]
@@ -287,7 +287,7 @@
         dataframes <- lapply(files, read.csv, skip = 1)
 
         # cleanup & pre-processing
-        for (i in 1:nsamples) {
+        for (i in seq_len(nsamples)) {
             df <- dataframes[[i]]
             # append sample name to a new column named sample
             df$sample <- rep(sampleNames[[i]], nrow(df))
@@ -654,7 +654,7 @@
 #' | v1    |  v2 ....                                               |
 #' +----------------------------------------------------------------+
 .reportLBE <- function(df) {
-    f1.f2 <- unlist(lapply(1:2, function(i) {
+    f1.f2 <- unlist(lapply(seq_len(2), function(i) {
         sum(df[1,] == i)
     }))
 
@@ -853,7 +853,7 @@
         paste(sampleNames, collapse = ", ")
     ))
     # CDR 1 - 3
-    for (i in 1:3) {
+    for (i in seq_len(3)) {
         specFiles <-
             .listFilesInOrder(
                 path = diversityDirectories,
@@ -913,7 +913,7 @@
     }
 
     # FR 1 - 4
-    for (i in 1:4) {
+    for (i in seq_len(4)) {
         specFiles <-
             .listFilesInOrder(
                 path = diversityDirectories,

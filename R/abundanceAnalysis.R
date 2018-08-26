@@ -131,9 +131,9 @@
         #                             rep(5, length(unique(df[[2]]))-1), 15))
         #}
 
-        row = rep(brewer.pal(12, "Paired"), nrow(df))[1:length(unique(df[[1]]))]
+        row = rep(brewer.pal(12, "Paired"), nrow(df))[seq_along(unique(df[[1]]))]
         col = rep(rev(brewer.pal(12, "Paired")),
-                  nrow(df))[1:length(unique(df[[2]]))]
+                  nrow(df))[seq_along(unique(df[[2]]))]
 
         chordDiagram(
             df,
