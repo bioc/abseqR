@@ -55,22 +55,16 @@
     palette <- c(
         "dodgerblue2",
         "#E31A1C",
-        # red
         "green4",
         "#6A3D9A",
-        # purple
         "#FF7F00",
-        # orange
         "black",
         "gold1",
         "skyblue2",
         "#FB9A99",
-        # lt pink
         "olivedrab1",
         "#CAB2D6",
-        # lt purple
         "#FDBF6F",
-        # lt orange
         "gray70",
         "khaki2",
         "maroon",
@@ -286,12 +280,12 @@
         df.shared <- df.original[mask,]
         # clones that are not shared with the other sample
         df.exclusive <- df.original[!mask,]
+        # grey, BLUHEX, purplish blue
         g <- ggplot() +
             stat_density(
                 data = df.original,
                 aes(x = prop, y = ..scaled..),
                 fill = "#808080",
-                # grey
                 alpha = 0.4,
                 adjust = 1,
                 size = 0.1,
@@ -310,7 +304,6 @@
                 data = df.exclusive,
                 aes(x = prop, y = ..scaled..),
                 fill = "#e0ccff",
-                # purplish blue
                 alpha = 0.4,
                 adjust = 1,
                 size = 0.1,

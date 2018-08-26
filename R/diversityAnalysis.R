@@ -536,14 +536,13 @@
 #'
 #' @return ggplot2 object
 .aminoAcidBar <- function(df, scale, region, germ = "") {
+    # oranges(G - T), greens(C - W), purples (N - H), reds (D, E), blues (K, R)
     group.colors <-
         c(
-            # oranges
             G = "#e65c00",
             A = "#ff751a",
             S = "#ff8533",
             T = "#ff944d",
-            # greens
             C = "#003300",
             V = "#145214",
             I = "#006622",
@@ -553,14 +552,11 @@
             Y = "#00b33c",
             M = "#2eb82e",
             W = "#33cc33",
-            # purples
             N = "#330066",
             Q = "#4d0099",
             H = "#6600cc",
-            # reds
             D = "#990000",
             E = "#b30000",
-            # blues
             K = "#000099",
             R = "#0000cc"
         )

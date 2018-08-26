@@ -56,8 +56,8 @@
                 dir.create(annotOut)
             }
             annotDirectories <-
-                sapply(directories, file.path, ABSEQ_DIR_ANNOT,
-                       USE.NAMES = FALSE)
+                vapply(directories, file.path, ABSEQ_DIR_ANNOT,
+                       USE.NAMES = FALSE, FUN.VALUE = "")
             .annotAnalysis(annotDirectories, annotOut, sampleNames, mashedNames)
         }
 
@@ -72,8 +72,8 @@
                 dir.create(abunOut)
             }
             abundanceDirectories <-
-                sapply(directories, file.path, ABSEQ_DIR_ABUN,
-                       USE.NAMES = FALSE)
+                vapply(directories, file.path, ABSEQ_DIR_ABUN,
+                       USE.NAMES = FALSE, FUN.VALUE = "")
             .abundanceAnalysis(
                 abundanceDirectories,
                 abunOut,
@@ -95,8 +95,8 @@
                 dir.create(prodOut)
             }
             productivityDirectories <-
-                sapply(directories, file.path,
-                       ABSEQ_DIR_PROD, USE.NAMES = FALSE)
+                vapply(directories, file.path,
+                       ABSEQ_DIR_PROD, USE.NAMES = FALSE, FUN.VALUE = "")
             .productivityAnalysis(productivityDirectories,
                                   prodOut,
                                   sampleNames,
@@ -115,7 +115,8 @@
                 dir.create(diversityOut)
             }
             diversityDirectories <-
-                sapply(directories, file.path, ABSEQ_DIR_DIV, USE.NAMES = FALSE)
+                vapply(directories, file.path,
+                       ABSEQ_DIR_DIV, USE.NAMES = FALSE, FUN.VALUE = "")
             .diversityAnalysis(diversityDirectories,
                                diversityOut,
                                sampleNames,
@@ -135,8 +136,9 @@
             if (!file.exists(pairwiseOut)) {
                 dir.create(pairwiseOut)
             }
-            diversityDirectories <- sapply(directories, file.path,
-                                           ABSEQ_DIR_DIV, USE.NAMES = FALSE)
+            diversityDirectories <- vapply(directories, file.path,
+                                           ABSEQ_DIR_DIV, USE.NAMES = FALSE,
+                                           FUN.VALUE = "")
             .clonotypeAnalysis(diversityDirectories,
                                pairwiseOut,
                                sampleNames,
@@ -153,10 +155,11 @@
             if (!file.exists(primerOut)) {
                 dir.create(primerOut)
             }
-            primerDirectories <- sapply(directories,
+            primerDirectories <- vapply(directories,
                                         file.path,
                                         ABSEQ_DIR_PRIM,
-                                        USE.NAMES = FALSE)
+                                        USE.NAMES = FALSE,
+                                        FUN.VALUE = "")
             .primerAnalysis(
                 primerDirectories,
                 primer5Files,
@@ -179,8 +182,8 @@
                 dir.create(utr5Out)
             }
             utr5Directories <-
-                sapply(directories, file.path, ABSEQ_DIR_5UTR,
-                       USE.NAMES = FALSE)
+                vapply(directories, file.path, ABSEQ_DIR_5UTR,
+                       USE.NAMES = FALSE, FUN.VALUE = "")
             .UTR5Analysis(
                 utr5Directories,
                 utr5Out,
@@ -202,8 +205,8 @@
                 dir.create(secOut)
             }
             secDirectories <-
-                sapply(directories, file.path, ABSEQ_DIR_SEC,
-                       USE.NAMES = FALSE)
+                vapply(directories, file.path, ABSEQ_DIR_SEC,
+                       USE.NAMES = FALSE, FUN.VALUE = "")
             .secretionSignalAnalysis(
                 secDirectories,
                 secOut,

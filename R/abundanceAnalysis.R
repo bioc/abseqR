@@ -362,11 +362,8 @@
             combinedNames
         ))
         .abundancePlot(searchFiles,
-                       # what are the sample names (in-order)
                        sampleNames,
-                       # output directory
                        abunOut,
-                       # whether or not to ignore D gene plots
                        skipDgene = skipDgene)
     } else {
         warning(paste(

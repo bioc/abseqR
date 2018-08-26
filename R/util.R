@@ -364,5 +364,5 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
         )
         && hasLog)
     }
-    sapply(Filter(.isRepo, repos), basename, USE.NAMES = FALSE)
+    vapply(Filter(.isRepo, repos), basename, USE.NAMES = FALSE, FUN.VALUE = "")
 }
