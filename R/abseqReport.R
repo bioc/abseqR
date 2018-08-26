@@ -201,7 +201,9 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
             # meanwhile, samples will either be a AbSeqCRep or just AbSeqRep.
             outputDir <- file.path(root, RESULT_DIR,
                           paste(sampleNames, collapse = "_vs_"))
-            samples <- .loadSamplesFromString(sampleNames, root)
+            samples <- .loadSamplesFromString(sampleNames,
+                                              root,
+                                              warnMove = FALSE)
             # due to the cache/shared user issue (see issue)
             # https://github.com/rstudio/rmarkdown/issues/499
             # we delay the report generation until AFTER the multiprocessing part
@@ -225,7 +227,7 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
             if (length(sampleNames) == 1) {
                 outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
                 sample <- .loadSamplesFromString(sampleNames, root,
-                                                  warnMove = FALSE)
+                                                  warnMove = TRUE)
                 listOfSamples[[sample@name]] <- sample
             }
         }
@@ -370,7 +372,7 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
         outputDir <- file.path(root, RESULT_DIR,
                                paste(sampleNames, collapse = "_vs_"))
         samples <- .loadSamplesFromString(sampleNames, root,
-                                          warnMove = FALSE)
+                                          warnMove = TRUE)
         if (length(sampleNames) == 1) {
             individualSamples[[samples@name]] <- samples
         }
@@ -412,7 +414,7 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
     if (length(sampleNames) == 1) {
         outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
         sample <- .loadAbSeqRepFromParams(file.path(outputDir, ANALYSIS_PARAMS))
-        if (normalizePath(sample@outdir) != root) {
+        if (suppressWarnings(normalizePath(sample@outdir)) != root) {
             if (warnMove) {
                 warning(paste("Sample output directory", sample@outdir,
                               "is different from provided path",
@@ -427,7 +429,7 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
                 tmpsample <-
                     .loadAbSeqRepFromParams(file.path(root, RESULT_DIR,
                                                       sname, ANALYSIS_PARAMS))
-                if (normalizePath(tmpsample@outdir) != root) {
+                if (suppressWarnings(normalizePath(tmpsample@outdir)) != root) {
                     if (warnMove) {
                         warning(paste("Sample output directory",
                                       tmpsample@outdir,
