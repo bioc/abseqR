@@ -19,6 +19,7 @@ library(png)
 library(plotly)
 library(grid)
 library(gridExtra)
+library(BiocStyle)
 # knitr::opts_chunk$set(tidy = TRUE)
 knitr::opts_chunk$set(message = FALSE)
 ```
