@@ -56,7 +56,7 @@ Collate:
     'abseqReport.R'
     'statistics.R'
     'pairwise.R'
-SystemRequirements: pandoc
+SystemRequirements: pandoc, abseqPy
 URL: https://github.com/malhamdoosh/abseqR
 BugReports: https://github.com/malhamdoosh/abseqR/issues
 biocViews: Sequencing,
