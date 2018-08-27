@@ -252,7 +252,7 @@ Row
     fileInteractiveness <- if (params$interactive) "" else "_static"
     alignmentQuality <- lapply(seq_along(alignQual), function(i) {
         line1 <- knitr::knit_expand(text = sprintf("### %s\n", names(alignQual)[i]))
-        line2 <- knitr::knit_expand(text = sprintf("\n```{r abseq_align_qual_chunk_%d, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}", i))
+        line2 <- knitr::knit_expand(text = sprintf("\n```{r abseq_align_qual_chunk_%s, eval=params$hasAbun, fig.width=params$width, fig.height=params$height}", alignQual[[i]]))
         line3 <- knitr::knit_expand(text = sprintf('\nfname <- .getFile(path = file.path(params$rootDir, "abundance"), pattern = ".*_igv_align_quality_%s_hm%s\\\\.Rdata")', alignQual[[i]], fileInteractiveness))
         line4 <- knitr::knit_expand(text = '\nif(!is.na(fname)) { load(fname); plot } else { ggplot(data.frame()) + xlim(0, 10) + ylim(0, 10) + annotate("text", x = 5, y = 5, label = "404!") }')
         line5 <- knitr::knit_expand(text = "\n```\n")
