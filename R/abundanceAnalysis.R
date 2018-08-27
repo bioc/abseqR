@@ -317,12 +317,7 @@
             )
             return(p)
         } else {
-            warning(paste(
-                "Could not find",
-                heatmapFile,
-                "for sample",
-                sampleName
-            ))
+            warning(paste("Could not find",heatmapFile,"for sample",sampleName))
         }
     })
 }

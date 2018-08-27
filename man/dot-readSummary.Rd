@@ -20,8 +20,7 @@
 }
 \value{
 value associated with key from summary file. "NA" (in string) if the field
-is not available
-refer to \code{util.R} for the key values
+is not available refer to util.R for the key values
 }
 \description{
 Return value specifed by key from AbSeq's summary file

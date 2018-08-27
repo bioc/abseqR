@@ -1,4 +1,7 @@
-#' Title
+#' Duplication level plot
+#'
+#' @description bins singletons, doubletons, and higher order clonotypes
+#' into a line plot
 #'
 #' @import ggplot2
 #' @include util.R
@@ -64,23 +67,18 @@
         g <- ggplot(df.union, aes(x = x, y = y))
 
         if (nsamples == 1) {
-            g <- g + geom_line(aes(linetype = region, color = sample),
+            g <- g + geom_line(aes(linetype = region),
                                color = BLUEHEX,
                                size = 0.65) +
-                guides(color = FALSE) +
-                #scale_size_manual(values = head(seq(1, length(regions), by = .5),
-                #                                n = length(regions))) +
-                scale_linetype_manual(values = .getLineTypes(regions))
+                guides(color = FALSE)
         } else {
             g <- g + geom_line(aes(linetype = region, color = sample),
-                               size = 0.65) +
-                #scale_size_manual(values = head(seq(1, length(regions), by = .5),
-                #                                n = length(regions))) +
-                scale_linetype_manual(values = .getLineTypes(regions))
+                               size = 0.65)
         }
 
-        g <- g + scale_x_continuous(breaks = xticks, labels = xlabels) +
-            theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+        g <- g +
+            scale_linetype_manual(values = .getLineTypes(regions)) +
+            scale_x_continuous(breaks = xticks, labels = xlabels) +
             labs(
                 title = paste(
                     "Sequence duplication levels of",
@@ -90,14 +88,20 @@
                 ),
                 x = "Duplication level",
                 y = "Proportion of duplicated sequences"
-            ) + theme_bw()
+            ) +
+            theme_bw() +
+            theme(axis.text.x = element_text(angle = 45, hjust = 1))
         return(g)
     }
 
 
 
 
-#' Title Rarefaction plot
+#' Rarefaction plot
+#'
+#' @description Plots the number of unique clonotypes (on the y-axis)
+#' drawn from a sample size on the x axis. The number of unique clonotypes
+#' is averaged over 5 repeated rounds.
 #'
 #' @import ggplot2
 #' @include util.R
@@ -177,22 +181,18 @@
         g <- ggplot(df.union, aes(x = x, y = y))
 
         if (nsamples == 1) {
-            g <- g + geom_line(aes(linetype = region, color = sample),
+            g <- g + geom_line(aes(linetype = region),
                                color = BLUEHEX,
                                size = 0.65) +
-                guides(color = FALSE) +
-                #scale_size_manual(values = head(seq(1, length(regions), by = .5),
-                #                                n = length(regions))) +
-                scale_linetype_manual(values = .getLineTypes(regions))
+                guides(color = FALSE)
         } else {
             g <- g +
-                geom_line(aes(linetype = region, color = sample), size = 0.65) +
-                #scale_size_manual(values = head(seq(1, length(regions), by = .5),
-                #                                n = length(regions))) +
-                scale_linetype_manual(values = .getLineTypes(regions))
+                geom_line(aes(linetype = region, color = sample), size = 0.65)
         }
 
-        g <- g + scale_x_continuous(breaks = xticks,
+        g <- g +
+            scale_linetype_manual(values = .getLineTypes(regions)) +
+            scale_x_continuous(breaks = xticks,
                                     limits = c(head(xticks, n = 1),
                                                tail(xticks, n = 1))) +
             geom_ribbon(
@@ -204,7 +204,6 @@
                 alpha = 0.1,
                 show.legend = FALSE
             ) +
-            theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
             labs(
                 title = paste(
                     "Rarefaction of",
@@ -215,13 +214,19 @@
                 subtitle = "Mean number of deduplicated sequences with 95% confidence interval",
                 x = 'Sample size',
                 y = "Number of deduplicated sequences"
-            ) + theme_bw()
+            ) +
+            theme_bw() +
+            theme(axis.text.x = element_text(angle = 90, hjust = 1))
         return(g)
     }
 
 
 
-#' Title Plots recapture
+#' Plots capture-recapture
+#'
+#' @description Plots the percent of recapture clonotypes (on the y-axis)
+#' drawn from a repeated (with replacement) sample size on the x axis. The
+#' percentage of recaptured clonotypes is averaged over 5 recapture rounds.
 #'
 #' @import ggplot2
 #' @include util.R
@@ -304,22 +309,18 @@
         p <- ggplot(df.union, aes(x = x, y = y))
 
         if (nsamples == 1) {
-            p <- p + geom_line(aes(linetype = region, color = sample),
+            p <- p + geom_line(aes(linetype = region),
                                color = BLUEHEX,
                                size = 0.65) +
-                guides(color = FALSE) +
-                #scale_size_manual(values = head(seq(1, length(regions), by = .5),
-                #                                n = length(regions))) +
-                scale_linetype_manual(values = .getLineTypes(regions))
+                guides(color = FALSE)
         } else {
             p <- p +
-                geom_line(aes(linetype = region, color = sample), size = 0.65) +
-                #scale_size_manual(values = head(seq(1, length(regions), by = .5),
-                #                                n = length(regions))) +
-                scale_linetype_manual(values = .getLineTypes(regions))
+                geom_line(aes(linetype = region, color = sample), size = 0.65)
         }
 
-        p <- p + scale_x_continuous(breaks = xticks) +
+        p <- p +
+            scale_linetype_manual(values = .getLineTypes(regions)) +
+            scale_x_continuous(breaks = xticks) +
             geom_ribbon(
                 aes(
                     ymin = y - ci,
@@ -329,7 +330,6 @@
                 alpha = 0.1,
                 show.legend = FALSE
             ) +
-            theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
             labs(
                 title = paste(
                     "Percent recapture of",
@@ -340,7 +340,9 @@
                 subtitle = "Mean number of recaptured sequences with 95% confidence interval",
                 x = "Sample size",
                 y = "Percent Recapture"
-            ) + theme_bw()
+            ) + theme_bw() +
+            theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
         return(p)
     }
 
@@ -426,6 +428,8 @@
 
 #' Composition logo plot
 #'
+#' @description Plots 2 kinds: scaled and unscaled composition logos
+#'
 #' @param compositionDirectory string type.
 #' @param outdir string type.
 #' @param sampleName string type.
@@ -441,8 +445,6 @@
                            regions = c("FR1", "CDR1", "FR2", "CDR2", "FR3", "CDR3", "FR4"),
                            .save = TRUE) {
     for (region in regions) {
-        # todo: change dirname such that compositionDirectory and outdir
-        # is differentiated!
         dirName <- file.path(compositionDirectory, region)
         outputPath <- file.path(outdir, region)
         if (!dir.exists(outputPath)) {
@@ -454,22 +456,16 @@
         df <- read.csv(summaryPlot)
         g1 <- .aminoAcidBar(df, scale = FALSE, region)
         g2 <- .aminoAcidBar(df, scale = TRUE, region)
-        fname1 <-
+        fname <-
             file.path(outputPath,
                       paste0(sampleName, "_cumulative_logo.png"))
-        fname2 <-
+        fnameScaled <-
             file.path(outputPath,
                       paste0(sampleName, "_cumulative_logo_scaled.png"))
-        ggsave(fname1,
-               plot = g1,
-               width = V_WIDTH,
-               height = V_HEIGHT)
-        ggsave(fname2,
-               plot = g2,
-               width = V_WIDTH,
-               height = V_HEIGHT)
-        .saveAs(.save, fname1, g1)
-        .saveAs(.save, fname2, g2)
+        ggsave(fname, plot = g1, width = V_WIDTH, height = V_HEIGHT)
+        ggsave(fnameScaled, plot = g2, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, fname, g1)
+        .saveAs(.save, fnameScaled, g2)
 
         germlineSpecific <-
             list.files(
@@ -490,10 +486,10 @@
                 .aminoAcidBar(df, scale = FALSE, region, germ = germName)
             g2 <-
                 .aminoAcidBar(df, scale = TRUE, region, germ = germName)
-            fname1 <-
+            fname <-
                 file.path(outputPath,
                           paste0(sampleName, "_", germName, "_cumulative_logo.png"))
-            fname2 <-
+            fnameScaled <-
                 file.path(
                     outputPath,
                     paste0(
@@ -503,20 +499,10 @@
                         "_cumulative_logo_scaled.png"
                     )
                 )
-            ggsave(
-                fname1,
-                plot = g1,
-                width = V_WIDTH,
-                height = V_HEIGHT
-            )
-            ggsave(
-                fname2,
-                plot = g2,
-                width = V_WIDTH,
-                height = V_HEIGHT
-            )
-            .saveAs(.save, fname1, g1)
-            .saveAs(.save, fname2, g2)
+            ggsave(fname, plot = g1, width = V_WIDTH, height = V_HEIGHT)
+            ggsave( fnameScaled, plot = g2, width = V_WIDTH, height = V_HEIGHT)
+            .saveAs(.save, fname, g1)
+            .saveAs(.save, fnameScaled, g2)
         })
     }
 }
@@ -740,227 +726,23 @@
         paste(sampleNames, collapse = ", ")
     ))
 
-    # fr/cdr plots
+    # fr/cdr plots --------------------------------------------------------
     # plot duplication, rarefaction, recapture
-    for (reg in c("cdr", "cdr_v", "fr")) {
-        if (reg == "cdr") {
-            includedRegions <- c("CDR1", "CDR2", "CDR3")
-        } else if (reg == "cdr_v") {
-            includedRegions <- c("CDR3", "V")
-        } else {
-            includedRegions <- c("FR1", "FR2", "FR3")
-        }
-        searchFiles <-
-            .listFilesInOrder(
-                path = diversityDirectories,
-                pattern =  paste0(".*_", reg,
-                                  "_duplication\\.csv(\\.gz)?$")
-            )
-        if (length(searchFiles) > 0) {
-            # duplication
-            g <- .plotDuplication(searchFiles,
-                                  sampleNames,
-                                  includedRegions)
-            saveName <-
-                file.path(diversityOut,
-                          paste0(mashedNames, "_", reg, "_duplication.png"))
-            ggsave(
-                saveName,
-                plot = g,
-                width = V_WIDTH,
-                height = V_HEIGHT
-            )
-            .saveAs(.save, saveName, g)
-        } else {
-            warning(paste(
-                "Could not find duplication files in",
-                paste(diversityDirectories, collapse = ", ")
-            ))
-        }
+    lapply(c("cdr", "cdr_v", "fr"), function(region) {
+        .plotDiversityCurves(region, diversityDirectories,
+                             sampleNames, mashedNames,
+                             diversityOut, .save = .save)
+    })
 
-        searchFiles <-
-            .listFilesInOrder(
-                path = diversityDirectories,
-                pattern = paste0(".*_", reg,
-                                 "_rarefaction\\.csv(\\.gz)?$")
-            )
-        if (length(searchFiles) > 0) {
-            # plot rarefaction
-            g <- .plotRarefaction(searchFiles,
-                                  sampleNames,
-                                  includedRegions)
-            saveName <-
-                file.path(diversityOut,
-                          paste0(mashedNames, "_", reg, "_rarefaction.png"))
-            ggsave(
-                saveName,
-                plot = g,
-                width = V_WIDTH,
-                height = V_HEIGHT
-            )
-            .saveAs(.save, saveName, g)
-        } else {
-            warning(paste(
-                "Could not find rarefaction files in",
-                paste(diversityDirectories, collapse = ", ")
-            ))
-        }
-        searchFiles <-
-            .listFilesInOrder(
-                path = diversityDirectories,
-                pattern = paste0(".*_", reg,
-                                 "_recapture\\.csv(\\.gz)?$")
-            )
-        if (length(searchFiles) > 0) {
-            # plot recapture
-            g <- .plotRecapture(searchFiles,
-                                sampleNames,
-                                includedRegions)
-            saveName <-
-                file.path(diversityOut,
-                          paste0(mashedNames, "_", reg, "_recapture.png"))
-            ggsave(
-                saveName,
-                plot = g,
-                width = V_WIDTH,
-                height = V_HEIGHT
-            )
-            .saveAs(.save, saveName, g)
-        } else {
-            warning(paste(
-                "Could not find recapture files in",
-                paste(diversityDirectories, collapse = ", ")
-            ))
-        }
-    }
-
-    # MINISECTION:
-    # ## SPECTRATYPES ###
-    specOut <- file.path(diversityOut, "spectratypes")
-    if (!file.exists(specOut)) {
-        dir.create(specOut)
-    }
-    message(paste(
-        "Plotting spectratypes on samples",
-        paste(sampleNames, collapse = ", ")
-    ))
-    # CDR 1 - 3
-    for (i in seq_len(3)) {
-        specFiles <-
-            .listFilesInOrder(
-                path = diversityDirectories,
-                pattern = paste0(".*_cdr", i,
-                                 "_spectratype\\.csv(\\.gz)?$")
-            )
-        if (length(specFiles) > 0) {
-            g <- .plotSpectratype(
-                lapply(specFiles, read.csv,
-                       stringsAsFactors = FALSE),
-                sampleNames,
-                paste0("CDR", i)
-            )
-            saveName <-
-                file.path(specOut,
-                          paste0(mashedNames, "_cdr", i, "_spectratype.png"))
-            ggsave(
-                saveName,
-                plot = g,
-                width = V_WIDTH,
-                height = V_HEIGHT
-            )
-            .saveAs(.save, saveName, g)
-        } else {
-            warning(paste0(
-                "Could not find CDR",
-                i,
-                " spectratype files in ",
-                paste(diversityDirectories, collapse = ", ")
-            ))
-        }
-    }
-
-    # special case, no outliers plot for CDR3 only
-    specFiles <-
-        .listFilesInOrder(path = diversityDirectories,
-                          pattern = ".*_cdr3_spectratype_no_outliers\\.csv(\\.gz)?$")
-
-    if (length(specFiles) > 0) {
-        g <-
-            .plotSpectratype(lapply(specFiles, read.csv, stringsAsFactors = FALSE),
+    # generate FR1-4, CDR1-3, CDR3 no outliers, and V spectratypes -------
+    .generateAllSpectratypes(diversityDirectories,
+                             diversityOut,
                              sampleNames,
-                             "CDR3")
-        saveName <-
-            file.path(specOut,
-                      paste0(mashedNames, "_cdr3_spectratype_no_outliers.png"))
-        ggsave(saveName,
-               plot = g,
-               width = V_WIDTH,
-               height = V_HEIGHT)
-        .saveAs(.save, saveName, g)
-    } else {
-        warning(paste(
-            "Could not find CDR3 spectratype (no outlier) files in",
-            paste(diversityDirectories, collapse = ", ")
-        ))
-    }
+                             mashedNames,
+                             .save = .save)
 
-    # FR 1 - 4
-    for (i in seq_len(4)) {
-        specFiles <-
-            .listFilesInOrder(
-                path = diversityDirectories,
-                pattern = paste0(".*_fr", i,
-                                 "_spectratype\\.csv(\\.gz)?$")
-            )
-        if (length(specFiles) > 0) {
-            g <-
-                .plotSpectratype(
-                    lapply(specFiles, read.csv, stringsAsFactors = FALSE),
-                    sampleNames,
-                    paste0("FR", i)
-                )
-            saveName <-
-                file.path(specOut,
-                          paste0(mashedNames, "_fr",
-                                 i, "_spectratype.png"))
-            ggsave(
-                saveName,
-                plot = g,
-                width = V_WIDTH,
-                height = V_HEIGHT
-            )
-            .saveAs(.save, saveName, g)
-        } else {
-            warning(paste0(
-                "Could not find FR",
-                i,
-                " spectratype files in ",
-                paste(diversityDirectories, collapse = ", ")
-            ))
-        }
-    }
-
-    # entire V-domain
-    specFiles <- .listFilesInOrder(path = diversityDirectories,
-                                   pattern = ".*_v_spectratype\\.csv(\\.gz)?$")
-    if (length(specFiles) > 0) {
-        g <-
-            .plotSpectratype(
-                lapply(specFiles, read.csv, stringsAsFactors = FALSE),
-                sampleNames,
-                "V domain"
-            )
-        saveName <-
-            file.path(specOut, paste0(mashedNames, "_v_spectratype.png"))
-        ggsave(saveName,
-               plot = g,
-               width = V_WIDTH,
-               height = V_HEIGHT)
-        .saveAs(.save, saveName, g)
-    }
-
-    # MINISECTION:
-    # ## COMPOSITION LOGOS ###
+    # generate composition logos -----------------------------------------
+    # not applicable to multi-sample scenario
     if (length(sampleNames) == 1) {
         compDir <- file.path(diversityDirectories[[1]], "composition_logos")
         compOut <- file.path(diversityOut, "composition_logos")
@@ -975,6 +757,7 @@
     }
 
     # we can plot region analysis if there's only one sample
+    # this feature is disabled until the backend has been optimized
     #if (length(sampleNames) == 1) {
     #  # default = top 15
     #  g <- .regionAnalysis(diversityOut, sampleNames[1])
@@ -982,184 +765,254 @@
     #         plot = g, width = V_WIDTH, height = V_HEIGHT)
     #}
 
-    ####################################################
-    #                  UNSEEN SPECIES                  #
-    ####################################################
+    # Calculate Lower Bound Estimate and diversity indices --------------------
+    .calculateDiversityEstimates(diversityDirectories,
+                                 diversityOut,
+                                 sampleNames)
+}
+
+#' Plots rarefaction, recapture, and de-dup plots for specified \code{region}
+#'
+#' @import ggplot2
+#' @include util.R
+#' @include distributions.R
+#'
+#' @param region string type. One of: "cdr", "cdr_v", and "fr". "cdr" means
+#' CDR1-3, "cdr_v" means CDR3 and V only, and finally "fr" means FR1-4.
+#' @param diversityDirectories list type. List of directories to diversity dir
+#' @param sampleNames vector type. 1-1 with diversityDirectories
+#' @param mashedNames string type. Prefix for output files using "mashed-up"
+#' @param diversityOut string type. Output directory sample names
+#' @param .save logical type. Save ggplot object?
+#'
+#' @return Nothing
+.plotDiversityCurves <- function(region,
+                                 diversityDirectories,
+                                 sampleNames,
+                                 mashedNames,
+                                 diversityOut,
+                                 .save = TRUE) {
+    if (region == "cdr") {
+        includedRegions <- c("CDR1", "CDR2", "CDR3")
+    } else if (region == "cdr_v") {
+        includedRegions <- c("CDR3", "V")
+    } else {
+        includedRegions <- c("FR1", "FR2", "FR3")
+    }
+
+    plotTypes <- c("duplication" = .plotDuplication,
+                   "rarefaction" = .plotRarefaction,
+                   "recapture" = .plotRecapture)
+
+    lapply(seq_along(plotTypes), function(i) {
+        functor <- plotTypes[[i]]
+        ptype <- names(plotTypes)[[i]]
+
+        searchFiles <-
+            .listFilesInOrder(path = diversityDirectories,
+                              pattern =  paste0(".*_", region,
+                                                "_", ptype, "\\.csv(\\.gz)?$"))
+        if (length(searchFiles) > 0) {
+            g <- functor(searchFiles, sampleNames, includedRegions)
+            saveName <-
+                file.path(diversityOut,
+                          paste0(mashedNames, "_", region, "_", ptype, ".png"))
+            ggsave(saveName,
+                   plot = g,
+                   width = V_WIDTH,
+                   height = V_HEIGHT)
+            .saveAs(.save, saveName, g)
+        } else {
+            warning(paste(
+                "Could not find", ptype, "files in",
+                paste(diversityDirectories, collapse = ", ")
+            ))
+        }
+    })
+}
+
+
+
+#' Generates all FR/CDR spectratypes
+#'
+#' @import ggplot2
+#' @include util.R
+#' @include distributions.R
+#'
+#' @param diversityDirectories list type. List of directories to diversity dir
+#' @param diversityOut string type. Output directory
+#' @param sampleNames vector type. 1-1 with diversityDirectories
+#' @param mashedNames string type. Prefix for output files using "mashed-up"
+#' sample names
+#' @param .save logical type. Save ggplot object?
+#'
+#' @return Nothing
+.generateAllSpectratypes <- function(diversityDirectories,
+                                     diversityOut,
+                                     sampleNames,
+                                     mashedNames,
+                                     .save = TRUE) {
+    specOut <- file.path(diversityOut, "spectratypes")
+    if (!file.exists(specOut)) {
+        dir.create(specOut)
+    }
+    message(paste(
+        "Plotting spectratypes on samples",
+        paste(sampleNames, collapse = ", ")
+    ))
+
+    regionTypes <- list("cdr" = seq_len(3), "fr" = seq_len(4))
+    lapply(seq_along(regionTypes), function(i) {
+        # grab the region (CDR/FR)
+        region <- names(regionTypes)[[i]]
+        # for CDR, 1-3, else 1-4
+        lapply(regionTypes[[i]], function(j) {
+            specFiles <-
+                .listFilesInOrder(path = diversityDirectories,
+                                  pattern = paste0(".*_",
+                                                   region,
+                                                   j,
+                                                   "_spectratype\\.csv(\\.gz)?$"))
+            if (length(specFiles) > 0) {
+                g <- .plotSpectratype(lapply(specFiles, read.csv,
+                                             stringsAsFactors = FALSE),
+                                      sampleNames,
+                                      paste0(toupper(region), j))
+                saveName <- file.path(specOut,
+                                      paste0(mashedNames,
+                                             "_",
+                                             region,
+                                             j,
+                                             "_spectratype.png"))
+                ggsave(saveName,plot = g, width = V_WIDTH, height = V_HEIGHT)
+                .saveAs(.save, saveName, g)
+            } else {
+                warning(paste0("Could not find ", region, j,
+                               " spectratype files in ",
+                               paste(diversityDirectories, collapse = ", ")))
+            }
+        })
+    })
+
+    # special case, no outliers plot for CDR3 only
+    specFiles <-
+        .listFilesInOrder(path = diversityDirectories,
+                          pattern = ".*_cdr3_spectratype_no_outliers\\.csv(\\.gz)?$")
+
+    if (length(specFiles) > 0) {
+        g <-
+            .plotSpectratype(lapply(specFiles, read.csv, stringsAsFactors = FALSE),
+                             sampleNames,
+                             "CDR3")
+        saveName <-
+            file.path(specOut,
+                      paste0(mashedNames, "_cdr3_spectratype_no_outliers.png"))
+        ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, saveName, g)
+    } else {
+        warning(paste(
+            "Could not find CDR3 spectratype (no outlier) files in",
+            paste(diversityDirectories, collapse = ", ")))
+    }
+
+    # entire V-domain
+    specFiles <- .listFilesInOrder(path = diversityDirectories,
+                                   pattern = ".*_v_spectratype\\.csv(\\.gz)?$")
+    if (length(specFiles) > 0) {
+        g <-
+            .plotSpectratype(
+                lapply(specFiles, read.csv, stringsAsFactors = FALSE),
+                sampleNames,
+                "V domain")
+        saveName <-
+            file.path(specOut, paste0(mashedNames, "_v_spectratype.png"))
+        ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
+        .saveAs(.save, saveName, g)
+    } else {
+        warning(paste("Cound not find V spectratype files in",
+                      paste(diversityDirectories, collapse = ", ")))
+    }
+}
+
+
+#' Calculates Lower Bound Estimates for unseen species and Common Diversity
+#' Indices from clonotype tables
+#'
+#' @description Employ common techniques to calculate LBE for unseen species
+#' and commonly used diversity indices
+#'
+#' @import tools
+#' @include util.R
+#' @include distributions.R
+#'
+#' @param diversityDirectories list type. List of directories to diversity dir
+#' @param diversityOut string type. Output directory
+#' @param sampleNames vector type. 1-1 with diversityDirectories sample names
+#'
+#' @return None
+.calculateDiversityEstimates <- function(diversityDirectories,
+                                         diversityOut,
+                                         sampleNames) {
     cdr3ClonesFile <- .listFilesInOrder(path = diversityDirectories,
                                         pattern = ".*_cdr3_clonotypes_.*_over\\.csv(\\.gz)?$")
+
+    if (length(cdr3ClonesFile) != length(sampleNames)) {
+        warning(paste(paste(sampleNames, collapse = ", "),
+                      "is missing CDR3 clonotype counts file,",
+                      "skipping LBE and IND analysis" ))
+        return()
+    }
+
+    # dataframes is in vegan input format, the clonotypes are
+    # now column headers instead of column values
+    dataframes <- lapply(cdr3ClonesFile, function(fname) {
+        df <- read.csv(fname, stringsAsFactors = FALSE)
+        d.trans <- as.data.frame(t(df[, "Count"]))
+        return(d.trans)
+    })
+
     lb.fname <- "lower_bound_estimate.tsv"
     ind.fname <- "diversity_indices.tsv"
 
-    if (length(cdr3ClonesFile)) {
-        # dataframes is in vegan input format, the clonotypes are now column headers
-        # instead of column values
-        dataframes <- lapply(cdr3ClonesFile, function(fname) {
-            df <- read.csv(fname, stringsAsFactors = FALSE)
-            d.trans <- as.data.frame(t(df[, "Count"]))
-            #names(d.trans) <- df$Clonotype
-            return(d.trans)
-        })
-        lbeOut <- file.path(diversityOut, lb.fname)
-        indOut <- file.path(diversityOut, ind.fname)
+    estimateTypes <- list(.reportLBE, .calculateDInd)
+    names(estimateTypes) <- c(lb.fname, ind.fname)
+    outputFiles <- c(file.path(diversityOut, lb.fname),
+                     file.path(diversityOut, ind.fname))
 
-        if (length(dataframes) == 1) {
-            ##### Lower bound estimates of unseen species
-            message(
-                paste(
-                    "Calculating unseen species lower bound estimates for",
-                    sampleNames[1]
-                )
-            )
-            df.lbe <- .reportLBE(dataframes[[1]])
-            write.table(
-                df.lbe,
-                file = lbeOut,
-                sep = "\t",
-                quote = FALSE,
-                row.names = FALSE
-            )
+    lapply(seq_along(estimateTypes), function(i) {
+        fileName <- names(estimateTypes)[[i]]
+        fileNameSansExt <- tools::file_path_sans_ext(fileName)
+        functor <- estimateTypes[[i]]
 
-            ##### Diversity indices
-            message(paste(
-                "Calculating standard diversity indices for",
-                sampleNames[1]
-            ))
-            df.ind <- .calculateDInd(dataframes[[1]])
-            write.table(
-                df.ind,
-                file = indOut,
-                sep = "\t",
-                quote = FALSE,
-                row.names = FALSE
-            )
+        files <-
+            .listFilesInOrder(path = diversityDirectories,
+                              pattern = paste0(fileNameSansExt,
+                                               "\\.tsv(\\.gz)?$"))
 
+        if (length(files) != length(sampleNames)) {
+            # if even one of the tsv file doesn't exist
+            # (which means we haven't generated it, or if it was deleted,
+            # we re-generate them)
+            message(paste("Calculating",
+                          sub("_", " ", fileNameSansExt, fixed = TRUE),
+                          "for", paste(sampleNames, collapse = ", ")))
+            df.ests <- lapply(dataframes, functor)
         } else {
-            ##### Lower bound estimates of unseen species
-            # don't bother recalculating .reportLBE unless the file can't be found
-            # .reportLBE might not be calculated if the user manually combined repertoires
-            # before actually calling abseqR::report() on the individual repertoires
-
-            # try to find all lower bound estimate files in all the sample directories, if
-            # even one of them does not exist, we'll have to generate the tsv file
-            lbesFiles <-
-                .listFilesInOrder(path = diversityDirectories,
-                                  pattern = paste0(lb.fname, "\\.tsv(\\.gz)?$"))
-            if (length(lbesFiles) != length(sampleNames)) {
-                message(paste(
-                    "Calculating unseen species lower bound estimates for",
-                    paste(sampleNames, collapse = ", ")
-                ))
-                df.lbes <- lapply(dataframes, .reportLBE)
-                stopifnot(
-                    length(df.lbes) == length(sampleNames) &&
-                        length(sampleNames) == length(diversityDirectories)
-                )
-
-                # write out to individual sample directories
-                lapply(seq_along(df.lbes), function(i) {
-                    write.table(
-                        df.lbes[[i]],
-                        file = file.path(diversityDirectories[[i]], lb.fname),
-                        sep = "\t",
-                        quote = FALSE,
-                        row.names = FALSE
-                    )
-                })
-            } else {
-                # expect 1-1 relationship
-                message(paste(
-                    "Loading precomputed lower bound estimates from",
-                    paste(sampleNames, collapse = ", ")
-                ))
-                stopifnot(length(diversityDirectories) == length(sampleNames))
-                lbesFiles <-
-                    .listFilesInOrder(path = diversityDirectories,
-                                      pattern = paste0(lb.fname, "\\.tsv(\\.gz)?$"))
-                stopifnot(length(lbesFiles) == length(sampleNames))
-                df.lbes <-
-                    lapply(lbesFiles, read.table, header = TRUE)
-            }
-            dfs <-
-                do.call("rbind", lapply(seq_along(df.lbes), function(i) {
-                    df <- df.lbes[[i]]
-                    df$sample <- sampleNames[i]
-                    return(df)
-                }))
-            write.table(
-                dfs,
-                file = lbeOut,
-                sep = "\t",
-                quote = FALSE,
-                row.names = FALSE
-            )
-
-            ##### Diversity indices
-            # same logic as above
-            indFiles <-
-                .listFilesInOrder(path = diversityDirectories,
-                                  pattern = paste0(ind.fname, "\\.tsv(\\.gz)?$"))
-            # if we can't recover all the required indices tsv file, re-generate
-            # all of them
-            if (length(indFiles) != length(sampleNames)) {
-                message(paste(
-                    "Calculating standard diversity indices for",
-                    paste(sampleNames, collapse = ", ")
-                ))
-
-                df.inds <- lapply(dataframes, .calculateDInd)
-                stopifnot(
-                    length(df.inds) == length(sampleNames) &&
-                        length(sampleNames) == length(diversityDirectories)
-                )
-
-                # write out to individual sample directories
-                lapply(seq_along(df.inds), function(i) {
-                    write.table(
-                        df.inds[[i]],
-                        file = file.path(diversityDirectories[[i]],
-                                         ind.fname),
-                        sep = "\t",
-                        quote = FALSE,
-                        row.names = FALSE
-                    )
-                })
-            } else {
-                message(paste(
-                    "Loading precomputed diversity indices from",
-                    paste(sampleNames, collapse = ", ")
-                ))
-                stopifnot(length(diversityDirectories) == length(sampleNames))
-                indFiles <-
-                    .listFilesInOrder(
-                        path = diversityDirectories,
-                        pattern = paste0(ind.fname, "\\.tsv(\\.gz)?$")
-                    )
-                stopifnot(length(indFiles) == length(sampleNames))
-                df.inds <-
-                    lapply(indFiles, read.table, header = TRUE)
-            }
-            dfs <-
-                do.call("rbind", lapply(seq_along(df.inds), function(i) {
-                    df <- df.inds[[i]]
-                    df$sample <- sampleNames[i]
-                    return(df)
-                }))
-            write.table(
-                dfs,
-                file = indOut,
-                sep = "\t",
-                quote = FALSE,
-                row.names = FALSE
-            )
+            # the rare occasion when all individual samples have already been
+            # analyzed and the TSVs are all available, we only need to reload
+            # them rather than re-computing the values
+            message(paste("Loading precomputed",
+                          sub("_", " ", fileNameSansExt, fixed = TRUE),
+                          "from",
+                          paste(sampleNames, collapse = ", ")))
+            df.ests <- lapply(files, read.table, header = TRUE)
         }
+        stopifnot(length(diversityDirectories) == length(sampleNames) &&
+                      length(df.ests) == length(sampleNames))
 
-    } else {
-        warning(
-            paste(
-                paste(sampleNames, collapse = ", "),
-                "is missing CDR3 clonotype counts file,",
-                "skipping LBE and IND analysis"
-            )
-        )
-    }
+        dfs <- do.call("rbind", Map(cbind, df.ests, sample = sampleNames))
+        write.table(dfs, file = outputFiles[[i]],
+                    sep = "\t", quote = FALSE,
+                    row.names = FALSE)
+    })
 }

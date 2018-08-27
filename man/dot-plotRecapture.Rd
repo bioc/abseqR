@@ -2,7 +2,7 @@
 % Please edit documentation in R/diversityAnalysis.R
 \name{.plotRecapture}
 \alias{.plotRecapture}
-\title{Title Plots recapture}
+\title{Plots capture-recapture}
 \usage{
 .plotRecapture(files, sampleNames, regions = c("CDR3", "V"))
 }
@@ -19,5 +19,7 @@ regions to be included in the plot. defaults to c("CDR3", "V")}
 ggplot2 object
 }
 \description{
-Title Plots recapture
+Plots the percent of recapture clonotypes (on the y-axis)
+drawn from a repeated (with replacement) sample size on the x axis. The
+percentage of recaptured clonotypes is averaged over 5 recapture rounds.
 }

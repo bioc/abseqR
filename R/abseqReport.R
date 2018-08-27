@@ -110,62 +110,35 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
     #  ------ sanitize function arguments ---------
     root <- normalizePath(directory)
     if (!(all(c(RESULT_DIR, AUX_DIR) %in% list.files(root)))) {
-        stop(
-            paste(
-                "Expected to find",
-                RESULT_DIR,
-                "and",
-                AUX_DIR,
-                "in",
-                root,
+        stop(paste("Expected to find", RESULT_DIR, "and", AUX_DIR,
+                "in", root,
                 "but they are missing. This directory should be the output",
-                "directory as specified in abseqPy. Aborting."
-            )
-        )
+                "directory as specified in abseqPy. Aborting."))
     }
+
     if (missing(report)) {
         report <- 3
     }
+
     if (missing(BPPARAM)) {
         BPPARAM <- BiocParallel::bpparam()
     }
+
     if (missing(compare)) {
         # if user didn't specify which to compare, don't compare, just load
         # all samples in root/RESULT_DIR, EXCLUDING sample comparisons
         compare <- .findRepertoires(file.path(root, RESULT_DIR))
     } else {
         # make sure samples in "compare" actually exists
-        availSamples <-
-            .findRepertoires(file.path(root, RESULT_DIR))
+        availSamples <- .findRepertoires(file.path(root, RESULT_DIR))
         lapply(compare, function(s) {
             user.sample.name <- unlist(lapply(strsplit(s, ","), trimws))
-            if (length(user.sample.name) > 1) {
-                lapply(user.sample.name, function(si) {
-                    if (!(si %in% availSamples)) {
-                        stop(
-                            paste(
-                                "Sample",
-                                si,
-                                "in 'compare' argument cannot",
-                                "be found in",
-                                file.path(root, RESULT_DIR)
-                            )
-                        )
-                    }
-                })
-            } else {
-                if (!(s %in% availSamples)) {
-                    stop(
-                        paste(
-                            "Sample",
-                            s,
-                            "in 'compare' argument cannot",
-                            "be found in",
-                            file.path(root, RESULT_DIR)
-                        )
-                    )
+            lapply(user.sample.name, function(si) {
+                if (!(si %in% availSamples)) {
+                    stop(paste("Sample", si, "in 'compare' argument cannot",
+                            "be found in", file.path(root, RESULT_DIR)))
                 }
-            }
+            })
         })
         compare <- unique(c(availSamples, compare))
     }
@@ -192,7 +165,6 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
     }
 
     if (loop) {
-        #lapply(compare, function(pair) {
         bplapply(compare, function(pair) {
             sampleNames <- unlist(lapply(strsplit(pair, ","), trimws))
 
@@ -212,7 +184,6 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
             abseqR::report(samples,
                            outputDir,
                            report = 1)   # always plot, but DO NOT GENERATE REPORT!
-            #})
         }, BPPARAM = BPPARAM)
     }
 
@@ -411,36 +382,19 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
 #'
 #' @return AbSeqRep or AbSeqCRep object depending on sampleNames
 .loadSamplesFromString <- function(sampleNames, root, warnMove = TRUE) {
-    if (length(sampleNames) == 1) {
-        outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
-        sample <- .loadAbSeqRepFromParams(file.path(outputDir, ANALYSIS_PARAMS))
+    Reduce("+", lapply(sampleNames, function(sname) {
+        sample <- .loadAbSeqRepFromParams(file.path(root, RESULT_DIR,
+                                                    sname, ANALYSIS_PARAMS))
         if (suppressWarnings(normalizePath(sample@outdir)) != root) {
             if (warnMove) {
-                warning(paste("Sample output directory", sample@outdir,
+                warning(paste("Sample output directory",
+                              sample@outdir,
                               "is different from provided path",
-                              root, "assuming directory was moved"))
+                              root,
+                              "assuming directory was moved"))
             }
             sample@outdir <- root
         }
         return(sample)
-    } else {
-        samples <-
-            Reduce("+", lapply(sampleNames, function(sname) {
-                tmpsample <-
-                    .loadAbSeqRepFromParams(file.path(root, RESULT_DIR,
-                                                      sname, ANALYSIS_PARAMS))
-                if (suppressWarnings(normalizePath(tmpsample@outdir)) != root) {
-                    if (warnMove) {
-                        warning(paste("Sample output directory",
-                                      tmpsample@outdir,
-                                      "is different from provided path",
-                                      root,
-                                      "assuming directory was moved"))
-                    }
-                    tmpsample@outdir <- root
-                }
-                return(tmpsample)
-            }))
-        return(samples)
-    }
+    }))
 }

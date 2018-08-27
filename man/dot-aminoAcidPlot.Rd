@@ -23,5 +23,5 @@
 none
 }
 \description{
-Composition logo plot
+Plots 2 kinds: scaled and unscaled composition logos
 }

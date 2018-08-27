@@ -2,7 +2,7 @@
 % Please edit documentation in R/diversityAnalysis.R
 \name{.plotDuplication}
 \alias{.plotDuplication}
-\title{Title}
+\title{Duplication level plot}
 \usage{
 .plotDuplication(files, sampleNames, regions = c("CDR3", "V"))
 }
@@ -19,5 +19,6 @@ Which regions to include in the plot. Default = c("CDR3", "V")}
 ggplot2 object
 }
 \description{
-Title
+bins singletons, doubletons, and higher order clonotypes
+into a line plot
 }

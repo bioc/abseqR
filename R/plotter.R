@@ -43,8 +43,16 @@
         if (!dir.exists(outputDir)) {
             dir.create(outputDir)
         }
+        # mashedNames are "file-system" friendly names, we collapse them
+        # with an underscore (from here on out, all plot names will be
+        # <mashedNames>_<...>.png)
         mashedNames <- paste(sampleNames, collapse = "_")
+
+        # combinedNames are "human" friendly names, we combine them with
+        # commas (from here on out, plot titles will be
+        # "<combinedNames> <...>")
         combinedNames <- paste(sampleNames, collapse = ", ")
+
         ##################################################
         #                                                #
         #               ANNOTATION PLOTS                 #

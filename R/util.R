@@ -42,6 +42,12 @@ ABSEQ_FILT_READ_COUNT_KEY <- "FilteredReads"
 ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
 
 
+#' Checks if abseqPy has a metadata line that suggests
+#' the orientation
+#'
+#' @param filename csv filename
+#'
+#' @return True if CSV metadata says "plot vertically"
 .checkVert <- function(filename) {
     f <- file(filename, "r")
     res <- grepl("vert", readLines(f, n = 1), fixed = TRUE)
@@ -49,6 +55,15 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
     return(res)
 }
 
+#' Get total number of samples (n)
+#'
+#' @description Often enough, the CSV values supplied do not contain
+#' raw counts but percentages (so this value will let us know exactly
+#' the sample size).
+#'
+#' @param filename csv filename
+#'
+#' @return string, sample size.
 .getTotal <- function(filename) {
     f <- file(filename, "r")
     res <- unlist(strsplit(readLines(f, n = 1), "="))[2]
@@ -78,25 +93,25 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
             full.names = TRUE,
             recursive = TRUE
         )
+        # short circuit once at least one of the paths don't have the required
+        # file. (Can't compare all the samples if one of them is missing!)
         if (length(retval) == 0) {
             return(c())
         }
         if (!(length(retval) %in% expectedRet)) {
-            stop(
-                paste(
-                    "Expected either",
-                    paste(expectedRet, collapse = ", ")
-                ),
-                "files to be found, but only",
-                length(retval),
-                "were found."
-            )
+            stop(paste("Expected either",paste(expectedRet, collapse = ", ")),
+                "files to be found, but only", length(retval), "were found.")
         }
         orderedFiles <- c(orderedFiles,  retval)
     }
     return(orderedFiles)
 }
 
+#' Returns all samples found under \code{sampleDirectory}
+#'
+#' @param sampleDirectory string, path to sample directory.
+#'
+#' @return un-normalized path to all samples under \code{sampleDirectory}
 .inferAnalyzed <- function(sampleDirectory) {
     everything <- list.files(sampleDirectory)
     fullPath <- lapply(everything, function(x) {
@@ -105,6 +120,11 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
     return(everything[unlist(lapply(fullPath, dir.exists))])
 }
 
+#' Helper function to capitalize the first letter of \code{str}
+#'
+#' @param str string type
+#'
+#' @return string, \code{str} capitalized
 .capitalize <- function(str) {
     firstLetter <- substr(str, 1, 1)
     rest <- substr(str, 2, nchar(str))
@@ -136,11 +156,12 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
              conf.interval = .95,
              .drop = TRUE) {
         # New version of length which can handle NA's: if na.rm==T, don't count them
-        length2 <- function (x, na.rm = FALSE) {
-            if (na.rm)
+        length2 <- function(x, na.rm = FALSE) {
+            if (na.rm) {
                 sum(!is.na(x))
-            else
+            } else {
                 length(x)
+            }
         }
 
         # This does the summary. For each group's data frame, return a vector with
@@ -174,6 +195,18 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
         return(datac)
     }
 
+#' Helper function to return line types by importance based on provided
+#' CD/Fs regions
+#'
+#' @description In the aesthetics of diversity plots (rarefaction, recapture,
+#' and duplication), the line types should emphasise the most important
+#' antibody region, they're ranked in ascending order of:
+#' "FR4", "FR1", "FR2", "FR3", "CDR1", "CDR2", "CDR3", "V".
+#'
+#' @param regions a list/vector of strings (regions)
+#'
+#' @return vector of strings, each corresponding to the appropriate line type
+#' for \code{regions}.
 .getLineTypes <- function(regions) {
     if (length(regions) > 6) {
         stop("No line types for regions with length > 6 ")
@@ -229,8 +262,7 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
 #'    \item{ProductiveReads}
 #' }
 #' @return value associated with key from summary file. "NA" (in string) if the field
-#' is not available
-#' refer to \code{util.R} for the key values
+#' is not available refer to util.R for the key values
 .readSummary <- function(sampleRoot, key) {
     fname <- file.path(sampleRoot, ABSEQ_SUMMARY)
     con <- file(fname, "r")

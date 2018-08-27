@@ -2,7 +2,7 @@
 % Please edit documentation in R/diversityAnalysis.R
 \name{.plotRarefaction}
 \alias{.plotRarefaction}
-\title{Title Rarefaction plot}
+\title{Rarefaction plot}
 \usage{
 .plotRarefaction(files, sampleNames, regions = c("CDR3", "V"))
 }
@@ -19,5 +19,7 @@ regions to be included. Defaults to c("CDR3", "V")}
 ggplot2 object
 }
 \description{
-Title Rarefaction plot
+Plots the number of unique clonotypes (on the y-axis)
+drawn from a sample size on the x axis. The number of unique clonotypes
+is averaged over 5 repeated rounds.
 }
