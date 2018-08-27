@@ -646,6 +646,7 @@
             }
             dev.off()
         } else {
+            # TODO: use heatmap when samples > 5 (calculate similarity distance)
             warning(
                 paste(
                     "Skipping venn diagram plot for",
@@ -657,7 +658,7 @@
     }
 
 
-#' Conduct all pairwise comparison analyses
+#' Conduct all vs all pairwise comparison analyses
 #'
 #' @include util.R
 #' @include statistics.R
@@ -844,7 +845,7 @@
     ))
     cdr3ClonesFile <- .listFilesInOrder(path = diversityDirectories,
                                         pattern = ".*_cdr3_clonotypes_.*_over\\.csv(\\.gz)?$")
-    if (length(cdr3ClonesFile) > 1) {
+    if (length(cdr3ClonesFile) == length(sampleNames)) {
         dataframes <- lapply(cdr3ClonesFile, function(fname) {
             df <- read.csv(fname, stringsAsFactors = FALSE)
             df$prop <- df$Count / sum(df$Count)
@@ -855,12 +856,10 @@
         .pairwiseComparison(dataframes, sampleNames, clonotypeOut, .save = .save)
 
         # venn diagram
-        .vennIntersection(dataframes,
-                          sampleNames,
-                          file.path(
-                              clonotypeOut,
-                              paste0(mashedNames, "_cdr3_clonotypeIntersection.png")
-                          ))
+        .vennIntersection(dataframes, sampleNames,
+                          file.path(clonotypeOut,
+                                    paste0(mashedNames,
+                                           "_cdr3_clonotypeIntersection.png")))
         # top 10 barplot
         g <- .topNDist(dataframes, sampleNames)
         saveName <- file.path(clonotypeOut,
@@ -870,5 +869,12 @@
                width = V_WIDTH_L,
                height = V_HEIGHT_L)
         .saveAs(.save, saveName, g)
+    } else {
+        warning(paste("Skipping clonotype analysis for",
+                      paste(sampleNames, collpse = ", "),
+                      ", can't find required CSVs, expected",
+                      length(sampleNames),
+                      "but got",
+                      length(cdr3ClonesFile), "instead."))
     }
 }

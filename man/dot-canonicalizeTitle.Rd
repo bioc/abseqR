@@ -2,7 +2,7 @@
 % Please edit documentation in R/primerAnalysis.R
 \name{.canonicalizeTitle}
 \alias{.canonicalizeTitle}
-\title{Convert short-form names to human friendly speech}
+\title{Convert file names to human friendly text}
 \usage{
 .canonicalizeTitle(str)
 }
@@ -13,5 +13,5 @@
 string
 }
 \description{
-Convert short-form names to human friendly speech
+Convert file names to human friendly text
 }

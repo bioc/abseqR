@@ -1,4 +1,4 @@
-#' Monolith AbSeq Plot function
+#' Monolith AbSeq Plot function - the "driver" program
 #'
 #' @include abundanceAnalysis.R
 #' @include annotationAnalysis.R

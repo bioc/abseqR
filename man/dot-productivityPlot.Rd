@@ -2,7 +2,7 @@
 % Please edit documentation in R/productivityAnalysis.R
 \name{.productivityPlot}
 \alias{.productivityPlot}
-\title{Summary of (un)productivity}
+\title{Summary of productivity}
 \usage{
 .productivityPlot(dataframes, sampleNames)
 }
@@ -15,5 +15,5 @@
 ggplot2 object
 }
 \description{
-Summary of (un)productivity
+Summary of productivity
 }

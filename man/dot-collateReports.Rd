@@ -2,8 +2,8 @@
 % Please edit documentation in R/abseqReport.R
 \name{.collateReports}
 \alias{.collateReports}
-\title{Collate all reports into a single directory and cretate an entry
-\code{index.html} file that redirects to all other HTML files}
+\title{Collate all HTML reports into a single directory and cretate an entry
+\code{index.html} file that redirects to all collated HTML files}
 \usage{
 .collateReports(reports, individualSamples, outputDirectory)
 }
@@ -20,6 +20,6 @@ extract filtering information and \% read counts.}
 Nothing
 }
 \description{
-Collate all reports into a single directory and cretate an entry
-\code{index.html} file that redirects to all other HTML files
+Collate all HTML reports into a single directory and cretate an entry
+\code{index.html} file that redirects to all collated HTML files
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/pairwise.R
 \name{.pairwiseComparison}
 \alias{.pairwiseComparison}
-\title{Conduct all pairwise comparison analyses}
+\title{Conduct all vs all pairwise comparison analyses}
 \usage{
 .pairwiseComparison(dataframes, sampleNames, outputPath, .save = TRUE)
 }
@@ -19,5 +19,5 @@
 nothing
 }
 \description{
-Conduct all pairwise comparison analyses
+Conduct all vs all pairwise comparison analyses
 }

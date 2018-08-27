@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotter.R
 \name{.plotSamples}
 \alias{.plotSamples}
-\title{Monolith AbSeq Plot function}
+\title{Monolith AbSeq Plot function - the "driver" program}
 \usage{
 .plotSamples(sampleNames, directories, analysis, outputDir, primer5Files,
   primer3Files, upstreamRanges, skipDgene = FALSE)
@@ -37,5 +37,5 @@ denoting upstreamStart and upstreamEnd for each sample.}
 none
 }
 \description{
-Monolith AbSeq Plot function
+Monolith AbSeq Plot function - the "driver" program
 }

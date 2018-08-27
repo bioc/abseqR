@@ -207,8 +207,8 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
 }
 
 
-#' Collate all reports into a single directory and cretate an entry
-#' \code{index.html} file that redirects to all other HTML files
+#' Collate all HTML reports into a single directory and cretate an entry
+#' \code{index.html} file that redirects to all collated HTML files
 #'
 #' @import flexdashboard png knitr BiocStyle
 #' @importFrom rmarkdown render pandoc_available

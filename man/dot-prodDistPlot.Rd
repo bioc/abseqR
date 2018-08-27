@@ -4,9 +4,8 @@
 \alias{.prodDistPlot}
 \title{Plots a distribution plot for different productivity analysis files}
 \usage{
-.prodDistPlot(productivityDirectories, sampleNames, title, reg, saveNames,
-  regions = c("cdr1", "cdr2", "cdr3", "fr1", "fr2", "fr3", "igv", "igd",
-  "igj"), .save = TRUE)
+.prodDistPlot(productivityDirectories, sampleNames, title, reg,
+  outputFileName, region, .save = TRUE)
 }
 \arguments{
 \item{productivityDirectories}{vector type.
@@ -17,20 +16,20 @@ files lives (usually <samplename>/productivity/)}
 
 \item{title}{string type.}
 
-\item{reg}{string type.
-Regular expression to find the right files for this particular distribution plot (see samples in masterScript.R)}
+\item{reg}{string type. Regular expression to find the right files
+for this particular distribution plot}
 
-\item{saveNames}{vector type.
-Vector of file names to save in the order of regions}
+\item{outputFileName}{string type.
+Vector of file names to save in the order of \code{regions}}
 
-\item{regions}{string type.
-Most of the dist plots are regional based. use c("") if no regions are involved}
+\item{region}{string type. Most of the dist plots are
+regional based. use "" if no regions are involved}
 
-\item{.save}{logical type. Save Rdata}
+\item{.save}{logical type. Save Rdata?}
 }
 \value{
 None
 }
 \description{
-Plots a distribution plot for different productivity analysis files
+A wrapper for plotDist
 }
