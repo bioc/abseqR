@@ -510,7 +510,8 @@ setMethod(
 )
 
 
-#' Title
+#' Generates HTML report from \code{\linkS4class{AbSeqRep}} and
+#' \code{\linkS4class{AbSeqCRep}} ojects
 #'
 #' @importFrom rmarkdown pandoc_available render
 #' @include util.R

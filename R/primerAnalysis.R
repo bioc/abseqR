@@ -70,6 +70,7 @@
 #' @param sampleNames vector type. 1-1 with primerDirectories
 #' @param combinedNames string type. Title friendly "combined" sample names
 #' @param mashedNames string type. File friendly "mashed-up" sample names
+#' @param .save logical type. Save Rdata?
 #'
 #' @return None
 .primerAnalysis <- function(primerDirectories,
@@ -78,7 +79,8 @@
                             primerOut,
                             sampleNames,
                             combinedNames,
-                            mashedNames) {
+                            mashedNames,
+                            .save = TRUE) {
     message(paste("Starting primer analysis for", combinedNames))
 
     primer5 <- .commonPrimerNames(primer5Files)
@@ -106,11 +108,11 @@
 
             lapply(X = primerNames, FUN = .plotPrimerIGVStatus, pend, ctg,
                    primerDirectories, sampleNames,
-                   primerOut, combinedNames, mashedNames)
+                   primerOut, combinedNames, mashedNames, .save)
 
             lapply(X = primerIntegrityTypes, FUN = .plotPrimerIntegrity, pend,
                    ctg, primerDirectories, sampleNames,
-                   primerOut, combinedNames, mashedNames)
+                   primerOut, combinedNames, mashedNames, .save)
         })
     })
 }
@@ -132,11 +134,13 @@
 #' @param primerOut string type. output directory
 #' @param combinedNames string type. Title friendly "combined" sample names
 #' @param mashedNames string type. File friendly "mashed-up" sample names
+#' @param .save logical type. Save Rdata?
 #'
 #' @return None
 .plotPrimerIGVStatus <- function(primer, pend, category,
                                  primerDirectories, sampleNames,
-                                 primerOut, combinedNames, mashedNames) {
+                                 primerOut, combinedNames, mashedNames,
+                                 .save = TRUE) {
     files <-
         .listFilesInOrder(path = primerDirectories,
                           pattern = paste0( ".*_", category, "_",
@@ -170,13 +174,11 @@
                               combinedNames ),
                           vertical,
                           subs = subtitle)
-    ggsave(file.path(primerOut, paste0(mashedNames,
-                                       "_", category, "_",
-                                       pend, "end_", primer,
-                                       "_igv_dist.png")),
-           plot = primPlot,
-           width = plotWidth,
-           height = plotHeight)
+    saveName <-
+        file.path(primerOut, paste0(mashedNames, "_", category, "_",
+                                    pend, "end_", primer, "_igv_dist.png"))
+    ggsave(saveName, plot = primPlot, width = plotWidth, height = plotHeight)
+    .saveAs(.save, saveName, plot = primPlot)
 }
 
 #' Plots the distribution of primer integrity for a given \code{category} and
@@ -195,11 +197,12 @@
 #' @param primerOut string type. output directory
 #' @param combinedNames string type. Title friendly "combined" sample names
 #' @param mashedNames string type. File friendly "mashed-up" sample names
+#' @param .save logical type. Save Rdata?
 #'
 #' @return None
 .plotPrimerIntegrity <- function(primerIntegrity, pend, category,
                                  primerDirectories, sampleNames, primerOut,
-                                 combinedNames, mashedNames) {
+                                 combinedNames, mashedNames, .save = TRUE) {
     files <-
         .listFilesInOrder(path = primerDirectories,
                           pattern = paste0( ".*_", category, "_",
@@ -213,6 +216,7 @@
         # nothing left to do
         return()
     }
+
     subtitle <- paste("Total is",
                       paste(lapply(files, function(x) {
                           as.integer(.getTotal(x))
@@ -238,11 +242,9 @@
                               combinedNames ),
                           vertical,
                           subs = subtitle)
-    ggsave(file.path(primerOut,
-                     paste0(mashedNames,
-                            "_", category, "_", pend, "end_", primerIntegrity,
-                            "_dist.png")),
-           plot = primPlot,
-           width = plotWidth,
-           height = plotHeight)
+    saveName <- file.path(primerOut,
+                          paste0(mashedNames, "_", category, "_", pend,
+                                 "end_", primerIntegrity, "_dist.png"))
+    ggsave(saveName, plot = primPlot, width = plotWidth, height = plotHeight)
+    .saveAs(.save, saveName, plot = primPlot)
 }

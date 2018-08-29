@@ -1,5 +1,9 @@
 #' Summary of productivity
 #'
+#' @description Shows the percentage of 1. productivity, 2. non-functional +
+#' reason for being unproductive,
+#' i.e. "Stop Codon" or "Out of frame" or "Stop & Out"
+#'
 #' @import ggplot2
 #'
 #' @param dataframes list type. List of sample dataframes
@@ -95,6 +99,138 @@
     }
 }
 
+#' Plots the error distribution for each region: CDRs, FRs, IGV, IGD, and IGJ
+#'
+#' @description Plots the distribution of indels (gaps), indels in
+#' out-of-frame sequences, and the distribution of mismatches for CDRs,
+#' FRs, IGV, IGD, and IGJ.
+#'
+#' @include util.R
+#' @include distributions.R
+#' @import ggplot2
+#'
+#' @param productivityDirectories list type. List of directories
+#' @param prodOut string type. Output directory
+#' @param sampleNames vector type. 1-1 with productivity directories
+#' @param combinedNames string type. Title friendly "combined" sample names
+#' @param mashedNames string type. File friendly "mashed-up" sample names
+#' @param .save logical type. Save Rdata?
+#'
+#' @return None
+.plotErrorDist <- function(productivityDirectories, prodOut,
+                           sampleNames, combinedNames,
+                           mashedNames, .save = TRUE) {
+    regions <-
+        c("cdr1", "cdr2", "cdr3", "fr1", "fr2", "fr3", "igv", "igd", "igj")
+
+    # gaps_dist plots only ---------------------------------------------------
+    message(paste("Plotting indel distributions for", combinedNames))
+    lapply(regions, function(region) {
+        .prodDistPlot(
+            productivityDirectories,
+            sampleNames,
+            "Gaps in",
+            "_gaps_dist\\.csv(\\.gz)?$",
+            file.path(prodOut, paste0(mashedNames, "_",
+                                      region,
+                                      "_gaps_dist.png")),
+            region, .save = .save)
+    })
+
+    # gaps_out_of_frame plots only (no igv, igd, ihj plots for this) ---------
+    subregions <- head(regions, n = 6)
+    message(paste(
+        "Plotting indel out of frame distributions for",
+        combinedNames
+    ))
+
+    lapply(subregions, function(region) {
+        .prodDistPlot(
+            productivityDirectories,
+            sampleNames,
+            "Gaps in",
+            "_gaps_dist_out_of_frame\\.csv(\\.gz)?$",
+            file.path(prodOut, paste0(mashedNames, "_", region,
+                                      "_gaps_dist_out_of_frame.png")),
+            region, .save = .save)
+    })
+
+    # mismatch dist only -----------------------------------------------------
+    message(paste("Plotting mismatches distributions for", combinedNames))
+    lapply(regions, function(region) {
+        .prodDistPlot(
+            productivityDirectories,
+            sampleNames,
+            "Mismatches in",
+            "_mismatches_dist\\.csv(\\.gz)?$",
+            file.path(prodOut, paste0(mashedNames,
+                                      "_", region, "_mismatches_dist.png")),
+            region, .save = .save)
+    })
+}
+
+
+#' Plots the error distribution for IGV germlines
+#'
+#' @description Plots the distribution of in-frame unproductive,
+#' out-of-frame unproductive, and productive IGV germlines.
+#'
+#' @include util.R
+#' @include distributions.R
+#' @import ggplot2
+#'
+#' @param productivityDirectories list type. List of directories
+#' @param prodOut string type. Output directory
+#' @param sampleNames vector type. 1-1 with productivity directories
+#' @param combinedNames string type. Title friendly "combined" sample names
+#' @param mashedNames string type. File friendly "mashed-up" sample names
+#' @param .save logical type, save Rdata?
+#'
+#' @return None
+.plotIGVErrors <- function(productivityDirectories, prodOut, sampleNames,
+                           combinedNames, mashedNames, .save = TRUE) {
+    # in frame unprod ----------
+    message(paste(
+        "Plotting inframe unproductive distributions for",
+        combinedNames
+    ))
+
+    .prodDistPlot(
+        productivityDirectories,
+        sampleNames,
+        "Abundance of In-frame Unproductive Clones in",
+        "_dist_inframe_unproductive\\.csv(\\.gz)?$",
+        file.path(prodOut, paste0(mashedNames,
+                                  "_igv_dist_inframe_unproductive.png")),
+        "igv", .save = .save)
+
+    # out of frame unprod --------
+    message(paste(
+        "Plotting out of frame clones distributions for",
+        combinedNames
+    ))
+    .prodDistPlot(
+        productivityDirectories,
+        sampleNames,
+        "Abundance of Out-Of-Frame Clones in",
+        "_dist_out_of_frame\\.csv(\\.gz)?$",
+        file.path(prodOut, paste0(mashedNames, "_igv_dist_out_of_frame.png")),
+        "igv", .save = .save)
+
+    # productive ----------------
+    message(paste(
+        "Plotting out IGV productive distributions for",
+        combinedNames
+    ))
+    .prodDistPlot(
+        productivityDirectories,
+        sampleNames,
+        "Abundance of Productive Clones in",
+        "_dist_productive\\.csv(\\.gz)?$",
+        file.path(prodOut, paste0(mashedNames, "_igv_dist_productive.png")),
+        "igv", .save = .save)
+}
+
 
 #' Conducts productivty analysis
 #'
@@ -123,7 +259,7 @@
                                    pattern = ".*_productivity\\.csv(\\.gz)?$")
 
 
-    if (length(prodFiles) > 0) {
+    if (length(prodFiles)) {
         g <- .productivityPlot(lapply(prodFiles, read.csv,
                                       stringsAsFactors = FALSE),
                                sampleNames)
@@ -132,62 +268,9 @@
         .saveAs(.save, saveName, g)
     }
 
-
-    # sub-productivity files
-    regions <- c("cdr1",
-                 "cdr2",
-                 "cdr3",
-                 "fr1",
-                 "fr2",
-                 "fr3",
-                 "igv",
-                 "igd",
-                 "igj")
-
-    # gaps_dist plots only ---------------------------------------------------
-    message(paste("Plotting indel distributions for", combinedNames))
-    lapply(regions, function(region) {
-        .prodDistPlot(
-            productivityDirectories,
-            sampleNames,
-            "Gaps in",
-            "_gaps_dist\\.csv(\\.gz)?$",
-            file.path(prodOut, paste0(mashedNames, "_",
-                                      region,
-                                      "_gaps_dist.png")),
-            region)
-    })
-
-    # gaps_out_of_frame plots only (no igv, igd, ihj plots for this) ---------
-    subregions <- head(regions, n = 6)
-    message(paste(
-        "Plotting indel out of frame distributions for",
-        combinedNames
-    ))
-
-    lapply(subregions, function(region) {
-        .prodDistPlot(
-            productivityDirectories,
-            sampleNames,
-            "Gaps in",
-            "_gaps_dist_out_of_frame\\.csv(\\.gz)?$",
-            file.path(prodOut, paste0(mashedNames, "_", region,
-                                      "_gaps_dist_out_of_frame.png")),
-            region)
-    })
-
-    # mismatch dist only -----------------------------------------------------
-    message(paste("Plotting mismatches distributions for", combinedNames))
-    lapply(regions, function(region) {
-        .prodDistPlot(
-            productivityDirectories,
-            sampleNames,
-            "Mismatches in",
-            "_mismatches_dist\\.csv(\\.gz)?$",
-            file.path(prodOut, paste0(mashedNames,
-                                      "_", region, "_mismatches_dist.png")),
-            region)
-    })
+    # plot the distribution of indels and mismatches -------------------------
+    .plotErrorDist(productivityDirectories, prodOut,
+                   sampleNames, combinedNames, mashedNames, .save = .save)
 
     # stop codon dist plot ---------------------------------------------------
     message(paste(
@@ -200,8 +283,7 @@
         "Stop codon in In-frame Clones",
         "_stopcodon_dist_in_frame\\.csv(\\.gz)?$",
         file.path(prodOut, paste0(mashedNames, "_stopcodon_dist_in_frame.png")),
-        ""
-    ) # no regions
+        "", .save = .save) # no regions
 
     # vjframe plot -----------------------------------------------------------
     message(paste("Plotting vjframe distributions for", combinedNames))
@@ -211,61 +293,17 @@
         "V-D-J Rearrangement",
         "_vjframe_dist\\.csv(\\.gz)?$",
         file.path(prodOut, paste0(mashedNames, "_vjframe_dist.png")),
-        ""
-    ) # no regions
+        "", .save = .save) # no regions
 
     # 3 special cases for IGV region -----------------------------------------
     # igv - inframe_unproductive, out of frame, productive
+    .plotIGVErrors(productivityDirectories, prodOut,
+                   sampleNames, combinedNames, mashedNames, .save = .save)
 
-    # in frame unprod ----------
-    message(paste(
-        "Plotting inframe unproductive distributions for",
-        combinedNames
-    ))
-
-    .prodDistPlot(
-        productivityDirectories,
-        sampleNames,
-        "Abundance of In-frame Unproductive Clones in",
-        "_dist_inframe_unproductive\\.csv(\\.gz)?$",
-        file.path(prodOut, paste0(mashedNames,
-                                  "_igv_dist_inframe_unproductive.png")),
-        "igv"
-    )
-
-    # out of frame unprod --------
-    message(paste(
-        "Plotting out of frame clones distributions for",
-        combinedNames
-    ))
-    .prodDistPlot(
-        productivityDirectories,
-        sampleNames,
-        "Abundance of Out-Of-Frame Clones in",
-        "_dist_out_of_frame\\.csv(\\.gz)?$",
-        file.path(prodOut, paste0(mashedNames, "_igv_dist_out_of_frame.png")),
-        "igv"
-    )
-
-    # productive ----------------
-    message(paste(
-        "Plotting out IGV productive distributions for",
-        combinedNames
-    ))
-    .prodDistPlot(
-        productivityDirectories,
-        sampleNames,
-        "Abundance of Productive Clones in",
-        "_dist_productive\\.csv(\\.gz)?$",
-        file.path(prodOut, paste0(mashedNames, "_igv_dist_productive.png")),
-        "igv"
-    )
 
     # stop codon in FR/CDR region proportion plot ----------------------------
-    message(paste(
-        "Plotting stop codon region distributions for",
-        combinedNames
-    ))
+    message(paste("Plotting stop codon region distributions for",
+                  combinedNames))
     lapply(c("inframe", "outframe"), function(framestat) {
         stopCodonRegionFiles <-
             .listFilesInOrder(
@@ -273,13 +311,8 @@
                 pattern = paste0(".*_stopcodon_region_",
                                  framestat, "\\.csv(\\.gz)?$")
             )
-        if (length(stopCodonRegionFiles) > 0) {
+        if (length(stopCodonRegionFiles)) {
             vert = .checkVert(stopCodonRegionFiles[[1]])
-            if (framestat == 'inframe') {
-                titlestatus <- "In-frame"
-            } else {
-                titlestatus <- "Out-of-frame"
-            }
             subtitle <- paste("Total is",
                               paste(
                                   lapply(stopCodonRegionFiles, function(x) {
@@ -291,23 +324,16 @@
             stopcodonRegion <- .plotDist(
                 lapply(stopCodonRegionFiles, read.csv, skip = 1),
                 sampleNames,
-                paste(
-                    "Stop codon in FRs and CDRs of",
-                    titlestatus,
-                    "sequences in",
-                    combinedNames
-                ),
+                paste("Stop codon in FRs and CDRs of",
+                      if (framestat == "inframe") "In-frame" else "Out-of-frame",
+                      "sequences in",
+                      combinedNames),
                 vert,
                 subs = subtitle,
-                sorted = FALSE
-            )
-            saveName <- file.path(prodOut,
-                                  paste0(
-                                      mashedNames,
-                                      "_stopcodon_region_",
-                                      framestat,
-                                      ".png"
-                                  ))
+                sorted = FALSE)
+            saveName <- file.path(prodOut, paste0(mashedNames,
+                                                  "_stopcodon_region_",
+                                                  framestat, ".png"))
             if (vert) {
                 ggsave(saveName, plot = stopcodonRegion,
                        width = V_WIDTH, height = V_HEIGHT)
@@ -316,6 +342,9 @@
                        width = H_WIDTH, height = H_HEIGHT)
             }
             .saveAs(.save, saveName, stopcodonRegion)
+        } else {
+            warning(paste("Could not find stop codon region distribution",
+                          "plot for samples", combinedNames))
         }
     })
 }

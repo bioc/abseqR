@@ -15,5 +15,7 @@
 ggplot2 object
 }
 \description{
-Summary of productivity
+Shows the percentage of 1. productivity, 2. non-functional +
+reason for being unproductive,
+i.e. "Stop Codon" or "Out of frame" or "Stop & Out"
 }

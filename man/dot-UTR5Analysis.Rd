@@ -2,10 +2,10 @@
 % Please edit documentation in R/upstreamAnalysis.R
 \name{.UTR5Analysis}
 \alias{.UTR5Analysis}
-\title{Title}
+\title{5' UTR analysis}
 \usage{
 .UTR5Analysis(utr5Directories, utr5Out, sampleNames, combinedNames,
-  mashedNames, upstreamRanges)
+  mashedNames, upstreamRanges, .save = TRUE)
 }
 \arguments{
 \item{utr5Directories}{list type. 5UTR directories where files are located}
@@ -21,10 +21,13 @@
 \item{upstreamRanges}{list type. Upstream ranges for each sample.
 If length(utr5Directories) > 1, the plots will only be generated for
 upstream ranges that are present in ALL samples. (i.e the intersection)}
+
+\item{.save}{logical type, save Rdata?}
 }
 \value{
 none
 }
 \description{
-Title
+Generates all the required plots for 5' UTR analysis. This
+includes upstream length distributions and upstream sequence validity.
 }

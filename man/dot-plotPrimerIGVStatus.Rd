@@ -6,7 +6,7 @@
 IGV indelled distribution in a bar plot}
 \usage{
 .plotPrimerIGVStatus(primer, pend, category, primerDirectories,
-  sampleNames, primerOut, combinedNames, mashedNames)
+  sampleNames, primerOut, combinedNames, mashedNames, .save = TRUE)
 }
 \arguments{
 \item{primer}{string, primer name}
@@ -24,6 +24,8 @@ IGV indelled distribution in a bar plot}
 \item{combinedNames}{string type. Title friendly "combined" sample names}
 
 \item{mashedNames}{string type. File friendly "mashed-up" sample names}
+
+\item{.save}{logical type. Save Rdata?}
 }
 \value{
 None

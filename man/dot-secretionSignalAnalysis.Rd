@@ -2,10 +2,10 @@
 % Please edit documentation in R/upstreamAnalysis.R
 \name{.secretionSignalAnalysis}
 \alias{.secretionSignalAnalysis}
-\title{Title}
+\title{Secretion signal analysis}
 \usage{
 .secretionSignalAnalysis(secDirectories, secOut, sampleNames,
-  combinedNames, mashedNames, upstreamRanges)
+  combinedNames, mashedNames, upstreamRanges, .save = TRUE)
 }
 \arguments{
 \item{secDirectories}{list type. Secretion signal directories where files
@@ -22,10 +22,13 @@ are located}
 \item{upstreamRanges}{list type. Upstream ranges for each sample.
 If length(secDirectories) > 1, the plots will only be generated for
 upstream ranges that are present in ALL samples. (i.e. the intersection)}
+
+\item{.save}{logical type, save Rdata?}
 }
 \value{
 none
 }
 \description{
-Title
+Generates all the required plots for Secretion signal analysis.
+This includes upstream length distributions and upstream sequence validity.
 }

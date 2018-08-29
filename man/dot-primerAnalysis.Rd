@@ -5,7 +5,7 @@
 \title{Conducts primer specificity analysis}
 \usage{
 .primerAnalysis(primerDirectories, primer5Files, primer3Files, primerOut,
-  sampleNames, combinedNames, mashedNames)
+  sampleNames, combinedNames, mashedNames, .save = TRUE)
 }
 \arguments{
 \item{primerDirectories}{string type. Path to primer analysis directory}
@@ -21,6 +21,8 @@
 \item{combinedNames}{string type. Title friendly "combined" sample names}
 
 \item{mashedNames}{string type. File friendly "mashed-up" sample names}
+
+\item{.save}{logical type. Save Rdata?}
 }
 \value{
 None

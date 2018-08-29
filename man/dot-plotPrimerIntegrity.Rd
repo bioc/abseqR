@@ -6,7 +6,7 @@
 5' or 3' \code{pend}}
 \usage{
 .plotPrimerIntegrity(primerIntegrity, pend, category, primerDirectories,
-  sampleNames, primerOut, combinedNames, mashedNames)
+  sampleNames, primerOut, combinedNames, mashedNames, .save = TRUE)
 }
 \arguments{
 \item{primerIntegrity}{string. One of "stopcodon", "integrity",
@@ -25,6 +25,8 @@
 \item{combinedNames}{string type. Title friendly "combined" sample names}
 
 \item{mashedNames}{string type. File friendly "mashed-up" sample names}
+
+\item{.save}{logical type. Save Rdata?}
 }
 \value{
 None
