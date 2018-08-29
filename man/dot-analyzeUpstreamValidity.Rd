@@ -24,6 +24,8 @@ will be generated.}
 \item{combinedNames}{string type. Title friendly "combined" sample names}
 
 \item{mashedNames}{string type. File friendly "mashed-up" sample names}
+
+\item{.save}{logical type. Save Rdata?}
 }
 \value{
 None

@@ -36,5 +36,5 @@ None
 Given an upstream length range,
 plot the distributions of IGV family without showing their actual lengths. If
 their actual lengths matter, refer
-to \code{\link{.plotTGVUpstreamLenDistDetailed}}.
+to \code{\link{.plotIGVUpstreamLenDistDetailed}}.
 }

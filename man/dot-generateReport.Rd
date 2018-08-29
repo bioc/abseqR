@@ -2,7 +2,8 @@
 % Please edit documentation in R/AbSeqRep.R
 \name{.generateReport}
 \alias{.generateReport}
-\title{Title}
+\title{Generates HTML report from \code{\linkS4class{AbSeqRep}} and
+\code{\linkS4class{AbSeqCRep}} ojects}
 \usage{
 .generateReport(object, root, outputDir, interactivePlot = TRUE,
   .indexHTML = "#")
@@ -23,5 +24,6 @@ This is typically used to redirect users back to index.html page}
 path (including HTML name) where the report (HTML file) was saved to
 }
 \description{
-Title
+Generates HTML report from \code{\linkS4class{AbSeqRep}} and
+\code{\linkS4class{AbSeqCRep}} ojects
 }
