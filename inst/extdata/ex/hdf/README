@@ -1,5 +1,5 @@
 This directory has been left empty intentionally.
 
-This directory should contain HDF files but are too large to store here, and serve no purpose
+This directory should contain HDF files but they are too large to be stored here, and serve no purpose
 in demonstrating abseqR exanples in the vignette. However, this directory should still exist
 as this directory is expected to be present in a normal AbSeq analysis.
