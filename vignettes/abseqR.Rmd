@@ -79,13 +79,6 @@ explicitly compare multiple samples and perform further downstream analyses.
   multiple samples with each other. The `comparative reports` include additional
   plots, for example, sample similarity clustering, overlapping clonotypes, etc. The usual plots are also generated for all the compared samples by adding an extra layer of `aes`thetic.
   
-<!-- MA: probably the AbSeq pipeline figure from the paper -->
-
-## AbSeq core analyses
-
-<!-- MA: explain briefly the analyses that can be conducted using abseqPY -->
-
-<!-- JF: explain briefly the analyses that can be conducted using abseqPY -->
 ## AbSeq core analyses
 
 `r sabseq()` includes, but is not limited to, merging paired-end reads,
@@ -450,11 +443,11 @@ The `report` argument can accept one of four possible values as follows:
 
 3. `abseqReport("SRR_CTRL", report = 2)` generates `static` plots in PNG format in addition to HTML reports.
 
-4. `abseqReport("SRR_CTRL", report = 3)` generates interactive plots in the HTML reports using the [plotly](https://cran.r-project.org/package=plotly). This is the default behaviour when the `report` argument is not specified.
+4. `abseqReport("SRR_CTRL", report = 3)` generates interactive plots in the HTML reports using [plotly](https://cran.r-project.org/package=plotly). This is the default behaviour when the `report` argument is not specified.
 
 ## Parallelization
 
-One of `abseqReport`'s parameters is the `BPPARAM`, which is used to pass arguments into the `BiocParallel::bplapply` function for customizing parallelization. More
+One of `abseqReport`'s parameters is `BPPARAM`, which is used to pass arguments into the `BiocParallel::bplapply` function for customizing parallelization. More
 information regarding the accepted values to `BPPARAM` can be found at
 BiocParallel's
 [page](https://bioconductor.org/packages/release/bioc/html/BiocParallel.html).
@@ -591,9 +584,9 @@ as unproductive and thus it is unlikely that it will express a functional antibo
 
 Figure \@ref(fig:prod-summ) summarizes the productivity analysis results of `PCR1`. Factors that cause sequences to be non-functional are colour coded as follows:
 
-1. Green -- sequences that contain at least one stop codon _and_ have a frameshift
-2. Cyan -- sequences _without stop codons_ but have a frameshift
-3. Purple -- sequences that are _in-frame_ but contain at least one stop codon
+1. Green -- sequences _without_ stop codons but have a frameshift
+2. Cyan -- sequences that are _in-frame_ but contain at least one stop codon
+3. Purple -- sequences that contain at least one stop codon _and_ have a frameshift
 
 ```{r prod-summ, fig.cap="Productivity rate of sequences in PCR1. This plot shows the percentage of productive and unproductive sequences, the reason for unproductive sequences are colour coded.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "productivity", "PCR1_productivity.png"))
@@ -682,7 +675,7 @@ a capture-recapture experiment at different sample sizes (x-axis).
 For each sample size, the percentage of recaptured clonotypes is calculated for five repeated capture-recapture experiments and the mean and confidence intervals are reported.
 
 In below figures, the complementarity-determining regions (CDRs)
-used to define a "clonotype". Similar plots can be generated for the framework regions (FRs) and the entire variable domain sequences. 
+are used to define a "clonotype". Similar plots can be generated for the framework regions (FRs) and the entire variable domain sequences. 
 
 ```{r dup, fig.cap="Proportion of duplicated clonotypes in PCR1. Higher-order duplication levels starting from 10 are binned.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "diversity", "PCR1_cdr_duplication.png"))
@@ -724,9 +717,9 @@ grid.arrange(img1, img2, ncol = 2)
 ## Comparative analysis
 
 The plots described in this section can be found in the `Clonotypes` tab of
-`PCR1 vs PCR2 vs PCR3`'s HTML report.*
+`PCR1 vs PCR2 vs PCR3`'s HTML report.
 
-Since overlapping clonotype analysis deals with _overlapping_ clonotypes,
+Since comparative analysis deals with _overlapping_ clonotypes,
 this analysis only applies when `compare` was supplied with at
 least one sample comparison. Earlier, the call to `abseqReport`
 had `compare = c("PCR1, PCR2, PCR3")`, therefore
