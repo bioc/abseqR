@@ -385,7 +385,8 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
     Reduce("+", lapply(sampleNames, function(sname) {
         sample <- .loadAbSeqRepFromParams(file.path(root, RESULT_DIR,
                                                     sname, ANALYSIS_PARAMS))
-        if (suppressWarnings(normalizePath(sample@outdir)) != root) {
+        if (suppressWarnings(normalizePath(sample@outdir)) !=
+            suppressWarnings(normalizePath(root))) {
             if (warnMove) {
                 warning(paste("Sample output directory",
                               sample@outdir,
