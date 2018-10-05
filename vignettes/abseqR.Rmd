@@ -339,7 +339,7 @@ multiComparison <- abseqReport(dataPath,
 
 <!-- using hidden chunks can cause problem for users who attempt to reproduce your results. Please remove all hidden chunks or make them visible -->
 
-__Note__, `abseqReport` always return S4 objects of the class __AbSeqRep__ for each sample in the `dataPath` directory regardless of the value of the `compare` argument as illustrated next:
+__Note__, `abseqReport` always returns S4 objects of the class __AbSeqRep__ for each sample in the `dataPath` directory regardless of the value of the `compare` argument as illustrated next:
 
 ```{r abseqR_show_return_of_abseqReport, results='hold'}
 # compare = c("PCR1,PCR2")
@@ -359,7 +359,7 @@ When constructing antibody libraries, users might be interested in comparing Ab 
 
 [Previously](#basic-analysis), the S4 objects of three samples of our toy example loaded into a variable named `samples`. As a hypothetical example,
 if the reports show an interesting observation between `PCR1` and `PCR3`,
-it might be of interest to isolate the 2 samples from the rest. 
+it might be of interest to isolate the two samples from the rest. 
 
 This code shows how the `+` operator can be used to create customized comparisons as follows:
 
@@ -430,7 +430,7 @@ SRRControl.lazy <- abseqReport("SRR_CTRL", report = 0)
 stopifnot(names(SRRControl.lazy) == names(SRRControl))
 ```
 
-## Alternative reporting options 
+## Alternative reporting options  {#fine-tune}
 
 In the previous section, the `report` parameter of `abseqReport` was used to
 load the samples in `SRRControl` without actually plotting any data. 
@@ -441,9 +441,9 @@ The `report` argument can accept one of four possible values as follows:
 
 2. `abseqReport("SRR_CTRL", report = 1)` generates static plots in PNG format but **does not** generate HTML reports. 
 
-3. `abseqReport("SRR_CTRL", report = 2)` generates `static` plots in PNG format in addition to HTML reports.
+3. `abseqReport("SRR_CTRL", report = 2)` generates static plots in PNG format in addition to HTML reports.
 
-4. `abseqReport("SRR_CTRL", report = 3)` generates interactive plots in the HTML reports using [plotly](https://cran.r-project.org/package=plotly). This is the default behaviour when the `report` argument is not specified.
+4. `abseqReport("SRR_CTRL", report = 3)` generates static plots in PNG format and interactive plots in the HTML reports using [plotly](https://cran.r-project.org/package=plotly). This is the default behaviour when the `report` argument is not specified.
 
 ## Parallelization
 
@@ -843,11 +843,11 @@ cat(tabl)
 ```
 
 Following that, an arbitrary number of sequences were randomly
-drawn from each of the 3 samples and randomly amplified.
+drawn from each of the three samples and randomly amplified.
 This process was repeated 3 times, resulting in a final repertoire
-of 3 samples, named PCR1, PCR2, and PCR3.
+of three samples, named PCR1, PCR2, and PCR3.
 
-Finally, these 3 samples were analyzed by `r sabseqPy()`. The command used to
+Finally, these three samples were analyzed by `r sabseqPy()`. The command used to
 analyze these samples are as follows:
 
 ```{bash abseqR__data_abseqPy_run, eval=FALSE}
@@ -876,7 +876,7 @@ file1: PCR3.fasta
 name: PCR3
 ```
 
-`r sabseqPy()`'s analysis output on these 3 samples are contained
+`r sabseqPy()`'s analysis output on these three samples are contained
 within the dataset described in this vignette.
 
 ## Session Info

@@ -33,6 +33,7 @@ from the \link{abseqReport} and \link{report} functions.
   \item{hv}
   \item{lv}
   \item{kv}
+  \item{klv}
 }
 each representing \bold{H}eavy, \bold{L}ambda and \bold{K}appa respectively.}
 
