@@ -8,7 +8,7 @@ plotting and reporting capabilities and
 allows them to generate interactive HTML reports for the convenience of viewing and sharing with other researchers. Additionally, `abseqR` extends `abseqPy` to __compare__ multiple
 repertoire analyses and perform further downstream analysis on its output.
 
-Note that `abseqR` does not require `abseqPy` to be installed to work yet the output of `abseqPy` must be already present to invoke `abseqR`'s functions.
+Note that `abseqR` does not require `abseqPy` to be installed to work but the output of `abseqPy` must be already present to invoke `abseqR`'s functions.
 
 ## Developers
 
