@@ -61,7 +61,7 @@ rawReads <- unlist(strsplit(params$rawReads, ","))
 filtReads <- unlist(strsplit(params$filtReads, ","))
 annotReads <- unlist(strsplit(params$annotReads, ","))
 prodReads <- unlist(strsplit(params$prodReads, ","))
-filters <- unlist(strsplit(params$filters, params$filterSplitter, fixed = T))
+filters <- unlist(strsplit(params$filters, params$filterSplitter, fixed = TRUE))
 if (length(samples) * 8 != (length(samples) + length(links) + length(chains) + length(rawReads) + length(filtReads) + length(annotReads) + length(prodReads)) + length(filters)) {
     stop(sprintf("Expected same argument length for singleSamples (%d), links (%d), chains (%d), rawReads (%d), filteredReads (%d), annotReads (%d), prodReads (%d) and filters (%d)",
                  length(samples),
@@ -79,7 +79,7 @@ singleTableInfo <- lapply(seq_along(samples), function(i) {
     annots <- .formatNumber(annotReads[i], rawReads[i])
     filtered <- .formatNumber(filtReads[i], annotReads[i])
     prods <- .formatNumber(prodReads[i], filtReads[i])
-    filts <- gsub(",", "<br>", filters[i], fixed = T)
+    filts <- gsub(",", "<br>", filters[i], fixed = TRUE)
     knitr::knit_expand(text = sprintf("[%s](%s) | %s | %s | %s | %s | %s | %s", samples[i], links[i], chains[i], reads, annots, filtered, prods, filts))
 })
 

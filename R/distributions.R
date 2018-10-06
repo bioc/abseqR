@@ -296,7 +296,7 @@
         x = xlabel,
         y = ylabel
     )
-    #geom_smooth(aes(colour=round), se=F,
+    #geom_smooth(aes(colour=round), se=FALSE,
     # method="glm", formula=y~ns(x, 3), lwd=0.7)+
     #geom_text_repel(aes(label = count), size = 3) +
     #geom_text(aes(label = count), vjust=-1, size = 3) +

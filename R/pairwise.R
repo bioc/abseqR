@@ -234,10 +234,10 @@
             scale_size_continuous(guide = "none", range = c(1, 10)) +
             scale_x_continuous(limits = c(xmin, 0), expand = c(0, 0.1)) +
             scale_y_continuous(limits = c(ymin, 0), expand = c(0, 0.1)) +
-            # geom_smooth(method = "lm", se = T, fullrange = T) +
+            # geom_smooth(method = "lm", se = TRUE, fullrange = TRUE) +
             # stat_smooth(data = df.union, aes(prop.x, prop.y,
             #                                  weight = 10^((prop.x + prop.y) / 2)),
-            #             color = "blue", method = "lm", fullrange = T, se = T) +
+            #             color = "blue", method = "lm", fullrange = TRUE, se = TRUE) +
             labs(y = name2, x = name1)
         grid.arrange(
             sample1.margin,
