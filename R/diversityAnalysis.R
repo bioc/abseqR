@@ -980,39 +980,45 @@
                      file.path(diversityOut, ind.fname))
 
     lapply(seq_along(estimateTypes), function(i) {
-        fileName <- names(estimateTypes)[[i]]
-        fileNameSansExt <- tools::file_path_sans_ext(fileName)
-        functor <- estimateTypes[[i]]
+        if (!file.exists(outputFiles[[i]])) {
+            fileName <- names(estimateTypes)[[i]]
+            fileNameSansExt <- tools::file_path_sans_ext(fileName)
+            functor <- estimateTypes[[i]]
 
-        files <-
-            .listFilesInOrder(path = diversityDirectories,
-                              pattern = paste0(fileNameSansExt,
-                                               "\\.tsv(\\.gz)?$"))
+            files <-
+                .listFilesInOrder(path = diversityDirectories,
+                                  pattern = paste0(fileNameSansExt,
+                                                   "\\.tsv(\\.gz)?$"))
 
-        if (length(files) != length(sampleNames)) {
-            # if even one of the tsv file doesn't exist
-            # (which means we haven't generated it, or if it was deleted,
-            # we re-generate them)
-            message(paste("Calculating",
-                          sub("_", " ", fileNameSansExt, fixed = TRUE),
-                          "for", paste(sampleNames, collapse = ", ")))
-            df.ests <- lapply(dataframes, functor)
+            if (length(files) != length(sampleNames)) {
+                # if even one of the tsv file doesn't exist
+                # (which means we haven't generated it, or if it was deleted,
+                # we re-generate them)
+                message(paste("Calculating",
+                              sub("_", " ", fileNameSansExt, fixed = TRUE),
+                              "for", paste(sampleNames, collapse = ", ")))
+                df.ests <- lapply(dataframes, functor)
+            } else {
+                # the rare occasion when all individual samples have already been
+                # analyzed and the TSVs are all available, we only need to reload
+                # them rather than re-computing the values
+                message(paste("Loading precomputed",
+                              sub("_", " ", fileNameSansExt, fixed = TRUE),
+                              "from",
+                              paste(sampleNames, collapse = ", ")))
+                df.ests <- lapply(files, read.table, header = TRUE)
+            }
+            stopifnot(length(diversityDirectories) == length(sampleNames) &&
+                          length(df.ests) == length(sampleNames))
+
+            dfs <- do.call("rbind", Map(cbind, df.ests, sample = sampleNames))
+            write.table(dfs, file = outputFiles[[i]],
+                        sep = "\t", quote = FALSE,
+                        row.names = FALSE)
+
         } else {
-            # the rare occasion when all individual samples have already been
-            # analyzed and the TSVs are all available, we only need to reload
-            # them rather than re-computing the values
-            message(paste("Loading precomputed",
-                          sub("_", " ", fileNameSansExt, fixed = TRUE),
-                          "from",
-                          paste(sampleNames, collapse = ", ")))
-            df.ests <- lapply(files, read.table, header = TRUE)
+            message(paste0("Found ", names(estimateTypes)[[i]],
+                           ", skipping ..."))
         }
-        stopifnot(length(diversityDirectories) == length(sampleNames) &&
-                      length(df.ests) == length(sampleNames))
-
-        dfs <- do.call("rbind", Map(cbind, df.ests, sample = sampleNames))
-        write.table(dfs, file = outputFiles[[i]],
-                    sep = "\t", quote = FALSE,
-                    row.names = FALSE)
     })
 }
