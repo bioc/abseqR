@@ -711,7 +711,7 @@
                         width = V_WIDTH,
                         height = V_WIDTH,
                         units = "in",
-                        res = 1200,
+                        res = 500,
                         pointsize = 10
                     )
                     .scatterPlotComplex(df.union,

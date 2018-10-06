@@ -118,11 +118,11 @@
 
         png(
             outputFileName,
-            width = V_WIDTH,
-            height = V_HEIGHT,
+            width = 3.25,
+            height = 3.25,
             units = "in",
-            res = 1200,
-            pointsize = 10
+            res = 800,
+            pointsize = 4
         )
 
         # circos theme setup
