@@ -4,7 +4,7 @@
 \alias{.findRepertoires}
 \title{Given a directory = <abseqPy_outputdir>/RESULT_DIR/, returns the directories (repositories) in
 'directory'. That is, will not return any sample_vs_sample directories.
-This is done by asserting that a 'repository' must have a log file (sample.log),
+This is done by asserting that a 'repository'
 must have an (analysis.params) file, and a summary.txt file.}
 \usage{
 .findRepertoires(directory)
