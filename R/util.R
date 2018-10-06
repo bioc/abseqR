@@ -377,7 +377,7 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
 
 #' Given a directory = <abseqPy_outputdir>/RESULT_DIR/, returns the directories (repositories) in
 #' 'directory'. That is, will not return any sample_vs_sample directories.
-#' This is done by asserting that a 'repository' must have a log file (sample.log),
+#' This is done by asserting that a 'repository'
 #' must have an (analysis.params) file, and a summary.txt file.
 #'
 #' A sample_vs_sample directory will not have these files.
@@ -390,11 +390,7 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
     repos <- list.files(directory, full.names = TRUE)
     # given a directory (d), return True if d is a repository
     .isRepo <- function(d) {
-        hasLog <- length(list.files(pattern = ".*\\.log$", path = d)) == 1
-        return(all(
-            c("analysis.params", "summary.txt") %in% list.files(d)
-        )
-        && hasLog)
+        all(c("analysis.params", "summary.txt") %in% list.files(d))
     }
     vapply(Filter(.isRepo, repos), basename, USE.NAMES = FALSE, FUN.VALUE = "")
 }
