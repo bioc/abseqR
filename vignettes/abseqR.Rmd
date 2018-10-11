@@ -6,8 +6,8 @@ author:
 
 package: "abseqR"
 output:
-    BiocStyle::html_document: default
-    BiocStyle::pdf_document:
+    BiocStyle::pdf_document: default
+    BiocStyle::html_document:
 vignette: >
     %\VignetteIndexEntry{Introduction to abseqR}
     %\VignetteEngine{knitr::rmarkdown}
@@ -23,12 +23,6 @@ library(gridExtra)
 library(BiocStyle)
 # knitr::opts_chunk$set(tidy = TRUE)
 knitr::opts_chunk$set(message = FALSE)
-```
-
-```{r environment_setup_release, include=FALSE}
-# make sure that any existing copy of "ex" has been removed before
-# we re-generate this vignette
-lapply(c("ex", "refined_comparison"), unlink, recursive = TRUE)
 ```
 
 ```{r abseqR_vignette_helper_functions, include=FALSE}
@@ -228,13 +222,11 @@ The output of `r sabseqPy()` on the simulated datasets is first fetched into a l
 
 ```{r abseqR_copy_data_files, results=FALSE}
 # substitute with any directory that you have read/write access to
-sandboxDirectory <- "."
-if (!file.exists(sandboxDirectory)) {
-    file.create(sandboxDirectory)
-}
+sandboxDirectory <- tempdir()
 
 # path to provided data (comes installed with abseqR)
 exdata <- system.file("extdata", "ex", package = "abseqR")
+
 # copy the provided data to sandboxDirectory
 file.copy(exdata, sandboxDirectory, recursive = TRUE)
 ```
@@ -254,14 +246,21 @@ list.files(path = file.path(dataPath, "auxiliary"))
 After [obtaining the datasets](#obtain-dataset), the `abseqReport` function from `r sabseqR()` is invoked to visualize the different analysis results as follows: 
 
 ```{r abseqR_quick_run, results=FALSE, warning=FALSE}
+# This section will visualize all the datasets individually
+# and compare PCR1 with PCR2 with PCR3
 
-# visualize all the datasets individually,
-# then "compare" PCR1 with PCR2 with PCR3
+# Interim solution
+if (Sys.info()["sysname"] == "Darwin") {
+    BPPARAM <- BiocParallel::SerialParam()
+} else {
+    BPPARAM <- BiocParallel::bpparam()
+}
 
-# use report = 3 if the results should be collated in a HTML document
+# you should use report = 3 to generate a HTML report
 samples <- abseqReport(dataPath,
                        compare = c("PCR1, PCR2, PCR3"),
-                       report = 1)
+                       report = 1,
+                       BPPARAM = BPPARAM)
 
 # ignore the warning message:
 # "Sample output directory <path> is different from provided path
@@ -273,9 +272,10 @@ samples <- abseqReport(dataPath,
 This creates plots for all samples included in `dataPath`.
 In addition, The `compare = c("PCR1, PCR2, PCR3")` argument specifies
 that samples `PCR1`, `PCR2`, and `PCR3` are explicitly
-compared against each other. Other possible values of the
-`compare` and `report` argument will be discussed in detail
-in later sections ([here](#abseqReport-compare) and [here](#fine-tune)).
+compared against each other. Other possible values for
+`compare`, `report` , and `BPPARAM` will be discussed in detail
+in later sections ([here](#abseqReport-compare), [here](#fine-tune),
+and [here](#parallelization)).
 
 
 ## HTML reports' directory structure
@@ -283,7 +283,7 @@ in later sections ([here](#abseqReport-compare) and [here](#fine-tune)).
 Figure \@ref(fig:abseq-final-folder-structure) shows the folder structure of `./ex/`
 after `r sabseqR()` completes.
 
-```{r abseq-final-folder-structure, fig.cap="Folder structure after `abseqR` completes. The landing page `index.html` provides a convenient way to navigate around the standalone HTML reports in `html_files/`.", echo=FALSE}
+```{r abseq-final-folder-structure, fig.cap="Folder structure after `abseqR` completes. The landing page `index.html` provides a convenient way to navigate around the standalone HTML reports in `html\\_files/`.", echo=FALSE}
 grid.raster(readPNG("post_report_fs.png"))
 ```
 
@@ -445,7 +445,7 @@ The `report` argument can accept one of four possible values as follows:
 
 4. `abseqReport("SRR_CTRL", report = 3)` generates static plots in PNG format and interactive plots in the HTML reports using [plotly](https://cran.r-project.org/package=plotly). This is the default behaviour when the `report` argument is not specified.
 
-## Parallelization
+## Parallelization {#parallelization}
 
 One of `abseqReport`'s parameters is `BPPARAM`, which is used to pass arguments into the `BiocParallel::bplapply` function for customizing parallelization. More
 information regarding the accepted values to `BPPARAM` can be found at
@@ -664,28 +664,28 @@ The plots described in this section can be found in the `Diversity` tab of the H
 
 To estimate repertoire diversity, `r sabseqR()` employs three commonly used techniques:
 
-**Duplication-level analysis** in which the number of times a clone appears in the sequenced sample is calculated. Figure \@ref(fig:dup) plots the proportion of sequences (y-axis) that appear once (singletons), twice (doubletons), 
+**Duplication-level analysis** in which the number of times a clone appears in the sequenced sample is calculated. Figure \@ref(fig:duplication) plots the proportion of sequences (y-axis) that appear once (singletons), twice (doubletons), 
 and at higher-orders (x-axis). The higher the percentage of singletones and doubletones, the more diverse the library would likely be. 
 
-**Rarefaction analysis** in which bootstrapping is used to estimate the *richness* of a library by calculating the proportion of unique sequences at different sample sizes. Figure \@ref(fig:rare) plots the number of deduplicated clonotypes (y-axis)
+**Rarefaction analysis** in which bootstrapping is used to estimate the *richness* of a library by calculating the proportion of unique sequences at different sample sizes. Figure \@ref(fig:rarefaction) plots the number of deduplicated clonotypes (y-axis)
 againse sample sizes (x-axis). For each sample size, five samples are drawn and the mean with confidence intervals are calculated. In a highly diverse library, the percentage of unique clones should significantly increase as the sample size increases. 
 
-**Capture-recapture analysis** in Figure \@ref(fig:recap) plots the percentage of clonotypes recaptured (y-axis) in
+**Capture-recapture analysis** in Figure \@ref(fig:recapture) plots the percentage of clonotypes recaptured (y-axis) in
 a capture-recapture experiment at different sample sizes (x-axis).
 For each sample size, the percentage of recaptured clonotypes is calculated for five repeated capture-recapture experiments and the mean and confidence intervals are reported.
 
 In below figures, the complementarity-determining regions (CDRs)
 are used to define a "clonotype". Similar plots can be generated for the framework regions (FRs) and the entire variable domain sequences. 
 
-```{r dup, fig.cap="Proportion of duplicated clonotypes in PCR1. Higher-order duplication levels starting from 10 are binned.", echo=FALSE, out.width="100%"}
+```{r duplication, fig.cap="Proportion of duplicated clonotypes in PCR1. Higher-order duplication levels starting from 10 are binned.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "diversity", "PCR1_cdr_duplication.png"))
 ```
 
-```{r rare, fig.cap="Rarefaction curve of clonotypes in PCR1. The number of deduplicated sequences are taken over the mean of 5 resampling rounds, where the shaded areas indicate 95% confidence interval.", echo=FALSE, out.width="100%"}
+```{r rarefaction, fig.cap="Rarefaction curve of clonotypes in PCR1. The number of deduplicated sequences are taken over the mean of 5 resampling rounds, where the shaded areas indicate 95\\% confidence interval.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "diversity", "PCR1_cdr_rarefaction.png"))
 ```
 
-```{r recap, fig.cap="Capture-recapture of clonotypes in PCR1. The number of recaptured sequences are taken over the mean of 5 resampling rounds, where the shaded areas indicate 95% confidence interval.", echo=FALSE, out.width="100%"}
+```{r recapture, fig.cap="Capture-recapture of clonotypes in PCR1. The number of recaptured sequences are taken over the mean of 5 resampling rounds, where the shaded areas indicate 95\\% confidence interval.", echo=FALSE, out.width="100%"}
 read_png(file.path(sdir, "diversity", "PCR1_cdr_recapture.png"))
 ```
 
