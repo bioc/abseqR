@@ -6,8 +6,8 @@ author:
 
 package: "abseqR"
 output:
-    BiocStyle::pdf_document: default
-    BiocStyle::html_document:
+    BiocStyle::html_document: default
+    BiocStyle::pdf_document:
 vignette: >
     %\VignetteIndexEntry{Introduction to abseqR}
     %\VignetteEngine{knitr::rmarkdown}
