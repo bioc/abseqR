@@ -42,6 +42,8 @@ AbSeqCRep <-
 
 #' Combines 2 \linkS4class{AbSeqCRep} objects together for comparison
 #'
+#' @include accessors-AbSeq.R
+#'
 #' @param e1 AbSeqCRep.
 #' @param e2 AbSeqCRep.
 #'
@@ -74,6 +76,7 @@ setMethod("+",
                     e2 = "AbSeqCRep"),
           function(e1, e2) {
               new("AbSeqCRep",
-                  repertoires = unique(c(e1@repertoires, e2@repertoires)))
+                  repertoires = unique(c(.asRepertoireList(e1),
+                                         .asRepertoireList(e2))))
 
           })

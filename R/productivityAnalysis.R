@@ -13,12 +13,13 @@
 .productivityPlot <- function(dataframes, sampleNames) {
     nsamples <- length(dataframes)
     if (length(sampleNames) != nsamples) {
-        stop(paste("Expected equal number of sample names and dataframes, got",
-                length(sampleNames), "samples and", nsamples, "dataframes."))
+        stop("Expected equal number of sample names and dataframes, got ",
+             length(sampleNames),
+             " samples and ", nsamples, " dataframes.")
     }
 
-    message(paste("Plotting productivity summary plot for",
-                   paste(sampleNames, collapse = ", ")))
+    message("Plotting productivity summary plot for ",
+            paste(sampleNames, collapse = ", "))
 
     #   ---- clean & pre-processing ----
     unusedCols <- c("X")
@@ -124,7 +125,7 @@
         c("cdr1", "cdr2", "cdr3", "fr1", "fr2", "fr3", "igv", "igd", "igj")
 
     # gaps_dist plots only ---------------------------------------------------
-    message(paste("Plotting indel distributions for", combinedNames))
+    message("Plotting indel distributions for ", combinedNames)
     lapply(regions, function(region) {
         .prodDistPlot(
             productivityDirectories,
@@ -139,10 +140,7 @@
 
     # gaps_out_of_frame plots only (no igv, igd, ihj plots for this) ---------
     subregions <- head(regions, n = 6)
-    message(paste(
-        "Plotting indel out of frame distributions for",
-        combinedNames
-    ))
+    message("Plotting indel out of frame distributions for ", combinedNames)
 
     lapply(subregions, function(region) {
         .prodDistPlot(
@@ -156,7 +154,7 @@
     })
 
     # mismatch dist only -----------------------------------------------------
-    message(paste("Plotting mismatches distributions for", combinedNames))
+    message("Plotting mismatches distributions for ", combinedNames)
     lapply(regions, function(region) {
         .prodDistPlot(
             productivityDirectories,
@@ -190,10 +188,7 @@
 .plotIGVErrors <- function(productivityDirectories, prodOut, sampleNames,
                            combinedNames, mashedNames, .save = TRUE) {
     # in frame unprod ----------
-    message(paste(
-        "Plotting inframe unproductive distributions for",
-        combinedNames
-    ))
+    message("Plotting inframe unproductive distributions for ", combinedNames)
 
     .prodDistPlot(
         productivityDirectories,
@@ -205,10 +200,7 @@
         "igv", .save = .save)
 
     # out of frame unprod --------
-    message(paste(
-        "Plotting out of frame clones distributions for",
-        combinedNames
-    ))
+    message("Plotting out of frame clones distributions for ", combinedNames)
     .prodDistPlot(
         productivityDirectories,
         sampleNames,
@@ -218,10 +210,7 @@
         "igv", .save = .save)
 
     # productive ----------------
-    message(paste(
-        "Plotting out IGV productive distributions for",
-        combinedNames
-    ))
+    message("Plotting out IGV productive distributions for ", combinedNames)
     .prodDistPlot(
         productivityDirectories,
         sampleNames,
@@ -273,10 +262,7 @@
                    sampleNames, combinedNames, mashedNames, .save = .save)
 
     # stop codon dist plot ---------------------------------------------------
-    message(paste(
-        "Plotting stop codon in-frame distributions for",
-        combinedNames
-    ))
+    message("Plotting stop codon in-frame distributions for ", combinedNames)
     .prodDistPlot(
         productivityDirectories,
         sampleNames,
@@ -286,7 +272,7 @@
         "", .save = .save) # no regions
 
     # vjframe plot -----------------------------------------------------------
-    message(paste("Plotting vjframe distributions for", combinedNames))
+    message("Plotting vjframe distributions for ", combinedNames)
     .prodDistPlot(
         productivityDirectories,
         sampleNames,
@@ -302,8 +288,7 @@
 
 
     # stop codon in FR/CDR region proportion plot ----------------------------
-    message(paste("Plotting stop codon region distributions for",
-                  combinedNames))
+    message("Plotting stop codon region distributions for ", combinedNames)
     lapply(c("inframe", "outframe"), function(framestat) {
         stopCodonRegionFiles <-
             .listFilesInOrder(
@@ -343,8 +328,8 @@
             }
             .saveAs(.save, saveName, stopcodonRegion)
         } else {
-            warning(paste("Could not find stop codon region distribution",
-                          "plot for samples", combinedNames))
+            warning("Could not find stop codon region distribution plot ",
+                    "for samples ", combinedNames)
         }
     })
 }

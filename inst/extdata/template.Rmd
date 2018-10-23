@@ -72,8 +72,8 @@ library(gridExtra)
     n <- length(flist)
     if (n != 1 && is.null(.callback)) {
         if (.stop) {
-            stop(paste("Expected to find one file, but found", n, "from",
-                       paste(flist, collapse = ", "), "instead"))
+            stop("Expected to find one file, but found ", n, " from ",
+                 paste(flist, collapse = ", "), " instead.")
         } else {
             return(NA)
         }
@@ -81,8 +81,8 @@ library(gridExtra)
         flist <- flist[lapply(flist, .callback) == TRUE]
         if (length(flist) != 1) {
             if (.stop) {
-                stop(paste("Expected to find one file, but found", n, "from",
-                           paste(flist, collapse = ", "), "instead"))
+                stop("Expected to find one file, but found ", n, " from ",
+                     paste(flist, collapse = ", "), " instead.")
             } else {
                 return(NA)
             }

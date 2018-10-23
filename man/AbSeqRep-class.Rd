@@ -123,10 +123,6 @@ values are either \code{imgt} or \code{kabat}.}
 abseqPyOutput <- tempdir()
 file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
 samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
-
-
-# gives the name of the first repertoire object returned by abseqReport
-# samples[[1]]@name
 }
 \seealso{
 \code{\link{abseqReport}} returns a \code{list} of \code{AbSeqRep}

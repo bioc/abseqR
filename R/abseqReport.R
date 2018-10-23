@@ -13,6 +13,7 @@
 #'
 #' @include util.R
 #' @include AbSeqRep.R
+#' @include accessors-AbSeq.R
 #' @import BiocParallel
 #'
 #' @param directory string type. directory as specified in
@@ -110,10 +111,9 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
     #  ------ sanitize function arguments ---------
     root <- normalizePath(directory)
     if (!(all(c(RESULT_DIR, AUX_DIR) %in% list.files(root)))) {
-        stop(paste("Expected to find", RESULT_DIR, "and", AUX_DIR,
-                "in", root,
-                "but they are missing. This directory should be the output",
-                "directory as specified in abseqPy. Aborting."))
+        stop("Expected to find ", RESULT_DIR, " and ", AUX_DIR, " in ", root,
+             " but they are missing. This directory should be the output ",
+             "directory as specified in abseqPy. Aborting.")
     }
 
     if (missing(report)) {
@@ -135,8 +135,8 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
             user.sample.name <- unlist(lapply(strsplit(s, ","), trimws))
             lapply(user.sample.name, function(si) {
                 if (!(si %in% availSamples)) {
-                    stop(paste("Sample", si, "in 'compare' argument cannot",
-                            "be found in", file.path(root, RESULT_DIR)))
+                    stop("Sample ", si, " in the 'compare' argument cannot ",
+                         "be found in ", file.path(root, RESULT_DIR))
                 }
             })
         })
@@ -199,7 +199,7 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
                 outputDir <- file.path(root, RESULT_DIR, sampleNames[1])
                 sample <- .loadSamplesFromString(sampleNames, root,
                                                   warnMove = TRUE)
-                listOfSamples[[sample@name]] <- sample
+                listOfSamples[[.asRepertoireName(sample)]] <- sample
             }
         }
         return(listOfSamples)
@@ -210,6 +210,7 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
 #' Collate all HTML reports into a single directory and cretate an entry
 #' \code{index.html} file that redirects to all collated HTML files
 #'
+#' @include accessors-AbSeq.R
 #' @import flexdashboard png knitr BiocStyle
 #' @importFrom rmarkdown render pandoc_available
 #'
@@ -235,37 +236,44 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
         multiSampleMask <- grepl(".*_vs_.*", names(reports))
 
         # define rmarkdown params
-        chains <- paste(lapply(individualSamples, function(x) {
-            return(x@chain)
-        }), collapse = ",")
+        chains <- paste(lapply(individualSamples, .asRepertoireChain),
+                        collapse = ",")
 
         rawReads <- paste(lapply(individualSamples, function(x) {
-            .readSummary(file.path(x@outdir, RESULT_DIR, x@name),
+            .readSummary(file.path(.asRepertoireDir(x),
+                                   RESULT_DIR,
+                                   .asRepertoireName(x)),
                          ABSEQ_RAW_READ_COUNT_KEY)
         }), collapse = ",")
 
         annotReads <- paste(lapply(individualSamples, function(x) {
-            .readSummary(file.path(x@outdir, RESULT_DIR, x@name),
+            .readSummary(file.path(.asRepertoireDir(x),
+                                   RESULT_DIR,
+                                   .asRepertoireName(x)),
                          ABSEQ_ANNOT_READ_COUNT_KEY)
         }), collapse = ",")
 
         filtReads <- paste(lapply(individualSamples, function(x) {
-            .readSummary(file.path(x@outdir, RESULT_DIR, x@name),
+            .readSummary(file.path(.asRepertoireDir(x),
+                                   RESULT_DIR,
+                                   .asRepertoireName(x)),
                          ABSEQ_FILT_READ_COUNT_KEY)
         }), collapse = ",")
 
         prodReads <- paste(lapply(individualSamples, function(x) {
-            .readSummary(file.path(x@outdir, RESULT_DIR, x@name),
+            .readSummary(file.path(.asRepertoireDir(x),
+                                   RESULT_DIR,
+                                   .asRepertoireName(x)),
                          ABSEQ_PROD_READ_COUNT_KEY)
         }), collapse = ",")
 
         filterSplitter <- "?"
         filters <- paste(lapply(individualSamples, function(x) {
             paste(
-                paste0("Bitscore: ", paste(x@bitscore, collapse = " - ")),
-                paste0("V alignment length: ", paste(x@alignlen, collapse = " - ")),
-                paste0("Query start: ", paste(x@qstart, collapse = " - ")),
-                paste0("Subject start: ", paste(x@sstart, collapse = " - ")),
+                paste0("Bitscore: ", .asRepertoireBitscore(x)),
+                paste0("V alignment length: ", .asRepertoireAlignLen(x)),
+                paste0("Query start: ", .asRepertoireQueryStart(x)),
+                paste0("Subject start: ", .asRepertoireSubjectStart(x)),
                 sep = ","
             )
         }), collapse = filterSplitter)
@@ -285,9 +293,9 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
             filters = filters,
             filterSplitter = filterSplitter,
             analysisParams = file.path(
-                individualSamples[[1]]@outdir,
+                .asRepertoireDir(individualSamples[[1]]),
                 RESULT_DIR,
-                individualSamples[[1]]@name,
+                .asRepertoireName(individualSamples[[1]]),
                 ANALYSIS_PARAMS
             )
         )
@@ -308,6 +316,7 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
 #' https://github.com/rstudio/rmarkdown/issues/499
 #'
 #' @include util.R
+#' @include accessors-AbSeq.R
 #' @include AbSeqRep.R
 #'
 #' @param root string, project root directory.
@@ -323,7 +332,7 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
     if (!dir.exists(reportDir)) {
         dir.create(reportDir)
     } else {
-        warning(paste(reportDir, "found, overriding contents."))
+        warning(reportDir, " found, overriding contents.")
     }
 
     # create nested HTML directory for all html files except index.html
@@ -331,7 +340,7 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
     if (!dir.exists(nestedHTMLdir)) {
         dir.create(nestedHTMLdir)
     } else {
-        warning(paste(nestedHTMLdir, "found, overriding contents."))
+        warning(nestedHTMLdir, " found, overriding contents.")
     }
 
     individualSamples <- list()
@@ -345,7 +354,7 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
         samples <- .loadSamplesFromString(sampleNames, root,
                                           warnMove = TRUE)
         if (length(sampleNames) == 1) {
-            individualSamples[[samples@name]] <- samples
+            individualSamples[[.asRepertoireName(samples)]] <- samples
         }
         pth <- .generateReport(
             samples,
@@ -374,25 +383,26 @@ abseqReport <- function(directory, report, compare, BPPARAM) {
 #'
 #' @include util.R
 #' @include AbSeqRep.R
+#' @include accessors-AbSeq.R
 #'
 #' @param sampleNames vector, singleton or otherwise
 #' @param root string type. root directory
-#' @param warnMove logical type. Warning message if the directory has been
-#' moved?
+#' @param warnMove logical type. Warning message
+#' ("message" level, not "warning" level) if the directory has been moved?
 #'
 #' @return AbSeqRep or AbSeqCRep object depending on sampleNames
 .loadSamplesFromString <- function(sampleNames, root, warnMove = TRUE) {
     Reduce("+", lapply(sampleNames, function(sname) {
         sample <- .loadAbSeqRepFromParams(file.path(root, RESULT_DIR,
                                                     sname, ANALYSIS_PARAMS))
-        if (suppressWarnings(normalizePath(sample@outdir)) !=
+        if (suppressWarnings(normalizePath(.asRepertoireDir(sample))) !=
             suppressWarnings(normalizePath(root))) {
             if (warnMove) {
-                warning(paste("Sample output directory",
-                              sample@outdir,
-                              "is different from provided path",
-                              root,
-                              "assuming directory was moved"))
+                message("Sample output directory ",
+                        .asRepertoireDir(sample),
+                        " is different from provided path ",
+                        root,
+                        ". Assuming directory was moved.")
             }
             sample@outdir <- root
         }

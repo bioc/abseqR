@@ -11,8 +11,8 @@
 
 \item{root}{string type. root directory}
 
-\item{warnMove}{logical type. Warning message if the directory has been
-moved?}
+\item{warnMove}{logical type. Warning message
+("message" level, not "warning" level) if the directory has been moved?}
 }
 \value{
 AbSeqRep or AbSeqCRep object depending on sampleNames
