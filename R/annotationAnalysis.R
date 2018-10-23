@@ -39,10 +39,8 @@
                height = V_HEIGHT)
         .saveAs(.save, fname, g)
     } else {
-        warning(paste(
-            "Cannot find clone length distribution file from samples",
-            paste(sampleNames, collapse = ", ")
-        ))
+        warning("Cannot find clone length distribution file from samples ",
+                paste(sampleNames, collapse = ", "))
     }
 
     # without outliers
@@ -69,12 +67,8 @@
                height = V_HEIGHT)
         .saveAs(.save, fname, g)
     } else {
-        warning(
-            paste(
-                "Cannot find clone length (no outliers)",
-                "distribution file from samples",
-                paste(sampleNames, collapse = ", ")
-            )
-        )
+        warning("Cannot find clone length (no outliers) ",
+                "distribution file from samples ",
+                paste(sampleNames, collapse = ", "))
     }
 }

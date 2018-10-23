@@ -38,15 +38,8 @@
         frames <- length(dataframes)
         # sanity check
         if (length(sampleNames) != frames) {
-            stop(
-                paste(
-                    "Expected equal number of sample names and dataframes, got",
-                    length(sampleNames),
-                    "samples and",
-                    frames,
-                    "dataframes."
-                )
-            )
+            stop("Expected equal number of sample names and dataframes, got ",
+                 length(sampleNames), " samples and ", frames, " dataframes.")
         }
 
         # If there was a cutoff, caps will display the right message,
@@ -218,15 +211,8 @@
                              showLabel = FALSE) {
     nsample <- length(dataframes)
     if (nsample != length(sampleNames)) {
-        stop(
-            paste(
-                "Expected equal number of sample names and dataframes, got",
-                length(sampleNames),
-                "samples and",
-                nsample,
-                "dataframes."
-            )
-        )
+        stop("Expected equal number of sample names and dataframes, got ",
+             length(sampleNames), " samples and ", nsample, " dataframes.")
     }
 
     # pre-processing
@@ -325,15 +311,8 @@
     frames <- length(dataframes)
 
     if (length(sampleNames) != frames) {
-        stop(
-            paste(
-                "Expected equal number of sample names and dataframes, got",
-                length(sampleNames),
-                "samples and",
-                frames,
-                "dataframes."
-            )
-        )
+        stop("Expected equal number of sample names and dataframes, got ",
+             length(sampleNames), " samples and ", frames, " dataframes.")
     }
 
     # add samplename into new "sample" column

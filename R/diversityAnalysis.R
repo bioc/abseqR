@@ -18,21 +18,14 @@
         nsamples <- length(files)
 
         if (nsamples != length(sampleNames)) {
-            stop(
-                paste(
-                    "Expected equal number of sample names and dataframes, got",
-                    length(sampleNames),
-                    "samples and",
-                    nsamples,
-                    "dataframes."
-                )
-            )
+            stop("Expected equal number of sample names and dataframes, got ",
+                 length(sampleNames),
+                 " samples and ",
+                 nsamples, " dataframes.")
         }
 
-        message(paste(
-            "Creating duplication plot for samples",
-            paste(sampleNames, collapse = ", ")
-        ))
+        message("Creating duplication plot for samples ",
+                paste(sampleNames, collapse = ", "))
 
         # read xticks and xlimits from first 2 row
         trimwsNoQuotes <- function(x) {
@@ -118,21 +111,14 @@
         nsamples <- length(files)
         # sanity check
         if (length(sampleNames) != nsamples) {
-            stop(
-                paste(
-                    "Expected equal number of sample names and dataframes, got",
-                    length(sampleNames),
-                    "samples and",
-                    nsamples,
-                    "dataframes."
-                )
-            )
+            stop("Expected equal number of sample names and dataframes, got ",
+                 length(sampleNames),
+                 " samples and ",
+                 nsamples, " dataframes.")
         }
 
-        message(paste(
-            "Creating rarefaction plot for samples",
-            paste(sampleNames, collapse = ", ")
-        ))
+        message("Creating rarefaction plot for samples ",
+                paste(sampleNames, collapse = ", "))
 
         # find the minimum xtick value from all the samples to plot as the
         # max xtick value on the actual graph (i.e. the graph is truncated to the
@@ -243,21 +229,14 @@
         nsamples <- length(files)
         # sanity check
         if (nsamples != length(sampleNames)) {
-            stop(
-                paste(
-                    "Expected equal number of sample names and dataframes, got",
-                    length(sampleNames),
-                    "samples and",
-                    nsamples,
-                    "dataframes."
-                )
-            )
+            stop("Expected equal number of sample names and dataframes, got ",
+                 length(sampleNames),
+                 " samples and ",
+                 nsamples, " dataframes.")
         }
 
-        message(paste(
-            "Creating recapture plot for samples",
-            paste(sampleNames, collapse = ", ")
-        ))
+        message("Creating recapture plot for samples ",
+                paste(sampleNames, collapse = ", "))
 
         # find the minimum xtick value from all the samples to plot as the
         # max xtick value on the actual graph (i.e. the graph is truncated to the
@@ -359,7 +338,7 @@
 #'
 #' @return ggplot2 object
 .regionAnalysis <- function(path, sampleName, top = 15) {
-    message(paste("Starting clonotype region analysis for", sampleName))
+    message("Starting clonotype region analysis for ", sampleName)
 
     df <- read.csv(
         paste0(
@@ -721,10 +700,8 @@
                                sampleNames,
                                mashedNames,
                                .save = TRUE) {
-    message(paste(
-        "Starting diversity analysis on samples",
-        paste(sampleNames, collapse = ", ")
-    ))
+    message("Starting diversity analysis on samples ",
+            paste(sampleNames, collapse = ", "))
 
     # fr/cdr plots --------------------------------------------------------
     # plot duplication, rarefaction, recapture
@@ -749,10 +726,8 @@
         if (!file.exists(compOut)) {
             dir.create(compOut)
         }
-        message(paste(
-            "Plotting composition logos on samples",
-            paste(sampleNames, collapse = ", ")
-        ))
+        message("Plotting composition logos on samples ",
+                paste(sampleNames, collapse = ", "))
         .aminoAcidPlot(compDir, compOut, sampleNames[1])
     }
 
@@ -823,10 +798,8 @@
                    height = V_HEIGHT)
             .saveAs(.save, saveName, g)
         } else {
-            warning(paste(
-                "Could not find", ptype, "files in",
-                paste(diversityDirectories, collapse = ", ")
-            ))
+            warning("Could not find ", ptype, " files in ",
+                    paste(diversityDirectories, collapse = ", "))
         }
     })
 }
@@ -856,10 +829,8 @@
     if (!file.exists(specOut)) {
         dir.create(specOut)
     }
-    message(paste(
-        "Plotting spectratypes on samples",
-        paste(sampleNames, collapse = ", ")
-    ))
+    message("Plotting spectratypes on samples ",
+            paste(sampleNames, collapse = ", "))
 
     regionTypes <- list("cdr" = seq_len(3), "fr" = seq_len(4))
     lapply(seq_along(regionTypes), function(i) {
@@ -887,9 +858,9 @@
                 ggsave(saveName,plot = g, width = V_WIDTH, height = V_HEIGHT)
                 .saveAs(.save, saveName, g)
             } else {
-                warning(paste0("Could not find ", region, j,
-                               " spectratype files in ",
-                               paste(diversityDirectories, collapse = ", ")))
+                warning("Could not find ",
+                        region, j, " spectratype files in ",
+                        paste(diversityDirectories, collapse = ", "))
             }
         })
     })
@@ -910,9 +881,8 @@
         ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
         .saveAs(.save, saveName, g)
     } else {
-        warning(paste(
-            "Could not find CDR3 spectratype (no outlier) files in",
-            paste(diversityDirectories, collapse = ", ")))
+        warning("Could not find CDR3 spectratype (no outlier) files in ",
+                paste(diversityDirectories, collapse = ", "))
     }
 
     # entire V-domain
@@ -929,8 +899,8 @@
         ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
         .saveAs(.save, saveName, g)
     } else {
-        warning(paste("Cound not find V spectratype files in",
-                      paste(diversityDirectories, collapse = ", ")))
+        warning("Cound not find V spectratype files in ",
+                paste(diversityDirectories, collapse = ", "))
     }
 }
 
@@ -957,9 +927,9 @@
                                         pattern = ".*_cdr3_clonotypes_.*_over\\.csv(\\.gz)?$")
 
     if (length(cdr3ClonesFile) != length(sampleNames)) {
-        warning(paste(paste(sampleNames, collapse = ", "),
-                      "is missing CDR3 clonotype counts file,",
-                      "skipping LBE and IND analysis" ))
+        warning(paste(sampleNames, collapse = ", "),
+                " is missing CDR3 clonotype counts file, ",
+                "skipping LBE and IND analysis.")
         return()
     }
 
@@ -994,18 +964,19 @@
                 # if even one of the tsv file doesn't exist
                 # (which means we haven't generated it, or if it was deleted,
                 # we re-generate them)
-                message(paste("Calculating",
-                              sub("_", " ", fileNameSansExt, fixed = TRUE),
-                              "for", paste(sampleNames, collapse = ", ")))
+                message("Calculating ",
+                        sub("_", " ", fileNameSansExt, fixed = TRUE),
+                        " for ",
+                        paste(sampleNames, collapse = ", "))
                 df.ests <- lapply(dataframes, functor)
             } else {
                 # the rare occasion when all individual samples have already been
                 # analyzed and the TSVs are all available, we only need to reload
                 # them rather than re-computing the values
-                message(paste("Loading precomputed",
-                              sub("_", " ", fileNameSansExt, fixed = TRUE),
-                              "from",
-                              paste(sampleNames, collapse = ", ")))
+                message("Loading precomputed ",
+                        sub("_", " ", fileNameSansExt, fixed = TRUE),
+                        " from ",
+                        paste(sampleNames, collapse = ", "))
                 df.ests <- lapply(files, read.table, header = TRUE)
             }
             stopifnot(length(diversityDirectories) == length(sampleNames) &&
@@ -1017,8 +988,7 @@
                         row.names = FALSE)
 
         } else {
-            message(paste0("Found ", names(estimateTypes)[[i]],
-                           ", skipping ..."))
+            message("Found ", names(estimateTypes)[[i]], ", skipping ...")
         }
     })
 }

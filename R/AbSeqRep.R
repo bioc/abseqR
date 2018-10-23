@@ -553,10 +553,9 @@ setMethod(
                 unlist(lapply(object@repertoires, function(x) {
                     x@name
                 }))
-            message(paste(
-                "Generating HTML report for",
-                paste(sampleNames, collapse = "_vs_")
-            ))
+
+            message("Generating HTML report for ",
+                    paste(sampleNames, collapse = "_vs_"))
 
             # get all analyses conducted by each repertoire by looking
             # at the directory structure created by abseqPy
@@ -665,7 +664,7 @@ setMethod(
                           interactivePlot = TRUE,
                           .indexHTML = "#") {
         if (rmarkdown::pandoc_available()) {
-            message(paste("Generating HTML report for", object@name))
+            message("Generating HTML report for ", object@name)
             analysisDirectory = file.path(object@outdir, RESULT_DIR, object@name)
             analyses <-
                 unlist(.inferAnalyzed(analysisDirectory))

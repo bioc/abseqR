@@ -14,23 +14,16 @@
     nsamples <- length(dataframes)
 
     if (nsamples != length(sampleNames)) {
-        stop(
-            paste(
-                "Expected equal number of sample names and dataframes, got",
-                length(sampleNames),
-                "samples and",
-                nsamples,
-                "dataframes."
-            )
-        )
+        stop("Expected equal number of sample names and dataframes, got ",
+             length(sampleNames),
+             " samples and ",
+             nsamples, " dataframes.")
     }
 
-    message(paste(
-        "Plotting top",
-        top,
-        "clonotype distribution for samples",
-        paste(sampleNames, collapse = ", ")
-    ))
+    message("Plotting top ",
+            top,
+            " clonotype distribution for samples ",
+            paste(sampleNames, collapse = ", "))
 
     # --- cleanup & pre-processing ---
     colNames <- c("Clonotype", "Count")
@@ -85,12 +78,8 @@
         "coral2"
     )
     if (length(unique(df.union$Clonotype)) > 30) {
-        warning(
-            paste0(
-                "Too many unique clonotypes are being plotted",
-                " - extrapolatingpalette for top10 clonotype dist plot."
-            )
-        )
+        warning("Too many unique clonotypes are being plotted",
+                " - extrapolating palette for top10 clonotype dist plot.")
         getPalatte <- colorRampPalette(brewer.pal(8, 'Accent'))
         palette <- getPalatte(length(unique(df.union$Clonotype)))
     }
@@ -131,7 +120,7 @@
 #'
 #' @return ggplot2 object
 .scatterPlot <- function(df1, df2, name1, name2, cloneClass) {
-    message(paste("Generating scatter plot for", name1, "and", name2))
+    message("Generating scatter plot for ", name1, " and ", name2)
 
     df.union <-
         merge(df1,
@@ -195,7 +184,7 @@
              name1,
              name2,
              cloneClass) {
-        message(paste("Generating scatter plot for", name1, "and", name2))
+        message("Generating scatter plot for ", name1, " and ", name2)
 
         # find what the smallest percentage is so we know what to use as the
         # minimum (since log10(0) wont cut it)
@@ -391,23 +380,16 @@
         nsample <- length(dataframes)
 
         if (nsample != length(sampleNames)) {
-            stop(
-                paste(
-                    "Expected equal number of sample names and dataframes, got",
-                    length(sampleNames),
-                    "samples and",
-                    nsample,
-                    "dataframes."
-                )
-            )
+            stop("Expected equal number of sample names and dataframes, got ",
+                 length(sampleNames),
+                 " samples and ",
+                 nsample, " dataframes.")
         }
 
         if (nsample >= 2 && nsample <= 5) {
             # output
-            message(paste(
-                "Creating Venn diagram for samples",
-                paste(sampleNames, collapse = ", ")
-            ))
+            message("Creating Venn diagram for samples ",
+                    paste(sampleNames, collapse = ", "))
             png(
                 filename = outFile,
                 width = 8,
@@ -647,13 +629,10 @@
             dev.off()
         } else {
             # TODO: use heatmap when samples > 5 (calculate similarity distance)
-            warning(
-                paste(
-                    "Skipping venn diagram plot for",
+            warning("Skipping venn diagram plot for ",
                     paste(sampleNames, collapse = ", "),
-                    "because they do not fall within the range of 2 <= x <= 5"
-                )
-            )
+                    ". Venn diagrams are not supported for comaprisons of ",
+                    "more than 5 samples.")
         }
     }
 
@@ -839,10 +818,10 @@
                                sampleNames,
                                mashedNames,
                                .save = TRUE) {
-    message(paste(
-        "Starting clonotype analysis on samples",
-        paste(sampleNames, collapse = ",")
-    ))
+
+    message("Starting clonotype analysis on samples ",
+            paste(sampleNames, collapse = ", "))
+
     cdr3ClonesFile <- .listFilesInOrder(path = diversityDirectories,
                                         pattern = ".*_cdr3_clonotypes_.*_over\\.csv(\\.gz)?$")
     if (length(cdr3ClonesFile) == length(sampleNames)) {
@@ -870,11 +849,12 @@
                height = V_HEIGHT_L)
         .saveAs(.save, saveName, g)
     } else {
-        warning(paste("Skipping clonotype analysis for",
-                      paste(sampleNames, collpse = ", "),
-                      ", can't find required CSVs, expected",
-                      length(sampleNames),
-                      "but got",
-                      length(cdr3ClonesFile), "instead."))
+        warning("Skipping clonotype analysis for ",
+                paste(sampleNames, collpse = ", "),
+                ", can't find required CSVs, expected ",
+                length(sampleNames),
+                " but got ",
+                length(cdr3ClonesFile),
+                " instead.")
     }
 }

@@ -81,7 +81,8 @@
                             combinedNames,
                             mashedNames,
                             .save = TRUE) {
-    message(paste("Starting primer analysis for", combinedNames))
+
+    message("Starting primer analysis for ", combinedNames)
 
     primer5 <- .commonPrimerNames(primer5Files)
     primer3 <- .commonPrimerNames(primer3Files)
@@ -99,12 +100,13 @@
             # get vector of primer names
             primerNames <- allPrimers[[i]]
             pend <- names(allPrimers)[[i]]
-            message(paste("Primers found across all samples",
-                          combinedNames,
-                          "for",
-                          paste0(pend, "'"),
-                          "end are: ",
-                          paste(primerNames, collapse = ", ")))
+            message("Primers found across all samples ",
+                   combinedNames,
+                   " for ",
+                   pend,
+                    "'",
+                   " end are: ",
+                   paste(primerNames, collapse = ", "))
 
             lapply(X = primerNames, FUN = .plotPrimerIGVStatus, pend, ctg,
                    primerDirectories, sampleNames,
