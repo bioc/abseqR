@@ -44,6 +44,7 @@ Imports:
 VignetteBuilder: knitr
 RoxygenNote: 6.1.0
 Collate: 
+    'accessors-AbSeq.R'
     'AbSeqCRep.R'
     'util.R'
     'distributions.R'
