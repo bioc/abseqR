@@ -90,10 +90,6 @@
 #' abseqPyOutput <- tempdir()
 #' file.copy(system.file("extdata", "ex", package = "abseqR"), abseqPyOutput, recursive=TRUE)
 #' samples <- abseqReport(file.path(abseqPyOutput, "ex"), report = 0)
-#'
-#'
-#' # gives the name of the first repertoire object returned by abseqReport
-#' # samples[[1]]@name
 AbSeqRep <- setClass(
     "AbSeqRep",
     slots = c(
@@ -205,6 +201,7 @@ setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqRep"), function(e1, e2) {
 #' a \linkS4class{AbSeqRep} object together for comparison
 #'
 #' @include AbSeqCRep.R
+#' @include accessors-AbSeq.R
 #'
 #' @param e1 AbSeqCRep.
 #' @param e2 AbSeqRep.
@@ -235,13 +232,14 @@ setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqRep"), function(e1, e2) {
 #' # you can now call the report function on this object
 #' # report(pcr123)           # uncomment this line to execute report
 setMethod("+", signature(e1 = "AbSeqCRep", e2 = "AbSeqRep"), function(e1, e2) {
-    new("AbSeqCRep", repertoires = unique(c(e1@repertoires, e2)))
+    new("AbSeqCRep", repertoires = unique(c(.asRepertoireList(e1), e2)))
 })
 
 #' Combines a \linkS4class{AbSeqRep} object with
 #' a \linkS4class{AbSeqCRep} object together for comparison
 #'
 #' @include AbSeqCRep.R
+#' @include accessors-AbSeq.R
 #'
 #' @param e1 AbSeqRep.
 #' @param e2 AbSeqCRep.
@@ -272,7 +270,7 @@ setMethod("+", signature(e1 = "AbSeqCRep", e2 = "AbSeqRep"), function(e1, e2) {
 #' # you can now call the report function on this object
 #' # report(pcr123)           # uncomment this line to execute report
 setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqCRep"), function(e1, e2) {
-    new("AbSeqCRep", repertoires = unique(c(e1, e2@repertoires)))
+    new("AbSeqCRep", repertoires = unique(c(e1, .asRepertoireList(e2))))
 })
 
 #' Plots \linkS4class{AbSeqRep} or
@@ -294,6 +292,7 @@ setMethod("+", signature(e1 = "AbSeqRep", e2 = "AbSeqCRep"), function(e1, e2) {
 #'
 #' @include util.R
 #' @include plotter.R
+#' @include accessors-AbSeq.R
 #' @include AbSeqCRep.R
 #'
 #' @param object AbSeqRep or AbSeqCRep object to plot.
@@ -381,16 +380,17 @@ setMethod(
         }
 
         if (!skip) {
-            analysisDirectories = c(file.path(object@outdir,
-                                              RESULT_DIR, object@name))
+            analysisDirectories = c(file.path(.asRepertoireDir(object),
+                                              RESULT_DIR,
+                                              .asRepertoireName(object)))
             # get analysis that were conducted by looking at the directory
             # structure
             analyses <-
                 unlist(.inferAnalyzed(analysisDirectories[1]))
-            sampleNames <- c(object@name)
-            primer5Files <- list(object@primer5end)
-            primer3Files <- list(object@primer3end)
-            upstreamRanges <- list(object@upstream)
+            sampleNames <- .asRepertoireName(object)
+            primer5Files <- list(.asRepertoirePrimer5(object))
+            primer3Files <- list(.asRepertoirePrimer3(object))
+            upstreamRanges <- list(.asRepertoireUpstream(object))
 
             .plotSamples(
                 sampleNames,
@@ -400,7 +400,7 @@ setMethod(
                 primer5Files,
                 primer3Files,
                 upstreamRanges,
-                skipDgene = (object@chain != "hv")
+                skipDgene = (.asRepertoireChain(object) != "hv")
             )
 
             if (report) {
@@ -415,7 +415,7 @@ setMethod(
 
         # to be consistent with the return value of abseqR::abseqReport()
         lst <- list()
-        lst[[object@name]] <- object
+        lst[[.asRepertoireName(object)]] <- object
         return(lst)
     }
 )
@@ -443,15 +443,18 @@ setMethod(
         }
 
         sampleNames <-
-            unlist(lapply(object@repertoires, function(x) {
-                x@name
-            }))
+            unlist(lapply(.asRepertoireList(object), .asRepertoireName))
 
         if (!skip) {
-            analysisDirectories <- unlist(lapply(object@repertoires, function(x) {
-                # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
-                file.path(x@outdir, RESULT_DIR, x@name)
-            }))
+            analysisDirectories <- unlist(
+                lapply(
+                    .asRepertoireList(object), function(x) {
+                        # /a/b/c/RESULT_DIR/sample_name has
+                        # all the analysis folders
+                        file.path(.asRepertoireDir(x),
+                                  RESULT_DIR,
+                                  .asRepertoireName(x))
+                    }))
 
             # get all analyses conducted by each repertoire by looking
             # at the directory structure created by abseqPy
@@ -463,23 +466,16 @@ setMethod(
 
 
             primer5Files <-
-                unlist(lapply(object@repertoires, function(x) {
-                    x@primer5end
-                }))
+                unlist(lapply(.asRepertoireList(object), .asRepertoirePrimer5))
+
             primer3Files <-
-                unlist(lapply(object@repertoires, function(x) {
-                    x@primer3end
-                }))
+                unlist(lapply(.asRepertoireList(object), .asRepertoirePrimer3))
 
-            upstreamRanges <- lapply(object@repertoires,
-                                     function(x) {
-                                         x@upstream
-                                     })
+            upstreamRanges <- lapply(.asRepertoireList(object),
+                                     .asRepertoireUpstream)
 
-            allChains <-
-                lapply(object@repertoires, function(x) {
-                    x@chain
-                })
+            allChains <- lapply(.asRepertoireList(object), .asRepertoireChain)
+
             # only include D gene plots if all chains only contain "hv"
             skipD <- (("kv" %in% allChains) || ("lv" %in% allChains))
 
@@ -504,7 +500,7 @@ setMethod(
             }
         }
 
-        lst <- object@repertoires
+        lst <- .asRepertoireList(object)
         names(lst) <- sampleNames
         return(lst)
     }
@@ -516,6 +512,7 @@ setMethod(
 #'
 #' @importFrom rmarkdown pandoc_available render
 #' @include util.R
+#' @include accessors-AbSeq.R
 #'
 #' @param object AbSeqCRep type.
 #' @param root string type. Root directory of the sample(s)
@@ -545,18 +542,18 @@ setMethod(
                           interactivePlot = TRUE,
                           .indexHTML = "#") {
         if (rmarkdown::pandoc_available()) {
-            analysisDirectories = unlist(lapply(object@repertoires, function(x) {
-                # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
-                file.path(x@outdir, RESULT_DIR, x@name)
-            }))
+            analysisDirectories = unlist(
+                lapply(
+                    .asRepertoireList(object), function(x) {
+                        # /a/b/c/RESULT_DIR/sample_name has all the analysis folders
+                        file.path(.asRepertoireDir(x), RESULT_DIR, .asRepertoireName(x))
+                    }))
+
             sampleNames <-
-                unlist(lapply(object@repertoires, function(x) {
-                    x@name
-                }))
-            message(paste(
-                "Generating HTML report for",
-                paste(sampleNames, collapse = "_vs_")
-            ))
+                unlist(lapply(.asRepertoireList(object), .asRepertoireName))
+
+            message("Generating HTML report for ",
+                    paste(sampleNames, collapse = "_vs_"))
 
             # get all analyses conducted by each repertoire by looking
             # at the directory structure created by abseqPy
@@ -568,30 +565,25 @@ setMethod(
 
             # define variables for template.Rmd's param list
             allChains <-
-                lapply(object@repertoires, function(x) {
-                    x@chain
-                })
+                lapply(.asRepertoireList(object), .asRepertoireChain)
+
             # only include D gene plots if all chains only contain "hv"
             includeD <- !(("kv" %in% allChains) || ("lv" %in% allChains))
 
 
             # template.Rmd param list
             bitFilters <-
-                lapply(object@repertoires, function(x) {
-                    paste(x@bitscore, collapse = " - ")
-                })
+                lapply(.asRepertoireList(object), .asRepertoireBitscore)
+
             alFilters <-
-                lapply(object@repertoires, function(x) {
-                    paste(x@alignlen, collapse = " - ")
-                })
+                lapply(.asRepertoireList(object), .asRepertoireAlignLen)
+
             ssFilters <-
-                lapply(object@repertoires, function(x) {
-                    paste(x@sstart, collapse = " - ")
-                })
+                lapply(.asRepertoireList(object), .asRepertoireSubjectStart)
+
             qsFilters <-
-                lapply(object@repertoires, function(x) {
-                    paste(x@qstart, collapse = " - ")
-                })
+                lapply(.asRepertoireList(object), .asRepertoireQueryStart)
+
             rawReadCounts <- lapply(X = analysisDirectories,
                                     FUN = .readSummary,
                                     ABSEQ_RAW_READ_COUNT_KEY)
@@ -665,18 +657,18 @@ setMethod(
                           interactivePlot = TRUE,
                           .indexHTML = "#") {
         if (rmarkdown::pandoc_available()) {
-            message(paste("Generating HTML report for", object@name))
-            analysisDirectory = file.path(object@outdir, RESULT_DIR, object@name)
+            message("Generating HTML report for ", .asRepertoireName(object))
+            analysisDirectory = file.path(.asRepertoireDir(object),
+                                          RESULT_DIR,
+                                          .asRepertoireName(object))
             analyses <-
                 unlist(.inferAnalyzed(analysisDirectory))
 
             # define parameters for template.Rmd's param list
-            bitFilter <-
-                paste(object@bitscore, collapse = " - ")
-            qsFilter <- paste(object@qstart, collapse = " - ")
-            ssFilter <- paste(object@sstart, collapse = " - ")
-            alFilter <-
-                paste(object@alignlen, collapse = " - ")
+            bitFilter <- .asRepertoireBitscore(object)
+            qsFilter <- .asRepertoireQueryStart(object)
+            ssFilter <- .asRepertoireSubjectStart(object)
+            alFilter <- .asRepertoireAlignLen(object)
             rawReadCount <- .readSummary(analysisDirectory,
                                          ABSEQ_RAW_READ_COUNT_KEY)
             annotReadCount <- .readSummary(analysisDirectory,
@@ -692,12 +684,12 @@ setMethod(
                 rootDir = normalizePath(root),
                 single = TRUE,
                 interactive = interactivePlot,
-                inclD = (object@chain == "hv"),
+                inclD = (.asRepertoireChain(object) == "hv"),
                 hasAnnot = (ABSEQ_DIR_ANNOT %in% analyses),
                 hasAbun = (ABSEQ_DIR_ABUN %in% analyses),
                 hasProd = (ABSEQ_DIR_PROD %in% analyses),
                 hasDiv = (ABSEQ_DIR_DIV %in% analyses),
-                name = object@name,
+                name = .asRepertoireName(object),
                 bitfilters = bitFilter,
                 qstartfilters = qsFilter,
                 sstartfilters = ssFilter,
@@ -714,8 +706,8 @@ setMethod(
             # as a safety measure, rename the template.Rmd file to
             # sample name so that the cache will not clash with other
             # samples it it wasn't cleared in time
-            tmpTemplate <-
-                file.path(outputDir, paste0(object@name, ".Rmd"))
+            tmpTemplate <- file.path(outputDir,
+                                     paste0(.asRepertoireName(object), ".Rmd"))
             file.copy(
                 system.file("extdata", "template.Rmd", package = "abseqR"),
                 tmpTemplate,

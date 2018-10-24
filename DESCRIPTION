@@ -15,7 +15,7 @@ License: GPL-3 | file LICENSE
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.5.0)
-Imports: 
+Imports:
     ggplot2,
     RColorBrewer,
     circlize,
@@ -43,7 +43,8 @@ Imports:
     graphics
 VignetteBuilder: knitr
 RoxygenNote: 6.1.0
-Collate: 
+Collate:
+    'accessors-AbSeq.R'
     'AbSeqCRep.R'
     'util.R'
     'distributions.R'
@@ -66,3 +67,4 @@ biocViews: Sequencing,
     ReportWriting,
     QualityControl,
     MultipleComparison
+Suggests: testthat

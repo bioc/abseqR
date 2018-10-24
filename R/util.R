@@ -99,8 +99,10 @@ ABSEQ_PROD_READ_COUNT_KEY <- "ProductiveReads"
             return(c())
         }
         if (!(length(retval) %in% expectedRet)) {
-            stop(paste("Expected either",paste(expectedRet, collapse = ", ")),
-                "files to be found, but only", length(retval), "were found.")
+            stop("Expected either ", paste(expectedRet, collapse = ", "),
+                 " files to be found, but only ",
+                 length(retval),
+                 " were found.")
         }
         orderedFiles <- c(orderedFiles,  retval)
     }

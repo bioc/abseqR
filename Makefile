@@ -21,7 +21,7 @@ vignette:
 	rm -rf vignettes/ex/ vignettes/refined_comparison/
 
 clean:
-	rm -rf vignettes/ex/ vignettes/refined_comparison/ vignettes/abseqR.html
+	rm -f tests/testthat/Rplots.pdf vignettes/abseqR.html
 
 help:
 	@echo -e "Available commands:"

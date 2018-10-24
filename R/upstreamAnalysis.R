@@ -20,7 +20,7 @@
     function(upstreamDirectories, upstreamOut, expectedLength,
              upstreamLengthRange, sampleNames,
              combinedNames, mashedNames, .save = TRUE) {
-        message(paste("Plotting upstream distributions for", combinedNames))
+        message("Plotting upstream distributions for ", combinedNames)
 
         # full lengthed upstream sequences and upstream seqs
         # that are shorter than the expected length
@@ -76,7 +76,7 @@
                                      sampleNames, combinedNames, mashedNames,
                                      .save = TRUE) {
 
-    message(paste("Starting upstream analysis on", combinedNames))
+    message("Starting upstream analysis on ", combinedNames)
 
     if (!is.infinite(expectedLength)) {
         lapply(c("gene", "family"), function(lvl) {
@@ -131,9 +131,12 @@
                     ggsave(saveName, plot = g, width = width, height = height)
                     .saveAs(.save, saveName, plot = g)
                 } else {
-                    warning(paste("Could not find", status,
-                                  "distribution for", lvl,
-                                  "for", combinedNames))
+                    warning("Could not find ",
+                            status,
+                            " distribution for ",
+                            lvl,
+                            " for ",
+                            combinedNames)
                 }
             })
         })
@@ -164,7 +167,7 @@
                           mashedNames,
                           upstreamRanges,
                           .save = TRUE) {
-    message(paste("Starting 5'UTR analysis on samples", combinedNames))
+    message("Starting 5'UTR analysis on samples ", combinedNames)
     upstreamRange <- unique(upstreamRanges)
     if (length(upstreamRange) == 1 && is.numeric(upstreamRange[[1]])) {
         upRange <- upstreamRange[[1]]
@@ -172,8 +175,8 @@
         END <- 2
 
         if (length(upRange) != 2) {
-            stop(paste("Expected range to only have start and",
-                       "stop values, but got", upRange, "instead"))
+            stop("Expected range to only have start and stop values, but got ",
+                 upRange, " instead.")
         }
 
         expectedLength <-
@@ -195,11 +198,13 @@
                                  mashedNames, .save = .save)
 
     } else if (length(upstreamRange) > 1) {
-        warning(paste("Found multiple different upstream ranges for samples",
-                      combinedNames, ":", upstreamRange,
-                      "Will not plot comparisons."))
+        warning("Found multiple different upstream ranges for samples ",
+                combinedNames,
+                ": ",
+                upstreamRange,
+                ". Will not plot comparisons.")
     } else {
-        warning(paste("UpstreamRange is not numeric for sample", combinedNames))
+        warning("UpstreamRange is not numeric for sample ", combinedNames)
     }
 }
 
@@ -230,10 +235,7 @@
              mashedNames,
              upstreamRanges,
              .save = TRUE) {
-        message(paste(
-            "Starting secretion signal analysis on samples",
-            combinedNames
-        ))
+        message("Starting secretion signal analysis on samples ", combinedNames)
         upstreamRange <- unique(upstreamRanges)
         if (length(upstreamRange) == 1 && is.numeric(upstreamRange[[1]])) {
 
@@ -242,8 +244,8 @@
             END <- 2
 
             if (length(upRange) != 2) {
-                stop(paste("Expected range to only have start and stop",
-                           "values, but got", upRange, "instead"))
+                stop("Expected range to only have start and stop values,",
+                     " but got ", upRange, " instead.")
             }
 
             expectedLength <-
@@ -271,12 +273,13 @@
             }
 
         } else if (length(upstreamRange) > 1) {
-            warning(paste("Found multiple different upstream ranges",
-                          "for samples", combinedNames, ":", upstreamRange,
-                          "Will not plot comparisons."))
+            warning("Found multiple different upstream ranges for samples ",
+                    combinedNames,
+                    ": ",
+                    upstreamRange,
+                    ". Will not plot comparisons.")
         } else {
-            warning(paste("UpstreamRange is not numeric for sample",
-                          combinedNames))
+            warning("UpstreamRange is not numeric for sample ", combinedNames)
         }
     }
 
@@ -330,9 +333,10 @@
         ggsave(saveName , plot = g, width = V_WIDTH, height = V_HEIGHT)
         .saveAs(.save, saveName, plot = g)
     } else {
-        warning(paste("Can't find upstream dist file for range",
-                      upstreamLengthRange, "for samples",
-                      combinedNames))
+        warning("Can't find upstream dist file for range ",
+                 upstreamLengthRange,
+                " for samples ",
+                 combinedNames)
     }
 }
 
@@ -407,8 +411,7 @@
                width = plotWidth, height = plotHeight)
         .saveAs(.save, saveName, plot = g)
     } else {
-        warning(paste("Can't find upstream dist file for samples",
-                      combinedNames))
+        warning("Can't find upstream dist file for samples ", combinedNames)
     }
 }
 
@@ -468,7 +471,6 @@
         ggsave(saveName, plot = g, width = V_WIDTH, height = V_HEIGHT)
         .saveAs(.save, saveName, plot = g)
     } else {
-        warning(paste("Can't find upstream dist files for samples",
-                      combinedNames))
+        warning("Can't find upstream dist files for samples ", combinedNames)
     }
 }

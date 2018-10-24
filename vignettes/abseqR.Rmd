@@ -35,7 +35,7 @@ read_png <- function(path) {
         #rasterGrob(as.raster(readPNG(path)), interpolate = TRUE)
         knitr::include_graphics(path)
     } else {
-        stop("File at", path, "not found, fatal.")
+        stop("File at ", path, " not found, fatal.")
     }
 }
 
@@ -262,7 +262,7 @@ samples <- abseqReport(dataPath,
                        report = 1,
                        BPPARAM = BPPARAM)
 
-# ignore the warning message:
+# ignore the message:
 # "Sample output directory <path> is different from provided path
 #   <path> assuming directory was moved"
 # This warning message tells us that the directory has
