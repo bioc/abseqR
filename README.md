@@ -65,7 +65,7 @@ This will generate an interctive report of the analysis results. Please refer to
 and collates the results into an interactive HTML report.
 
 <div align="center">
-<img src="images/abseq_gif.gif" width=400 height=300>
+    <img src="images/abseq_gif.gif" width=791 height=474>
 </div>
 
 Additional plots along with documentation can be found in `abseqR`'s main vignette.
