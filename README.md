@@ -64,7 +64,7 @@ This will generate an interctive report of the analysis results. Please refer to
 `abseqR` generates numerous plots for the quality control analysis of antibody libraries
 and collates the results into an interactive HTML report.
 
-![](images/abseq_gif3.gif)
+<img src="images/abseq_gif3.gif" style="width:250px;height:250px;"/>
 
 Additional plots along with documentation can be found in `abseqR`'s main vignette.
 
