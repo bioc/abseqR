@@ -62,25 +62,9 @@ This will generate an interctive report of the analysis results. Please refer to
 ## Features
 
 `abseqR` generates numerous plots for the quality control analysis of antibody libraries
-and collates the results into an interactive HTML report. Here are some examples:
+and collates the results into an interactive HTML report.
 
-<br/>
-<br/>
-
-__V-(D)-J germline abundance__                                   | __Diversity estimation__
-:---------------------------------------------------------------:|:--------------------------------------------------:
-![VDJ Germline abundance](images/PCR1_igv_dist_family_level.png) | ![CDR duplication](images/PCR1_cdr_duplication.png)
-
-<br/>
-<br/>
-
-__Productivity analysis__                             | __Clonotype analysis__
-:----------------------------------------------------:|:---------------------------------------------------------------:
-![Productivity summary](images/PCR1_productivity.png) | <img src="images/PCR1_vs_PCR2_clone_scatter.png" width="2000" alt="clonotype_scatterplot"/>
-
-
-<br/>
-<br/>
+![](images/abseq_gif3.gif)
 
 Additional plots along with documentation can be found in `abseqR`'s main vignette.
 
