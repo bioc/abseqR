@@ -6,8 +6,8 @@ author:
 
 package: "abseqR"
 output:
-    BiocStyle::html_document: default
-    BiocStyle::pdf_document:
+    BiocStyle::pdf_document: default
+    BiocStyle::html_document:
 vignette: >
     %\VignetteIndexEntry{Introduction to abseqR}
     %\VignetteEngine{knitr::rmarkdown}
@@ -33,7 +33,10 @@ sabseq <- function() { return("`AbSeq`"); }
 read_png <- function(path) {
     if (file.exists(path)) {
         #rasterGrob(as.raster(readPNG(path)), interpolate = TRUE)
-        knitr::include_graphics(path)
+        # in windows, the path is \ but LaTEX does not appreciate these slashes
+        knitr::include_graphics(gsub("\\", "/",
+                                     normalizePath(path),
+                                     fixed = TRUE))
     } else {
         stop("File at ", path, " not found, fatal.")
     }
