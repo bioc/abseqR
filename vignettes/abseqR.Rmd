@@ -111,11 +111,12 @@ BiocManager::install("abseqR")
 
 ## GitHub
 
-To install `r sabseqR()` from its GitHub repository, type in R console:
+To install the development version of `r sabseqR()` from GitHub,
+type in R console:
 ```r
-if (!require("devtools"))
-    install.packages("devtools")
-devtools::install_github("malhamdoosh/abseqR")
+if (!require("BiocManager"))
+    install.packages("BiocManager")
+BiocManager::install("malhamdoosh/abseqR")
 ```
 
 ## System prerequisites

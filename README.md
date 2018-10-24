@@ -30,7 +30,8 @@ system's `PATH` variable, it will not be able to generate a collated HTML report
 
 #### Install from Bioconductor
 
-As soon as `abseqR` is available in the [Bioconductor](http://bioconductor.org/) project, it can be installed from R console as follows:
+As soon as `abseqR` is available in the [Bioconductor](http://bioconductor.org/)
+project, it can be installed from R console as follows:
 ```r
 if (!require("BiocManager"))
     install.packages("BiocManager")
@@ -39,11 +40,12 @@ BiocManager::install("abseqR")
 
 #### Install from GitHub
 
-It is also possible to directly install `abseqR` from GitHub via `devtools` by running the following commands in R Console:
+To install the development version of `abseqR`
+from GitHub, type the following commands in R Console:
 ```r
-if (!require("devtools"))
-    install.packages("devtools")
-devtools::install_github("malhamdoosh/abseqR")
+if (!require("BiocManager"))
+    install.packages("BiocManager")
+BiocManager::install("malhamdoosh/abseqR")
 ```
 
 ## Quick start
