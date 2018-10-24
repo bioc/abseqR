@@ -200,7 +200,7 @@
                     type = "bar",
                     color = I("DarkBlue")
                 ),
-                plotly_empty(),
+                plotly_empty(type = "scatter"),
                 plot_ly(
                     x = as.numeric(colnames(m)),
                     y = as.numeric(rownames(m)),
