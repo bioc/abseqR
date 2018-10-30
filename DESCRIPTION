@@ -1,7 +1,7 @@
 Package: abseqR
 Type: Package
 Title: Reporting and data analysis functionalities for Rep-Seq datasets of antibody libraries
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: c(
     person("JiaHong", "Fong", email = "jiahfong@gmail.com", role = c("cre", "aut")),
     person("Monther", "Alhamdoosh", email = "m.hamdoosh@gmail.com", role = "aut"))
